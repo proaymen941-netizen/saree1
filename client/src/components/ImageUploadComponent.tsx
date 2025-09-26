@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Upload, Image as ImageIcon, Loader2, X, Eye, Download, Trash2 } from 'lucide-react';
+import { Upload, Image as ImageIcon, Loader as Loader2, X, Eye, Download, Trash2 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 interface ImageUploadComponentProps {
@@ -116,6 +116,29 @@ export default function ImageUploadComponent({
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (!files || files.length === 0) return;
+
+    // التحقق من توفر خدمة رفع الصور
+    try {
+      const testResponse = await fetch('/api/images/upload', {
+        method: 'HEAD'
+      });
+      
+      if (!testResponse.ok) {
+        toast({
+          title: "خدمة رفع الصور غير متوفرة",
+          description: "يرجى إدخال رابط الصورة يدوياً",
+          variant: "destructive",
+        });
+        return;
+      }
+    } catch (error) {
+      toast({
+        title: "خدمة رفع الصور غير متوفرة",
+        description: "يرجى إدخال رابط الصورة يدوياً",
+        variant: "destructive",
+      });
+      return;
+    }
 
     setIsUploading(true);
     setUploadProgress(0);

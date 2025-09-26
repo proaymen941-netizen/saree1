@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Upload, Image as ImageIcon, Loader2, X } from 'lucide-react';
+import { Upload, Image as ImageIcon, Loader as Loader2, X } from 'lucide-react';
 
 interface ImageUploadProps {
   label: string;
@@ -31,6 +31,20 @@ export default function ImageUpload({
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
+
+    // التحقق من توفر خدمة رفع الصور
+    const response = await fetch('/api/images/upload', {
+      method: 'HEAD'
+    });
+    
+    if (!response.ok) {
+      toast({
+        title: "خدمة رفع الصور غير متوفرة",
+        description: "يرجى إدخال رابط الصورة يدوياً",
+        variant: "destructive",
+      });
+      return;
+    }
 
     // Validate file type
     if (!file.type.startsWith('image/')) {
