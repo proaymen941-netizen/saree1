@@ -102,7 +102,7 @@ export const drivers = pgTable("drivers", {
 // Orders table
 export const orders = pgTable("orders", {
   id: uuid("id").primaryKey().defaultRandom(),
-  orderNumber: varchar("order_number", { length: 50 }).notNull().unique(),
+  orderNumber: varchar("order_number", { length: 50 }),
   customerName: varchar("customer_name", { length: 100 }).notNull(),
   customerPhone: varchar("customer_phone", { length: 20 }).notNull(),
   customerEmail: varchar("customer_email", { length: 100 }),

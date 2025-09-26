@@ -77,8 +77,14 @@ app.use((req, res, next) => {
 (async () => {
   try {
     // إعداد Supabase buckets
-    log('🪣 إعداد buckets التخزين في Supabase...');
-    await ensureBucketsExist();
+    log('🪣 محاولة إعداد buckets التخزين في Supabase...');
+    try {
+      await ensureBucketsExist();
+      log('✅ تم إعداد Supabase بنجاح');
+    } catch (supabaseError) {
+      log('⚠️ تعذر إعداد Supabase. سيعمل التطبيق بدون خدمة رفع الصور.');
+      console.error('Supabase setup error:', supabaseError);
+    }
     
     const server = await registerRoutes(app);
 

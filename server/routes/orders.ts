@@ -39,7 +39,7 @@ router.post("/", async (req, res) => {
     }
 
     // إنشاء رقم طلب فريد
-    const orderNumber = `ORD-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const orderNumber = `ORD${Date.now()}${Math.floor(Math.random() * 1000)}`;
 
     // التأكد من أن العناصر هي JSON string
     let itemsString;

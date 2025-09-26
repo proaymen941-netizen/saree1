@@ -40,7 +40,11 @@ function generateUniqueFilename(originalName: string, category: string): string 
 }
 
 // التأكد من إنشاء buckets عند بدء الخادم
-ensureBucketsExist().catch(console.error);
+if (supabaseClient) {
+  ensureBucketsExist().catch(console.error);
+} else {
+  console.log('⚠️ Supabase غير متوفر. سيتم تعطيل خدمة رفع الصور.');
+}
 
 // دالة التحقق من صحة الصورة
 function validateImageFile(file: Express.Multer.File): string | null {
@@ -66,6 +70,14 @@ function validateImageFile(file: Express.Multer.File): string | null {
 // رفع صورة واحدة إلى Supabase
 router.post('/upload', upload.single('image'), async (req, res) => {
   try {
+    // التحقق من توفر خدمة Supabase
+    if (!supabaseClient) {
+      return res.status(503).json({
+        success: false,
+        message: 'خدمة رفع الصور غير متوفرة حالياً. يرجى المحاولة لاحقاً.'
+      });
+    }
+
     if (!req.file) {
       return res.status(400).json({
         success: false,
@@ -145,6 +157,14 @@ router.post('/upload', upload.single('image'), async (req, res) => {
 // رفع صور متعددة إلى Supabase
 router.post('/upload-multiple', upload.array('images', 10), async (req, res) => {
   try {
+    // التحقق من توفر خدمة Supabase
+    if (!supabaseClient) {
+      return res.status(503).json({
+        success: false,
+        message: 'خدمة رفع الصور غير متوفرة حالياً. يرجى المحاولة لاحقاً.'
+      });
+    }
+
     const files = req.files as Express.Multer.File[];
     
     if (!files || files.length === 0) {
@@ -228,6 +248,14 @@ router.post('/upload-multiple', upload.array('images', 10), async (req, res) => 
 // حذف صورة من Supabase
 router.delete('/delete', async (req, res) => {
   try {
+    // التحقق من توفر خدمة Supabase
+    if (!supabaseClient) {
+      return res.status(503).json({
+        success: false,
+        message: 'خدمة حذف الصور غير متوفرة حالياً.'
+      });
+    }
+
     const { url, category } = req.body;
 
     if (!url) {

@@ -1,20 +1,36 @@
 import { createClient } from '@supabase/supabase-js';
 
 // إعدادات Supabase للتخزين
-const supabaseUrl = process.env.SUPABASE_URL || 'https://flftwguecvlvnksvtgon.supabase.co';
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZsZnR3Z3VlY3Zsdm5rc3Z0Z29uIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1ODIxMzYyNiwiZXhwIjoyMDczNzg5NjI2fQ.6b7x3xDJGnpe0vYHX9Td5NMTxC3vt41jTe8c9pECDAI';
+// قراءة إعدادات Supabase من متغيرات البيئة
+const supabaseUrl = process.env.SUPABASE_URL?.trim() || process.env.VITE_SUPABASE_URL?.trim();
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim() || process.env.SUPABASE_ANON_KEY?.trim();
 
+// التحقق من صحة الإعدادات
 if (!supabaseUrl || !supabaseServiceKey) {
-  throw new Error('إعدادات Supabase مفقودة. يرجى تعيين SUPABASE_URL و SUPABASE_SERVICE_ROLE_KEY في متغيرات البيئة.');
+  console.warn('⚠️ إعدادات Supabase مفقودة. سيتم تعطيل خدمة رفع الصور.');
+  console.log('💡 لتفعيل رفع الصور، يرجى تعيين SUPABASE_URL و SUPABASE_SERVICE_ROLE_KEY في متغيرات البيئة.');
+}
+
+// التحقق من صحة URL
+if (supabaseUrl && !supabaseUrl.startsWith('http')) {
+  console.error('❌ SUPABASE_URL غير صحيح. يجب أن يبدأ بـ http:// أو https://');
+  console.log('🔗 URL الحالي:', supabaseUrl);
 }
 
 // إنشاء عميل Supabase للخادم
-export const supabaseClient = createClient(supabaseUrl, supabaseServiceKey, {
-  auth: {
-    autoRefreshToken: false,
-    persistSession: false
-  }
-});
+export const supabaseClient = supabaseUrl && supabaseServiceKey && supabaseUrl.startsWith('http') 
+  ? createClient(supabaseUrl, supabaseServiceKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      },
+      global: {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
+    })
+  : null;
 
 // أسماء buckets للتخزين
 export const STORAGE_BUCKETS = {
@@ -27,6 +43,12 @@ export const STORAGE_BUCKETS = {
 
 // دالة إنشاء buckets إذا لم تكن موجودة
 export async function ensureBucketsExist() {
+  // التحقق من توفر عميل Supabase
+  if (!supabaseClient) {
+    console.log('⚠️ عميل Supabase غير متوفر. تم تخطي إنشاء buckets.');
+    return;
+  }
+
   try {
     console.log('🪣 التحقق من وجود buckets التخزين...');
     
@@ -114,6 +136,12 @@ export async function uploadImageToSupabase(
   bucketName: string,
   contentType: string = 'image/jpeg'
 ): Promise<{ url: string; path: string } | null> {
+  // التحقق من توفر عميل Supabase
+  if (!supabaseClient) {
+    console.warn('⚠️ عميل Supabase غير متوفر. لا يمكن رفع الصورة.');
+    return null;
+  }
+
   try {
     console.log(`📤 رفع صورة إلى bucket: ${bucketName}, اسم الملف: ${fileName}`);
     
@@ -167,6 +195,12 @@ export async function deleteImageFromSupabase(
   filePath: string, 
   bucketName: string
 ): Promise<boolean> {
+  // التحقق من توفر عميل Supabase
+  if (!supabaseClient) {
+    console.warn('⚠️ عميل Supabase غير متوفر. لا يمكن حذف الصورة.');
+    return false;
+  }
+
   try {
     console.log(`🗑️ حذف صورة من bucket: ${bucketName}, مسار الملف: ${filePath}`);
     
