@@ -447,6 +447,47 @@ router.get("/restaurants/:restaurantId/menu", async (req, res) => {
   }
 });
 
+// جلب جميع عناصر القائمة للإدارة
+router.get("/menu-items", async (req, res) => {
+  try {
+    const { restaurantId, page = 1, limit = 50 } = req.query;
+    
+    if (restaurantId) {
+      // جلب عناصر قائمة مطعم محدد
+      const menuItems = await storage.getMenuItems(restaurantId as string);
+      const sortedItems = menuItems.sort((a, b) => a.name.localeCompare(b.name));
+      res.json(sortedItems);
+    } else {
+      // جلب جميع عناصر القائمة مع pagination  
+      const allRestaurants = await storage.getRestaurants();
+      let allMenuItems: any[] = [];
+      
+      for (const restaurant of allRestaurants) {
+        const restaurantMenuItems = await storage.getMenuItems(restaurant.id);
+        allMenuItems = allMenuItems.concat(restaurantMenuItems);
+      }
+      
+      const sortedItems = allMenuItems.sort((a: any, b: any) => a.name.localeCompare(b.name));
+      
+      // تطبيق pagination
+      const startIndex = (Number(page) - 1) * Number(limit);
+      const endIndex = startIndex + Number(limit);
+      const paginatedItems = sortedItems.slice(startIndex, endIndex);
+      
+      res.json({
+        menuItems: paginatedItems,
+        total: sortedItems.length,
+        page: Number(page),
+        limit: Number(limit),
+        totalPages: Math.ceil(sortedItems.length / Number(limit))
+      });
+    }
+  } catch (error) {
+    console.error("خطأ في جلب عناصر القائمة:", error);
+    res.status(500).json({ error: "خطأ في الخادم" });
+  }
+});
+
 router.post("/menu-items", async (req, res) => {
   try {
     // التحقق من صحة البيانات

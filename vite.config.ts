@@ -8,21 +8,15 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export default defineConfig(() => {
   const plugins = [react()];
 
-  // إضافة plugins الخاصة بـ Replit فقط في بيئة التطوير على Replit
-  if (process.env.NODE_ENV !== "production" && process.env.REPL_ID) {
-    try {
-      // محاولة استيراد plugins الخاصة بـ Replit فقط إذا كانت متوفرة
-      const cartographer = require("@replit/vite-plugin-cartographer").cartographer;
-      plugins.push(cartographer());
-      
-      // إضافة runtime error overlay فقط على Replit
-      const runtimeErrorOverlay = require("@replit/vite-plugin-runtime-error-modal").default;
-      plugins.push(runtimeErrorOverlay());
-    } catch (error) {
-      // تجاهل الخطأ إذا لم تكن الحزم متوفرة (في بيئة Production)
-      console.log('Replit plugins not available');
-    }
-  }
+  // تعطيل plugins الخاصة بـ Replit مؤقتاً لتجنب مشاكل الـ syntax
+  // if (process.env.NODE_ENV !== "production" && process.env.REPL_ID) {
+  //   try {
+  //     plugins.push(cartographer());
+  //     plugins.push(runtimeErrorOverlay());
+  //   } catch (error) {
+  //     console.log('Replit plugins not available');
+  //   }
+  // }
 
   return {
     plugins,
