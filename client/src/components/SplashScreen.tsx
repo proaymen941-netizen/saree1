@@ -4,7 +4,7 @@ import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, Loader2 } from 'lucide-react';
 import { prefetchBootstrap } from '@/lib/bootstrap';
-import waselLogo from '@assets/ChatGPT_Image_24_أبريل_2026،_07_12_29_ص_1777004113284.png';
+import waselLogo from '@assets/ChatGPT_Image_24_أبريل_2026،_07_12_29_ص_1777005957448.png';
 
 interface SplashScreenProps {
   onFinish: () => void;
@@ -68,44 +68,54 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
   return (
     <div className="fixed inset-0 z-[9999] flex flex-col transition-opacity duration-500 overflow-hidden bg-gradient-to-b from-[#0E1729] via-[#152033] to-[#0B1220]">
       {/* خلفيات إشعاع متحركة */}
-      <div className="absolute -top-32 -right-24 w-96 h-96 rounded-full bg-[#F97316] opacity-20 blur-3xl animate-pulse" />
-      <div className="absolute -bottom-32 -left-24 w-[28rem] h-[28rem] rounded-full bg-[#FFA94D] opacity-15 blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-      <div className="absolute top-1/3 left-1/4 w-64 h-64 rounded-full bg-[#F97316] opacity-10 blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
+      <div className="absolute -top-32 -right-24 w-96 h-96 rounded-full bg-[#F5A623] opacity-20 blur-3xl animate-pulse" />
+      <div className="absolute -bottom-32 -left-24 w-[28rem] h-[28rem] rounded-full bg-[#FFC061] opacity-15 blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+      <div className="absolute top-1/3 left-1/4 w-64 h-64 rounded-full bg-[#F5A623] opacity-10 blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
 
       {/* خطوط سرعة متحركة */}
       <div className="absolute inset-0 overflow-hidden opacity-40 pointer-events-none">
-        <div className="absolute top-1/4 right-0 h-1 w-32 bg-gradient-to-l from-[#F97316] to-transparent rounded-full splash-speed-line" />
-        <div className="absolute top-1/3 right-0 h-0.5 w-24 bg-gradient-to-l from-[#FFA94D] to-transparent rounded-full splash-speed-line" style={{ animationDelay: '0.4s' }} />
-        <div className="absolute top-1/2 right-0 h-1 w-40 bg-gradient-to-l from-[#F97316] to-transparent rounded-full splash-speed-line" style={{ animationDelay: '0.8s' }} />
-        <div className="absolute top-2/3 right-0 h-0.5 w-28 bg-gradient-to-l from-[#FFA94D] to-transparent rounded-full splash-speed-line" style={{ animationDelay: '1.2s' }} />
+        <div className="absolute top-1/4 right-0 h-1 w-32 bg-gradient-to-l from-[#F5A623] to-transparent rounded-full splash-speed-line" />
+        <div className="absolute top-1/3 right-0 h-0.5 w-24 bg-gradient-to-l from-[#FFC061] to-transparent rounded-full splash-speed-line" style={{ animationDelay: '0.4s' }} />
+        <div className="absolute top-1/2 right-0 h-1 w-40 bg-gradient-to-l from-[#F5A623] to-transparent rounded-full splash-speed-line" style={{ animationDelay: '0.8s' }} />
+        <div className="absolute top-2/3 right-0 h-0.5 w-28 bg-gradient-to-l from-[#FFC061] to-transparent rounded-full splash-speed-line" style={{ animationDelay: '1.2s' }} />
       </div>
 
       {/* قسم الشعار */}
       <div className="flex-1 flex flex-col items-center justify-center px-6 relative z-10">
         <div className="relative splash-logo-enter">
           {/* هالة توهج خلف الشعار */}
-          <div className="absolute inset-0 bg-[#F97316] rounded-full blur-[80px] opacity-40 scale-90" />
-          <div className="absolute inset-0 bg-[#FFA94D] rounded-full blur-[120px] opacity-25 scale-110" />
+          <div className="absolute inset-0 bg-[#F5A623] rounded-full blur-[80px] opacity-45 scale-90" />
+          <div className="absolute inset-0 bg-[#FFC061] rounded-full blur-[120px] opacity-25 scale-110" />
+
+          {/* حلقة دوّارة منقّطة حول الشعار */}
+          <div className="absolute inset-0 -m-6 md:-m-8 rounded-full border-2 border-dashed border-[#F5A623]/40 splash-rotate-slow pointer-events-none" />
+          <div className="absolute inset-0 -m-12 md:-m-14 rounded-full border border-[#F5A623]/15 splash-rotate-reverse pointer-events-none" />
 
           <img
             src={logoUrl}
             alt="واصل - Wasel"
-            className="relative w-64 h-64 md:w-80 md:h-80 object-contain drop-shadow-[0_25px_60px_rgba(249,115,22,0.55)] splash-float"
+            className="relative w-64 h-64 md:w-80 md:h-80 object-contain drop-shadow-[0_25px_60px_rgba(245,166,35,0.6)] splash-float"
             data-testid="img-splash-logo"
           />
+
+          {/* نقاط لامعة دوّارة */}
+          <div className="absolute inset-0 -m-6 md:-m-8 splash-rotate-slow pointer-events-none">
+            <span className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-[#F5A623] shadow-[0_0_12px_rgba(245,166,35,0.9)]" />
+            <span className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-2 h-2 rounded-full bg-white/70 shadow-[0_0_10px_rgba(255,255,255,0.7)]" />
+          </div>
         </div>
 
         {/* العنوان والوصف */}
-        <div className="mt-8 text-center space-y-3 splash-text-enter">
-          <h1 className="text-5xl md:text-6xl font-black text-white tracking-tight" data-testid="text-splash-title">
+        <div className="mt-10 text-center space-y-3 splash-text-enter">
+          <h1 className="text-5xl md:text-6xl font-black text-white tracking-tight drop-shadow-[0_4px_20px_rgba(245,166,35,0.4)]" data-testid="text-splash-title">
             {splashTitle}
           </h1>
           <div className="flex items-center justify-center gap-2">
-            <span className="h-px w-10 bg-gradient-to-l from-transparent to-[#F97316]" />
-            <p className="text-[#F97316] text-xs md:text-sm font-bold tracking-[0.3em]">WASEL</p>
-            <span className="h-px w-10 bg-gradient-to-r from-transparent to-[#F97316]" />
+            <span className="h-px w-10 bg-gradient-to-l from-transparent to-[#F5A623]" />
+            <p className="text-[#F5A623] text-xs md:text-sm font-bold tracking-[0.4em]">WASEL</p>
+            <span className="h-px w-10 bg-gradient-to-r from-transparent to-[#F5A623]" />
           </div>
-          <p className="text-base md:text-lg font-medium text-white/70 leading-relaxed max-w-[320px] md:max-w-md mx-auto pt-2">
+          <p className="text-base md:text-lg font-medium text-white/75 leading-relaxed max-w-[320px] md:max-w-md mx-auto pt-2">
             {splashSubtitle}
           </p>
         </div>

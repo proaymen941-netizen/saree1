@@ -17,7 +17,7 @@ import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useUiSettings } from '@/context/UiSettingsContext';
 import { CustomerNotificationsPanel } from './CustomerNotificationsPanel';
-import waselLogo from '@assets/ChatGPT_Image_24_أبريل_2026،_07_12_29_ص_1777004113284.png';
+import waselLogo from '@assets/ChatGPT_Image_24_أبريل_2026،_07_12_29_ص_1777005957448.png';
 
 export const TopBar: React.FC = () => {
   const [, setLocation] = useLocation();
@@ -73,10 +73,13 @@ export const TopBar: React.FC = () => {
             onClick={() => setLocation('/')}
             data-testid="link-home-logo"
           >
-            <img src={logoUrl} alt={appName} className="h-14 w-auto object-contain transition-transform group-hover:scale-105 drop-shadow-[0_0_15px_rgba(249,115,22,0.4)]" />
+            <div className="relative">
+              <div className="absolute inset-0 bg-[#F5A623] rounded-full blur-xl opacity-25 group-hover:opacity-40 transition-opacity" />
+              <img src={logoUrl} alt={appName} className="relative h-14 w-auto object-contain transition-transform group-hover:scale-105 drop-shadow-[0_0_15px_rgba(245,166,35,0.45)]" />
+            </div>
             <div className="flex flex-col leading-none">
               <span className="text-2xl font-black text-white tracking-tight">{appName}</span>
-              <span className="text-[10px] font-bold text-[#F97316] tracking-[0.25em] mt-0.5">WASEL</span>
+              <span className="text-[10px] font-bold text-[#F5A623] tracking-[0.3em] mt-1">WASEL</span>
             </div>
           </div>
 
