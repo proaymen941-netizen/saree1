@@ -129,79 +129,108 @@ export const TopBar: React.FC = () => {
         </div>
       </div>
 
-      {/* Mobile Header - Red-Orange background like reference image */}
-      <div className="md:hidden header-gradient shadow-md">
-        <div className="px-3 py-2.5 flex items-center justify-between gap-2">
-          {/* Right side: Menu + Notifications + Search */}
+      {/* Mobile Header - Modern glass design with navy gradient + amber accents */}
+      <div className="md:hidden relative bg-gradient-to-br from-[#0E1729] via-[#152033] to-[#0B1220] shadow-xl overflow-hidden">
+        {/* Decorative glow blobs */}
+        <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-[#F5A623] opacity-20 blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-12 -left-12 w-44 h-44 rounded-full bg-[#FFC061] opacity-10 blur-3xl pointer-events-none" />
+
+        <div className="relative px-3 py-2.5 flex items-center justify-between gap-2">
+          {/* Right side (RTL leading): Menu + Notifications */}
           <div className="flex items-center gap-1">
             <Button 
               variant="ghost" 
               size="icon" 
-              className="h-10 w-10 text-white hover:bg-white/20 shrink-0" 
+              className="h-10 w-10 text-white hover:bg-white/15 shrink-0 rounded-xl" 
               onClick={() => document.getElementById('sidebar-trigger')?.click()}
             >
               <MenuIcon className="h-6 w-6" />
             </Button>
             <CustomerNotificationsPanel />
-            <button 
-              onClick={() => setIsSearchOpen(!isSearchOpen)}
-              className="h-10 w-10 flex items-center justify-center text-white hover:bg-white/20 rounded-full transition-colors"
-            >
-              <Search className="h-5 w-5" />
-            </button>
           </div>
 
-          {/* Center: App Name + Location */}
+          {/* Center: Brand pill with logo + name */}
           <div 
-            className="flex-1 flex flex-col items-center cursor-pointer"
+            className="flex-1 flex items-center justify-center cursor-pointer"
             onClick={() => setLocation('/')}
+            data-testid="link-home-logo-mobile"
           >
-            <span className="text-white font-black text-lg leading-tight">واصل</span>
-            <div className="flex items-center gap-1 text-white/90 text-[10px] mt-0.5">
-              <span>دوماً في خدمتك</span>
-              <ChevronDown className="h-3 w-3" />
+            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm">
+              <div className="relative">
+                <div className="absolute inset-0 bg-[#F5A623] rounded-full blur-md opacity-50" />
+                <img src={logoUrl} alt={appName} className="relative h-8 w-8 object-contain drop-shadow-[0_0_8px_rgba(245,166,35,0.5)]" />
+              </div>
+              <div className="flex flex-col leading-none">
+                <span className="text-white font-black text-base">{appName}</span>
+                <span className="text-[8px] font-bold text-[#F5A623] tracking-[0.25em] mt-0.5">WASEL</span>
+              </div>
             </div>
           </div>
 
-          {/* Left side: Location Pin + Cart */}
+          {/* Left side (RTL trailing): Search + Cart */}
           <div className="flex items-center gap-1">
+            <button 
+              onClick={() => setIsSearchOpen(!isSearchOpen)}
+              className="h-10 w-10 flex items-center justify-center text-white hover:bg-white/15 rounded-xl transition-colors"
+              aria-label="search"
+            >
+              <Search className="h-5 w-5" />
+            </button>
             <button
               onClick={handleOpenCart}
-              className="h-10 w-10 flex items-center justify-center text-white hover:bg-white/20 rounded-full transition-colors relative"
+              className="h-10 w-10 flex items-center justify-center text-white hover:bg-white/15 rounded-xl transition-colors relative"
+              aria-label="cart"
             >
               <ShoppingCart className="h-5 w-5" />
               {getItemCount() > 0 && (
-                <span className="absolute top-0.5 right-0.5 bg-white text-primary text-[9px] rounded-full h-4 w-4 flex items-center justify-center font-black border border-primary/20">
+                <span className="absolute top-0.5 right-0.5 bg-[#F5A623] text-[#0E1729] text-[9px] rounded-full h-4 min-w-4 px-1 flex items-center justify-center font-black ring-2 ring-[#0E1729] shadow-lg">
                   {getItemCount()}
                 </span>
               )}
             </button>
-            <button
-              onClick={() => setLocation('/favorites')}
-              className="h-10 w-10 flex items-center justify-center text-white hover:bg-white/20 rounded-full transition-colors"
-            >
-              <Heart className="h-5 w-5" />
-            </button>
           </div>
+        </div>
+
+        {/* Location strip */}
+        <div className="relative px-3 pb-2.5">
+          <button
+            onClick={() => setLocation('/profile')}
+            className="w-full flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 backdrop-blur-sm transition-colors"
+            data-testid="button-location-strip"
+          >
+            <div className="w-6 h-6 rounded-full bg-[#F5A623]/20 flex items-center justify-center">
+              <MapPin className="h-3.5 w-3.5 text-[#F5A623]" />
+            </div>
+            <div className="flex-1 text-right">
+              <div className="text-[9px] font-bold text-white/60 leading-none">التوصيل إلى</div>
+              <div className="text-xs font-bold text-white truncate leading-tight mt-0.5">
+                {user ? 'موقعك الحالي' : 'حدد موقعك للبدء'}
+              </div>
+            </div>
+            <ChevronDown className="h-3.5 w-3.5 text-white/60" />
+          </button>
         </div>
 
         {/* Mobile Search Bar - Expandable */}
         {isSearchOpen && (
-          <div className="px-3 pb-2.5">
+          <div className="relative px-3 pb-3 -mt-1">
             <form onSubmit={handleSearch} className="relative">
               <input
                 autoFocus
-                className="w-full bg-white/20 backdrop-blur-sm text-white placeholder-white/70 border border-white/30 rounded-full px-4 py-2 pr-10 text-sm focus:outline-none focus:bg-white/30"
+                className="w-full bg-white/95 text-slate-900 placeholder-slate-400 border border-white/30 rounded-2xl px-4 py-2.5 pr-11 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#F5A623] shadow-lg"
                 placeholder="ابحث عن مطعم أو طبق..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
-              <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2 text-white">
+              <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-[#F5A623] text-white flex items-center justify-center shadow-md">
                 <Search className="h-4 w-4" />
               </button>
             </form>
           </div>
         )}
+
+        {/* Bottom curved decoration */}
+        <div className="relative h-3 bg-background rounded-t-3xl -mb-px" />
       </div>
     </div>
   );
