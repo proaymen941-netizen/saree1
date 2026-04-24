@@ -130,40 +130,72 @@ export default function Layout({ children }: LayoutProps) {
         <SheetTrigger asChild>
           <button id="sidebar-trigger" className="hidden" />
         </SheetTrigger>
-        <SheetContent side="right" className="w-[300px] p-0 flex flex-col border-none shadow-2xl bg-white">
-          
-          {/* Header: gradient top */}
-          <div className="header-gradient pt-8 pb-6 px-6 relative rounded-b-3xl">
+        <SheetContent side="right" className="w-[320px] p-0 flex flex-col border-none shadow-2xl bg-gradient-to-b from-slate-50 to-white">
+
+          {/* Hero header: dark navy with logo + profile card */}
+          <div className="relative bg-gradient-to-br from-[#0E1729] via-[#152033] to-[#0B1220] px-5 pt-7 pb-14 overflow-hidden">
+            {/* Decorative blobs */}
+            <div className="absolute -top-12 -right-8 w-44 h-44 rounded-full bg-[#F5A623] opacity-25 blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-10 -left-10 w-40 h-40 rounded-full bg-[#FFC061] opacity-15 blur-3xl pointer-events-none" />
+
             <button
               onClick={() => setSidebarOpen(false)}
-              className={`absolute top-4 ${language === 'ar' ? 'left-4' : 'right-4'} p-1.5 text-white/80 hover:text-white hover:bg-white/20 rounded-full transition-colors`}
+              className={`absolute top-4 ${language === 'ar' ? 'left-4' : 'right-4'} z-10 p-1.5 text-white/80 hover:text-white hover:bg-white/15 rounded-full transition-colors`}
+              data-testid="button-close-sidebar"
             >
               <X className="h-5 w-5" />
             </button>
 
-            {/* Logo */}
-            <div className="flex justify-center mb-3 mt-2">
-              {sidebarLogoUrl ? (
-                <img
-                  src={sidebarLogoUrl}
-                  alt={appName}
-                  className="h-24 w-auto object-contain"
-                />
-              ) : (
-                <div className="text-4xl font-black tracking-tighter select-none leading-none text-white">
-                  {appName}
-                </div>
-              )}
+            {/* Logo + brand */}
+            <div className="relative flex items-center justify-center gap-3 mb-5">
+              <div className="relative">
+                <div className="absolute inset-0 bg-[#F5A623] rounded-full blur-xl opacity-40" />
+                {sidebarLogoUrl ? (
+                  <img src={sidebarLogoUrl} alt={appName} className="relative h-16 w-16 object-contain drop-shadow-[0_0_15px_rgba(245,166,35,0.5)]" />
+                ) : (
+                  <div className="relative h-16 w-16 flex items-center justify-center rounded-2xl bg-white/10 text-3xl font-black text-white">
+                    و
+                  </div>
+                )}
+              </div>
+              <div className="flex flex-col leading-none">
+                <span className="text-3xl font-black text-white tracking-tight">{appName}</span>
+                <span className="text-[10px] font-bold text-[#F5A623] tracking-[0.35em] mt-1">WASEL</span>
+              </div>
             </div>
 
-            {/* Tagline */}
-            <p className="text-center text-sm font-bold text-white/90 leading-snug px-2">
+            <p className="relative text-center text-xs font-bold text-white/70 leading-snug px-4">
               {sidebarTagline}
             </p>
           </div>
 
+          {/* Profile card - overlaps the header */}
+          <div className="relative -mt-9 px-5 z-10">
+            <button
+              onClick={() => navigate(user ? '/profile' : '/auth')}
+              className="w-full flex items-center gap-3 p-3 rounded-2xl bg-white border border-slate-100 shadow-[0_10px_30px_-12px_rgba(14,23,41,0.25)] hover:shadow-[0_15px_35px_-10px_rgba(245,166,35,0.35)] transition-all"
+              data-testid="button-profile-card"
+            >
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#F5A623] to-[#FFC061] flex items-center justify-center text-white font-black text-lg shadow-md flex-shrink-0">
+                {user ? (user.name?.charAt(0) || user.phone?.charAt(0) || 'و') : <User className="h-6 w-6" />}
+              </div>
+              <div className="flex-1 text-right min-w-0">
+                <p className="text-sm font-black text-slate-900 truncate">
+                  {user ? (user.name || (language === 'ar' ? 'مرحباً بك' : 'Welcome')) : (language === 'ar' ? 'تسجيل الدخول' : 'Sign in')}
+                </p>
+                <p className="text-[11px] font-bold text-slate-400 truncate">
+                  {user?.phone || (language === 'ar' ? 'سجل دخولك للاستفادة من الميزات' : 'Sign in to enjoy features')}
+                </p>
+              </div>
+              {language === 'ar' ? <ChevronLeft className="h-4 w-4 text-slate-300" /> : <ChevronRight className="h-4 w-4 text-slate-300" />}
+            </button>
+          </div>
+
           {/* Menu Items */}
-          <div className="flex-1 overflow-y-auto py-4 px-4">
+          <div className="flex-1 overflow-y-auto px-4 pt-5 pb-4">
+            <p className="px-2 mb-2 text-[10px] font-black text-slate-400 tracking-[0.3em] uppercase">
+              {language === 'ar' ? 'القائمة' : 'Menu'}
+            </p>
             <div className="space-y-1">
               {sidebarMenuItems.map((item) => {
                 const Icon = item.icon;
@@ -172,69 +204,81 @@ export default function Layout({ children }: LayoutProps) {
                   <button
                     key={item.path}
                     onClick={() => navigate(item.path)}
-                    className={`w-full flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all duration-200 ${
+                    className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 ${
                       isActive
-                        ? 'bg-primary/10 text-primary'
-                        : 'text-gray-800 hover:bg-gray-50'
+                        ? 'bg-gradient-to-l from-[#F5A623]/15 to-transparent ring-1 ring-[#F5A623]/30'
+                        : 'hover:bg-slate-50'
                     }`}
+                    data-testid={`link-sidebar-${item.path.replace('/', '')}`}
                   >
-                    <div className={`w-10 h-10 flex items-center justify-center rounded-xl flex-shrink-0 ${
-                      isActive ? 'bg-primary/15' : 'bg-gray-100'
+                    <div className={`w-9 h-9 flex items-center justify-center rounded-xl flex-shrink-0 transition-colors ${
+                      isActive
+                        ? 'bg-gradient-to-br from-[#F5A623] to-[#FFC061] text-white shadow-md'
+                        : 'bg-slate-100 text-slate-600'
                     }`}>
-                      <Icon className={`h-5 w-5 ${isActive ? 'text-primary' : 'text-gray-600'}`} />
+                      <Icon className="h-4.5 w-4.5" />
                     </div>
-                    <span className={`text-base font-bold flex-1 text-right ${isActive ? 'text-primary' : 'text-gray-800'}`}>
+                    <span className={`text-sm flex-1 text-right ${isActive ? 'font-black text-slate-900' : 'font-bold text-slate-700'}`}>
                       {item.label}
                     </span>
                     {isActive && (
-                      language === 'ar'
-                        ? <ChevronLeft className="h-4 w-4 text-primary" />
-                        : <ChevronRight className="h-4 w-4 text-primary" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#F5A623]" />
                     )}
                   </button>
                 );
               })}
-
-              {/* Language Toggle */}
-              <button
-                onClick={toggleLanguage}
-                className="w-full flex items-center gap-4 px-4 py-3.5 rounded-2xl transition-all duration-200 text-gray-800 hover:bg-gray-50"
-              >
-                <div className="w-10 h-10 flex items-center justify-center rounded-xl flex-shrink-0 bg-gray-100">
-                  <Globe className="h-5 w-5 text-gray-600" />
-                </div>
-                <span className="text-base font-bold flex-1 text-right text-gray-800">
-                  {language === 'ar' ? 'English' : 'العربية'}
-                </span>
-                <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full font-bold">
-                  {language === 'ar' ? 'EN' : 'AR'}
-                </span>
-              </button>
             </div>
+
+            {/* Divider */}
+            <div className="my-4 h-px bg-slate-100" />
+
+            <p className="px-2 mb-2 text-[10px] font-black text-slate-400 tracking-[0.3em] uppercase">
+              {language === 'ar' ? 'التفضيلات' : 'Preferences'}
+            </p>
+
+            {/* Language Toggle */}
+            <button
+              onClick={toggleLanguage}
+              className="w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 hover:bg-slate-50"
+              data-testid="button-toggle-language"
+            >
+              <div className="w-9 h-9 flex items-center justify-center rounded-xl flex-shrink-0 bg-slate-100 text-slate-600">
+                <Globe className="h-4.5 w-4.5" />
+              </div>
+              <span className="text-sm font-bold flex-1 text-right text-slate-700">
+                {language === 'ar' ? 'English' : 'العربية'}
+              </span>
+              <span className="text-[10px] font-black bg-[#F5A623]/15 text-[#F5A623] px-2 py-0.5 rounded-full">
+                {language === 'ar' ? 'EN' : 'AR'}
+              </span>
+            </button>
           </div>
 
           {/* Footer */}
-          <div className="px-6 py-5 border-t border-gray-100">
-            <div className="flex justify-center gap-4 mb-4">
+          <div className="px-5 py-4 border-t border-slate-100 bg-slate-50/50">
+            <div className="flex items-center justify-center gap-3 mb-3">
               {showShareButton && (
                 <button
                   onClick={handleShare}
-                  className="w-12 h-12 flex items-center justify-center rounded-full border border-gray-200 bg-white hover:bg-gray-50 shadow-sm transition-colors"
+                  className="w-11 h-11 flex items-center justify-center rounded-2xl bg-white border border-slate-200 hover:border-[#F5A623]/40 hover:bg-[#F5A623]/5 shadow-sm transition-all"
+                  data-testid="button-share"
                 >
-                  <Share2 className="h-5 w-5 text-gray-600" />
+                  <Share2 className="h-4.5 w-4.5 text-slate-600" />
                 </button>
               )}
               {showContactButton && (
                 <button
                   onClick={() => window.open(whatsappLink, '_blank')}
-                  className="w-12 h-12 flex items-center justify-center rounded-full border border-primary/20 bg-primary/5 hover:bg-primary/10 shadow-sm transition-colors"
+                  className="flex-1 max-w-[180px] h-11 flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#F5A623] to-[#FFC061] text-white font-black text-sm shadow-md hover:shadow-lg transition-all"
+                  data-testid="button-contact-support"
                 >
-                  <MessageCircle className="h-5 w-5 text-primary" />
+                  <MessageCircle className="h-4 w-4" />
+                  {language === 'ar' ? 'تواصل معنا' : 'Contact us'}
                 </button>
               )}
             </div>
-            <p className="text-[11px] text-center text-gray-400 font-bold uppercase tracking-widest">
-              {appName} V{appVersion}
+            <p className="text-[10px] text-center text-slate-400 font-bold tracking-[0.3em]">
+              {appName} · V{appVersion}
             </p>
           </div>
 
