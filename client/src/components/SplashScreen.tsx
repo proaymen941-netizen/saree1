@@ -1,17 +1,21 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useUiSettings } from '@/context/UiSettingsContext';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, Loader2 } from 'lucide-react';
 import { prefetchBootstrap } from '@/lib/bootstrap';
-import waselLogo from '@assets/ChatGPT_Image_24_أبريل_2026،_07_12_29_ص_1777005957448.png';
+import waselLogo from '@assets/wasel-logo.png';
 
 interface SplashScreenProps {
   onFinish: () => void;
 }
 
-const MIN_SPLASH_MS = 900;   // الحد الأدنى لعرض الشاشة لتجنب الوميض
-const MAX_BOOTSTRAP_MS = 6000; // أقصى انتظار لتحميل البيانات قبل تفعيل الزر
+const MIN_SPLASH_MS = 1400;
+const MAX_BOOTSTRAP_MS = 6000;
+
+const PARTICLE_COUNT = 22;
+const TWINKLE_COUNT = 14;
+const RAY_COUNT = 12;
 
 export const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
   const { getSetting, loading: settingsLoading } = useUiSettings();
@@ -19,7 +23,6 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
   const [show, setShow] = useState(true);
   const [ready, setReady] = useState(false);
 
-  // تحميل بيانات التطبيق من الخادم أثناء عرض السبلاش لتجنب التأخير لاحقاً
   useEffect(() => {
     let cancelled = false;
     const startedAt = Date.now();
@@ -41,10 +44,38 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
     return () => { cancelled = true; };
   }, [user?.id, user?.phone]);
 
+  // Pre-compute random positions once so they don't shift on re-render
+  const particles = useMemo(() =>
+    Array.from({ length: PARTICLE_COUNT }, (_, i) => ({
+      id: i,
+      left: Math.random() * 100,
+      top: 20 + Math.random() * 60,
+      size: 3 + Math.random() * 6,
+      delay: Math.random() * 6,
+      duration: 5 + Math.random() * 4,
+      hue: Math.random() > 0.5 ? '#F5A623' : '#FFC061',
+    })), []);
+
+  const twinkles = useMemo(() =>
+    Array.from({ length: TWINKLE_COUNT }, (_, i) => ({
+      id: i,
+      left: Math.random() * 100,
+      top: Math.random() * 100,
+      size: 2 + Math.random() * 3,
+      delay: Math.random() * 2.4,
+    })), []);
+
+  const rays = useMemo(() =>
+    Array.from({ length: RAY_COUNT }, (_, i) => ({
+      id: i,
+      angle: (360 / RAY_COUNT) * i,
+      delay: (i * 0.15) % 4,
+    })), []);
+
   if (settingsLoading) {
     return (
-      <div className="fixed inset-0 bg-white z-[9999] flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      <div className="fixed inset-0 bg-[#0E1729] z-[9999] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#F5A623]"></div>
       </div>
     );
   }
@@ -67,13 +98,34 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
 
   return (
     <div className="fixed inset-0 z-[9999] flex flex-col transition-opacity duration-500 overflow-hidden bg-gradient-to-b from-[#0E1729] via-[#152033] to-[#0B1220]">
-      {/* خلفيات إشعاع متحركة */}
-      <div className="absolute -top-32 -right-24 w-96 h-96 rounded-full bg-[#F5A623] opacity-20 blur-3xl animate-pulse" />
-      <div className="absolute -bottom-32 -left-24 w-[28rem] h-[28rem] rounded-full bg-[#FFC061] opacity-15 blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+      {/* خلفية شبكية متدرجة متحركة */}
+      <div className="absolute inset-0 splash-bg-mesh pointer-events-none" />
+
+      {/* خلفيات إشعاع كبيرة */}
+      <div className="absolute -top-32 -right-24 w-96 h-96 rounded-full bg-[#F5A623] opacity-25 blur-3xl animate-pulse" />
+      <div className="absolute -bottom-32 -left-24 w-[28rem] h-[28rem] rounded-full bg-[#FFC061] opacity-20 blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
       <div className="absolute top-1/3 left-1/4 w-64 h-64 rounded-full bg-[#F5A623] opacity-10 blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
 
-      {/* خطوط سرعة متحركة */}
-      <div className="absolute inset-0 overflow-hidden opacity-40 pointer-events-none">
+      {/* نجوم متلألئة منتشرة في الخلفية */}
+      <div className="absolute inset-0 pointer-events-none">
+        {twinkles.map((t) => (
+          <span
+            key={t.id}
+            className="absolute rounded-full bg-white splash-twinkle"
+            style={{
+              left: `${t.left}%`,
+              top: `${t.top}%`,
+              width: `${t.size}px`,
+              height: `${t.size}px`,
+              animationDelay: `${t.delay}s`,
+              boxShadow: '0 0 8px rgba(255,255,255,0.8)',
+            }}
+          />
+        ))}
+      </div>
+
+      {/* خطوط سرعة جانبية */}
+      <div className="absolute inset-0 overflow-hidden opacity-50 pointer-events-none">
         <div className="absolute top-1/4 right-0 h-1 w-32 bg-gradient-to-l from-[#F5A623] to-transparent rounded-full splash-speed-line" />
         <div className="absolute top-1/3 right-0 h-0.5 w-24 bg-gradient-to-l from-[#FFC061] to-transparent rounded-full splash-speed-line" style={{ animationDelay: '0.4s' }} />
         <div className="absolute top-1/2 right-0 h-1 w-40 bg-gradient-to-l from-[#F5A623] to-transparent rounded-full splash-speed-line" style={{ animationDelay: '0.8s' }} />
@@ -82,34 +134,113 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
 
       {/* قسم الشعار */}
       <div className="flex-1 flex flex-col items-center justify-center px-6 relative z-10">
-        <div className="relative splash-logo-enter">
-          {/* هالة توهج خلف الشعار */}
-          <div className="absolute inset-0 bg-[#F5A623] rounded-full blur-[80px] opacity-45 scale-90" />
-          <div className="absolute inset-0 bg-[#FFC061] rounded-full blur-[120px] opacity-25 scale-110" />
+        <div className="relative">
+          {/* أشعة ضوئية تنبثق من الشعار */}
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div className="relative w-80 h-80">
+              {rays.map((ray) => (
+                <div
+                  key={ray.id}
+                  className="absolute top-1/2 left-1/2 origin-center splash-ray"
+                  style={{
+                    width: '2px',
+                    height: '180px',
+                    marginTop: '-90px',
+                    marginLeft: '-1px',
+                    background: 'linear-gradient(to top, transparent, #F5A623 60%, transparent)',
+                    transform: `rotate(${ray.angle}deg)`,
+                    animationDelay: `${ray.delay}s`,
+                  }}
+                />
+              ))}
+            </div>
+          </div>
 
-          {/* حلقة دوّارة منقّطة حول الشعار */}
-          <div className="absolute inset-0 -m-6 md:-m-8 rounded-full border-2 border-dashed border-[#F5A623]/40 splash-rotate-slow pointer-events-none" />
-          <div className="absolute inset-0 -m-12 md:-m-14 rounded-full border border-[#F5A623]/15 splash-rotate-reverse pointer-events-none" />
+          {/* موجات صدى متوسعة (sonar pulse) */}
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div className="absolute w-48 h-48 rounded-full border-2 border-[#F5A623] splash-pulse-ring" />
+            <div className="absolute w-48 h-48 rounded-full border-2 border-[#FFC061] splash-pulse-ring" style={{ animationDelay: '1s' }} />
+            <div className="absolute w-48 h-48 rounded-full border-2 border-[#F5A623] splash-pulse-ring" style={{ animationDelay: '2s' }} />
+          </div>
 
-          <img
-            src={logoUrl}
-            alt="واصل - Wasel"
-            className="relative w-64 h-64 md:w-80 md:h-80 object-contain drop-shadow-[0_25px_60px_rgba(245,166,35,0.6)] splash-float"
-            data-testid="img-splash-logo"
-          />
+          {/* الشعار + الهالة */}
+          <div className="relative splash-logo-enter">
+            {/* هالة توهج خلف الشعار */}
+            <div className="absolute inset-0 bg-[#F5A623] rounded-full blur-[80px] opacity-50 scale-90" />
+            <div className="absolute inset-0 bg-[#FFC061] rounded-full blur-[120px] opacity-30 scale-110" />
 
-          {/* نقاط لامعة دوّارة */}
-          <div className="absolute inset-0 -m-6 md:-m-8 splash-rotate-slow pointer-events-none">
-            <span className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-[#F5A623] shadow-[0_0_12px_rgba(245,166,35,0.9)]" />
-            <span className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-2 h-2 rounded-full bg-white/70 shadow-[0_0_10px_rgba(255,255,255,0.7)]" />
+            {/* 3 حلقات مدارية بسرعات مختلفة */}
+            <div className="absolute inset-0 -m-4 md:-m-6 rounded-full border-2 border-dashed border-[#F5A623]/50 splash-rotate-slow pointer-events-none" />
+            <div className="absolute inset-0 -m-10 md:-m-12 rounded-full border border-[#F5A623]/25 splash-rotate-reverse pointer-events-none" />
+            <div className="absolute inset-0 -m-16 md:-m-20 rounded-full border border-dotted border-[#FFC061]/20 splash-rotate-medium pointer-events-none" />
+
+            {/* الشعار مع تأثير اللمعان */}
+            <div className="relative w-64 h-64 md:w-80 md:h-80">
+              <img
+                src={logoUrl}
+                alt="واصل - Wasel"
+                className="relative w-full h-full object-contain drop-shadow-[0_25px_60px_rgba(245,166,35,0.65)] splash-float"
+                data-testid="img-splash-logo"
+              />
+              {/* طبقة لمعان تمر على الشعار */}
+              <div className="absolute inset-0 splash-shimmer rounded-full pointer-events-none" />
+            </div>
+
+            {/* نجوم تدور على الحلقة الداخلية */}
+            <div className="absolute inset-0 -m-4 md:-m-6 splash-rotate-slow pointer-events-none">
+              <span className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-[#F5A623] shadow-[0_0_15px_rgba(245,166,35,1)]" />
+              <span className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-2 h-2 rounded-full bg-white shadow-[0_0_12px_rgba(255,255,255,0.9)]" />
+              <span className="absolute top-1/2 right-0 -translate-y-1/2 translate-x-1/2 w-2 h-2 rounded-full bg-[#FFC061] shadow-[0_0_10px_rgba(255,192,97,0.9)]" />
+              <span className="absolute top-1/2 left-0 -translate-y-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-[#FFC061] shadow-[0_0_10px_rgba(255,192,97,0.9)]" />
+            </div>
+
+            {/* نجوم على الحلقة الخارجية تدور بعكس الاتجاه */}
+            <div className="absolute inset-0 -m-10 md:-m-12 splash-rotate-reverse pointer-events-none">
+              <span className="absolute top-1/4 right-0 w-1.5 h-1.5 rounded-full bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)]" />
+              <span className="absolute bottom-1/4 left-0 w-1.5 h-1.5 rounded-full bg-[#F5A623] shadow-[0_0_8px_rgba(245,166,35,0.9)]" />
+            </div>
+          </div>
+
+          {/* جسيمات ذهبية تطفو حول الشعار */}
+          <div className="absolute inset-0 -m-32 pointer-events-none">
+            {particles.map((p) => (
+              <span
+                key={p.id}
+                className="absolute rounded-full splash-particle"
+                style={{
+                  left: `${p.left}%`,
+                  top: `${p.top}%`,
+                  width: `${p.size}px`,
+                  height: `${p.size}px`,
+                  background: p.hue,
+                  boxShadow: `0 0 ${p.size * 2}px ${p.hue}`,
+                  animationDelay: `${p.delay}s`,
+                  animationDuration: `${p.duration}s`,
+                }}
+              />
+            ))}
           </div>
         </div>
 
         {/* العنوان والوصف */}
-        <div className="mt-10 text-center space-y-3 splash-text-enter">
-          <h1 className="text-5xl md:text-6xl font-black text-white tracking-tight drop-shadow-[0_4px_20px_rgba(245,166,35,0.4)]" data-testid="text-splash-title">
-            {splashTitle}
+        <div className="mt-12 text-center space-y-3 splash-text-enter">
+          {/* اسم العلامة - حروف تظهر واحداً واحداً */}
+          <h1
+            className="text-5xl md:text-6xl font-black text-white tracking-tight drop-shadow-[0_4px_20px_rgba(245,166,35,0.5)]"
+            data-testid="text-splash-title"
+            aria-label={splashTitle}
+          >
+            {splashTitle.split('').map((ch, i) => (
+              <span
+                key={i}
+                className="splash-letter"
+                style={{ animationDelay: `${1 + i * 0.12}s` }}
+              >
+                {ch === ' ' ? '\u00A0' : ch}
+              </span>
+            ))}
           </h1>
+
           <div className="flex items-center justify-center gap-2">
             <span className="h-px w-10 bg-gradient-to-l from-transparent to-[#F5A623]" />
             <p className="text-[#F5A623] text-xs md:text-sm font-bold tracking-[0.4em]">WASEL</p>
@@ -128,18 +259,25 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
             onClick={handleStart}
             disabled={!ready}
             data-testid="button-splash-start"
-            className="w-full h-16 md:h-[68px] rounded-2xl text-lg md:text-xl font-black bg-gradient-to-r from-[#F97316] to-[#FB923C] hover:from-[#EA670F] hover:to-[#F97316] text-white shadow-[0_15px_40px_rgba(249,115,22,0.45)] flex items-center justify-center gap-3 active:scale-95 transition-all group disabled:opacity-70 disabled:cursor-not-allowed border border-white/10"
+            className="w-full h-16 md:h-[68px] rounded-2xl text-lg md:text-xl font-black bg-gradient-to-r from-[#F5A623] to-[#FFC061] hover:from-[#E89512] hover:to-[#F5A623] text-[#0E1729] shadow-[0_15px_40px_rgba(245,166,35,0.45)] flex items-center justify-center gap-3 active:scale-95 transition-all group disabled:opacity-70 disabled:cursor-not-allowed border border-white/10 relative overflow-hidden"
           >
             {ready ? (
               <>
-                {buttonText}
-                <ChevronLeft className="h-6 w-6 group-hover:-translate-x-2 transition-transform" />
+                <span className="relative z-10">{buttonText}</span>
+                <ChevronLeft className="h-6 w-6 group-hover:-translate-x-2 transition-transform relative z-10" />
+                {/* لمعان داخل الزر */}
+                <span className="absolute inset-0 splash-shimmer" />
               </>
             ) : (
-              <>
+              <span className="flex items-center gap-2">
                 <Loader2 className="h-5 w-5 animate-spin" />
-                جاري التحميل...
-              </>
+                <span className="flex gap-1">
+                  <span className="splash-loading-dot inline-block w-1.5 h-1.5 rounded-full bg-[#0E1729]" style={{ animationDelay: '0s' }} />
+                  <span className="splash-loading-dot inline-block w-1.5 h-1.5 rounded-full bg-[#0E1729]" style={{ animationDelay: '0.2s' }} />
+                  <span className="splash-loading-dot inline-block w-1.5 h-1.5 rounded-full bg-[#0E1729]" style={{ animationDelay: '0.4s' }} />
+                </span>
+                <span>جاري التحميل</span>
+              </span>
             )}
           </Button>
           <p className="text-center text-white/40 text-xs mt-4 font-medium tracking-wide">

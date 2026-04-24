@@ -17,7 +17,7 @@ import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useUiSettings } from '@/context/UiSettingsContext';
 import { CustomerNotificationsPanel } from './CustomerNotificationsPanel';
-import waselLogo from '@assets/ChatGPT_Image_24_أبريل_2026،_07_12_29_ص_1777005957448.png';
+import waselLogo from '@assets/wasel-logo.png';
 
 export const TopBar: React.FC = () => {
   const [, setLocation] = useLocation();
