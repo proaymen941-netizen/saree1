@@ -2,7 +2,7 @@
   "dev": {
     "driver": "pg",
     "host": "localhost",
-    "database": "sareeonedb",
+    "database": "waseldb",
     "user": "postgres",
     "password": "password"
   },

@@ -35,7 +35,7 @@ const defaultUiSettings = [
   { key: "sidebar_image_url", value: "", category: "branding", description: "صورة خلفية القائمة الجانبية" },
   { key: "sidebar_logo_url", value: "", category: "branding", description: "شعار القائمة الجانبية (إذا كان مختلفاً عن شعار الهيدر)" },
   { key: "show_sidebar_logo", value: "true", category: "branding", description: "إظهار شعار القائمة الجانبية" },
-  { key: "sidebar_tagline", value: "خدمة التوصيل الأسرع في المملكة", category: "branding", description: "الشعار النصي في القائمة الجانبية" },
+  { key: "sidebar_tagline", value: "واصل · نوصل لك بكل سرعة وأمان", category: "branding", description: "الشعار النصي في القائمة الجانبية" },
   { key: "address_text", value: "أختار العنوان", category: "branding", description: "نص عنوان الموقع في الشريط العلوي" },
   // إعدادات الشاشة الرئيسية - بانر العروض
   { key: "offer_banner_1_title", value: "عروض حصرية يومية للتوصيل", category: "home", description: "عنوان البانر الأول" },
@@ -57,7 +57,7 @@ const defaultUiSettings = [
   { key: "splash_image_url", value: "", category: "splash", description: "صورة شاشة الترحيب" },
   { key: "splash_image_url_2", value: "", category: "splash", description: "صورة إضافية للترحيب" },
   { key: "splash_title", value: "واصل", category: "splash", description: "عنوان شاشة الترحيب" },
-  { key: "splash_subtitle", value: "أفضل الخضار والفواكه الطازجة توصل لبابك", category: "splash", description: "نص الترحيب" },
+  { key: "splash_subtitle", value: "نوصل لك بكل سرعة وأمان", category: "splash", description: "نص الترحيب" },
   { key: "splash_button_text", value: "ابدأ الآن", category: "splash", description: "نص زر البداية" },
   // إعدادات الدعم والتواصل
   { key: "show_support_button", value: "true", category: "support", description: "إظهار زر الدعم في الشريط السفلي" },
