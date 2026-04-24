@@ -28,6 +28,7 @@ import RatingsManagement from './RatingsManagement';
 import SpecialOffers from './SpecialOffers';
 import WalletManagement from './WalletManagement';
 import RestaurantManagement from '../components/RestaurantManagement';
+import AdminSettings from './AdminSettings';
 
 interface AdminDashboardProps {
   onLogout: () => void;
@@ -46,15 +47,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout }) => {
   const stats = [
     { title: 'إجمالي الطلبات', value: '2,345', icon: ShoppingBag, color: 'text-blue-600' },
     { title: 'العملاء النشطين', value: '1,234', icon: Users, color: 'text-green-600' },
-    { title: 'إجمالي المبيعات', value: '₪45,678', icon: DollarSign, color: 'text-orange-600' },
+    { title: 'إجمالي المبيعات', value: '45,678', icon: DollarSign, color: 'text-orange-600' },
     { title: 'السائقين المتاحين', value: '23', icon: Truck, color: 'text-purple-600' },
   ];
 
   const navigationItems = [
     { id: 'overview', label: 'نظرة عامة', icon: BarChart3 },
     { id: 'orders', label: 'الطلبات', icon: ShoppingBag },
-    { id: 'restaurants', label: 'المطاعم', icon: Store },
-    { id: 'sections', label: 'أقسام المطاعم', icon: Grid },
+    { id: 'restaurants', label: 'المتاجر', icon: Store },
+    { id: 'sections', label: 'أقسام المتاجر', icon: Grid },
     { id: 'drivers', label: 'السائقين', icon: Truck },
     { id: 'categories', label: 'الفئات', icon: Package },
     { id: 'offers', label: 'العروض', icon: Star },
@@ -189,8 +190,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout }) => {
           <TabsList className="grid w-full grid-cols-10">
             <TabsTrigger value="overview">نظرة عامة</TabsTrigger>
             <TabsTrigger value="orders">الطلبات</TabsTrigger>
-            <TabsTrigger value="restaurants">المطاعم</TabsTrigger>
-            <TabsTrigger value="sections">أقسام المطاعم</TabsTrigger>
+            <TabsTrigger value="restaurants">المتاجر</TabsTrigger>
+            <TabsTrigger value="sections">أقسام المتاجر</TabsTrigger>
             <TabsTrigger value="drivers">السائقين</TabsTrigger>
             <TabsTrigger value="categories">الفئات</TabsTrigger>
             <TabsTrigger value="offers">العروض</TabsTrigger>
@@ -214,7 +215,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout }) => {
                       <div key={order} className="flex items-center justify-between p-3 border rounded-lg">
                         <div>
                           <p className="font-medium">طلب #{1000 + order}</p>
-                          <p className="text-sm text-gray-600">مطعم الوزيكو للعربكة</p>
+                          <p className="text-sm text-gray-600">متجر الوزيكو للعربكة</p>
                         </div>
                         <Badge variant="secondary">قيد التحضير</Badge>
                       </div>
@@ -268,7 +269,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout }) => {
                             {order % 2 === 0 ? "مؤكد" : "قيد المراجعة"}
                           </Badge>
                         </div>
-                        <p className="text-sm text-gray-500 mt-2">₪{50 + order * 10} - منذ {order} ساعات</p>
+                        <p className="text-sm text-gray-500 mt-2">{50 + order * 10} - منذ {order} ساعات</p>
                       </div>
                       <div className="flex items-center gap-2">
                         <Button variant="outline" size="sm">
@@ -334,7 +335,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout }) => {
                         <Package className="h-8 w-8 text-gray-400" />
                         <div>
                           <p className="font-medium">{category}</p>
-                          <p className="text-sm text-gray-600">{5 + index * 2} مطعم</p>
+                          <p className="text-sm text-gray-600">{5 + index * 2} متجر</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
@@ -372,53 +373,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout }) => {
           </TabsContent>
 
           <TabsContent value="settings" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Cog className="h-5 w-5" />
-                  إعدادات النظام
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-semibold text-gray-800">إعدادات التوصيل</h3>
-                    <div className="space-y-3">
-                      <div className="flex justify-between items-center p-3 border rounded-lg">
-                        <span>رسوم التوصيل الأساسية</span>
-                        <span className="font-semibold">5.00 شيكل</span>
-                      </div>
-                      <div className="flex justify-between items-center p-3 border rounded-lg">
-                        <span>رسوم التوصيل لكل كيلومتر</span>
-                        <span className="font-semibold">1.50 شيكل</span>
-                      </div>
-                      <div className="flex justify-between items-center p-3 border rounded-lg">
-                        <span>الحد الأدنى للطلبات</span>
-                        <span className="font-semibold">15.00 شيكل</span>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-semibold text-gray-800">إعدادات الدفع</h3>
-                    <div className="space-y-3">
-                      <div className="flex justify-between items-center p-3 border rounded-lg">
-                        <span>المحفظة الإلكترونية</span>
-                        <Badge className="bg-green-100 text-green-800">مفعل</Badge>
-                      </div>
-                      <div className="flex justify-between items-center p-3 border rounded-lg">
-                        <span>الدفع النقدي</span>
-                        <Badge className="bg-green-100 text-green-800">مفعل</Badge>
-                      </div>
-                      <div className="flex justify-between items-center p-3 border rounded-lg">
-                        <span>الدفع بالبطاقة</span>
-                        <Badge variant="secondary">غير مفعل</Badge>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <AdminSettings />
           </TabsContent>
         </Tabs>
         </main>

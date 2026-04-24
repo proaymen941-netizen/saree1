@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import React, { useState, useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/context/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { NotificationSystem } from '@/components/NotificationSystem';
 import { 
   BarChart3, 
   Users, 
@@ -18,22 +17,57 @@ import {
   TrendingUp,
   Clock,
   Star,
-  AlertCircle
+  AlertCircle,
+  FileText
 } from 'lucide-react';
 import { apiRequest } from '@/lib/queryClient';
+import { formatCurrency } from '@/lib/utils';
+import { DriverManagementPanel } from '@/components/admin/DriverManagementPanel';
+import { RestaurantManagementPanel } from '@/components/admin/RestaurantManagementPanel';
+import AdvancedReports from '@/pages/admin/AdvancedReports';
 
 export default function AdminDashboard() {
   const { user, logout } = useAuth();
   const [activeTab, setActiveTab] = useState('overview');
+  const queryClient = useQueryClient();
 
   const { data: dashboardData, isLoading } = useQuery({
     queryKey: ['/api/admin/dashboard'],
     queryFn: async () => {
-      const response = await apiRequest('GET', '/api/admin/dashboard', null, user?.token);
+      const response = await apiRequest('GET', '/api/admin/dashboard');
       return response.json();
     },
-    refetchInterval: 30000, // تحديث كل 30 ثانية
+    refetchInterval: 15000,
   });
+
+  // تحديث فوري عبر WebSocket عند وجود تغييرات
+  useEffect(() => {
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const wsUrl = `${protocol}//${window.location.host}/ws`;
+    let ws: WebSocket | null = null;
+    let reconnect: any;
+
+    const connect = () => {
+      ws = new WebSocket(wsUrl);
+      ws.onopen = () => {
+        ws?.send(JSON.stringify({ type: 'auth', payload: { userId: 'admin_dashboard', userType: 'admin' } }));
+      };
+      ws.onmessage = (e) => {
+        try {
+          const msg = JSON.parse(e.data);
+          if (['order_update', 'new_order', 'order_status_changed', 'new_wasalni_request', 'NEW_NOTIFICATION', 'settings_changed'].includes(msg.type)) {
+            queryClient.invalidateQueries({ queryKey: ['/api/admin/dashboard'] });
+            queryClient.invalidateQueries({ queryKey: ['/api/admin/orders'] });
+            queryClient.invalidateQueries({ queryKey: ['/api/restaurant-accounts'] });
+          }
+        } catch {}
+      };
+      ws.onclose = () => { reconnect = setTimeout(connect, 5000); };
+      ws.onerror = () => ws?.close();
+    };
+    connect();
+    return () => { if (reconnect) clearTimeout(reconnect); ws?.close(); };
+  }, [queryClient]);
 
   const handleLogout = () => {
     logout();
@@ -63,11 +97,11 @@ export default function AdminDashboard() {
     },
     { 
       title: 'إجمالي المبيعات', 
-      value: `${stats.totalRevenue || 0} ريال`, 
+      value: formatCurrency(stats.totalRevenue || 0), 
       icon: DollarSign, 
       color: 'text-orange-600',
       bgColor: 'bg-orange-50',
-      change: stats.todayRevenue ? `اليوم: ${stats.todayRevenue} ريال` : 'إجمالي',
+      change: stats.todayRevenue ? `اليوم: ${formatCurrency(stats.todayRevenue)}` : 'إجمالي',
       changeType: 'neutral'
     },
     { 
@@ -83,9 +117,8 @@ export default function AdminDashboard() {
 
   const todayStats = [
     { title: 'طلبات اليوم', value: stats.todayOrders || 0, icon: Package },
-    { title: 'مبيعات اليوم', value: `${stats.todayRevenue || 0} ريال`, icon: TrendingUp },
+    { title: 'مبيعات اليوم', value: formatCurrency(stats.todayRevenue || 0), icon: TrendingUp },
     { title: 'طلبات معلقة', value: stats.pendingOrders || 0, icon: Clock },
-    { title: 'المطاعم النشطة', value: stats.totalRestaurants || 0, icon: Store },
   ];
 
   if (isLoading) {
@@ -100,40 +133,18 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50" dir="rtl">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
-                <BarChart3 className="h-6 w-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-gray-900">لوحة التحكم</h1>
-                <p className="text-sm text-gray-500">مرحباً {user?.name}</p>
-              </div>
-            </div>
-            <Button 
-              variant="outline" 
-              onClick={handleLogout}
-              className="flex items-center gap-2 hover:bg-red-50 hover:text-red-600 hover:border-red-200"
-            >
-              <LogOut className="h-4 w-4" />
-              تسجيل الخروج
-            </Button>
-          </div>
+    <div className="space-y-8 p-4 md:p-8" dir="rtl">
+      <div className="flex items-center gap-3 mb-6">
+        <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+          <BarChart3 className="h-7 w-7 text-white" />
         </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Notification System */}
-        <div className="mb-8">
-          <NotificationSystem userType="admin" />
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">نظرة عامة على النظام</h1>
+          <p className="text-sm text-gray-500">مرحباً {user?.name}، إليك ملخص أداء اليوم</p>
         </div>
+      </div>
 
-        {/* Main Stats Cards */}
+      {/* Main Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {statCards.map((stat, index) => {
             const Icon = stat.icon;
@@ -187,9 +198,9 @@ export default function AdminDashboard() {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 h-auto p-1">
             <TabsTrigger value="overview" className="py-3">نظرة عامة</TabsTrigger>
-            <TabsTrigger value="orders" className="py-3">الطلبات الحديثة</TabsTrigger>
-            <TabsTrigger value="restaurants" className="py-3">المطاعم</TabsTrigger>
+            <TabsTrigger value="orders" className="py-3">الطلبات</TabsTrigger>
             <TabsTrigger value="drivers" className="py-3">السائقين</TabsTrigger>
+            <TabsTrigger value="reports" className="py-3">التقارير</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
@@ -227,7 +238,7 @@ export default function AdminDashboard() {
                              order.status === 'delivered' ? 'تم التوصيل' :
                              order.status === 'cancelled' ? 'ملغي' : order.status}
                           </Badge>
-                          <p className="text-sm font-medium mt-1">{order.total || 0} ريال</p>
+                          <p className="text-sm font-medium mt-1">{formatCurrency(order.total || 0)}</p>
                         </div>
                       </div>
                     ))}
@@ -311,7 +322,7 @@ export default function AdminDashboard() {
                       </div>
                       <div className="flex items-center gap-4">
                         <div className="text-left">
-                          <p className="font-medium">{order.total || 0} ريال</p>
+                          <p className="font-medium">{formatCurrency(order.total || 0)}</p>
                           <p className="text-xs text-gray-500">
                             {order.items ? JSON.parse(order.items).length : 0} عنصر
                           </p>
@@ -344,49 +355,14 @@ export default function AdminDashboard() {
             </Card>
           </TabsContent>
 
-          <TabsContent value="restaurants">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Store className="h-5 w-5" />
-                  المطاعم المسجلة
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center py-12 text-gray-500">
-                  <Store className="h-16 w-16 mx-auto mb-4 opacity-50" />
-                  <p className="text-lg font-medium mb-2">إدارة المطاعم</p>
-                  <p className="text-sm mb-4">يمكنك إدارة المطاعم من القائمة الجانبية</p>
-                  <Button variant="outline">
-                    انتقل إلى إدارة المطاعم
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+          <TabsContent value="drivers">
+            <DriverManagementPanel />
           </TabsContent>
 
-          <TabsContent value="drivers">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Truck className="h-5 w-5" />
-                  السائقين المسجلين
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center py-12 text-gray-500">
-                  <Truck className="h-16 w-16 mx-auto mb-4 opacity-50" />
-                  <p className="text-lg font-medium mb-2">إدارة السائقين</p>
-                  <p className="text-sm mb-4">يمكنك إدارة السائقين من القائمة الجانبية</p>
-                  <Button variant="outline">
-                    انتقل إلى إدارة السائقين
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+          <TabsContent value="reports">
+            <AdvancedReports />
           </TabsContent>
         </Tabs>
-      </main>
-    </div>
+      </div>
   );
 }

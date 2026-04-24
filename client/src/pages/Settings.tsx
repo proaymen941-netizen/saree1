@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useTheme } from '../context/ThemeContext';
+import { useLanguage } from '../context/LanguageContext';
 import { useToast } from '@/hooks/use-toast';
 import { PermissionsManager } from '@/components/PermissionsManager';
 
@@ -30,6 +31,7 @@ interface SettingsGroup {
 export default function Settings() {
   const [, setLocation] = useLocation();
   const { theme, toggleTheme } = useTheme();
+  const { language, setLanguage } = useLanguage();
   const { toast } = useToast();
   
   const [settings, setSettings] = useState({
@@ -38,7 +40,6 @@ export default function Settings() {
       promotions: true,
       sound: true,
     },
-    language: 'ar',
     currency: 'YER',
     autoLocation: true,
     biometric: false,
@@ -119,12 +120,18 @@ export default function Settings() {
           label: 'اللغة',
           description: 'اختيار لغة التطبيق',
           type: 'select',
-          value: settings.language,
+          value: language,
           options: [
             { value: 'ar', label: 'العربية' },
             { value: 'en', label: 'English' },
           ],
-          onChange: (value: string) => handleSimpleSettingChange('language', value),
+          onChange: (value: 'ar' | 'en') => {
+            setLanguage(value);
+            toast({
+              title: "تم تغيير اللغة",
+              description: value === 'ar' ? "تم تحويل التطبيق للغة العربية" : "App has been switched to English",
+            });
+          },
         },
         {
           key: 'currency',
@@ -134,8 +141,6 @@ export default function Settings() {
           value: settings.currency,
           options: [
             { value: 'YER', label: 'الريال اليمني (YER)' },
-            { value: 'SAR', label: 'الريال السعودي (SAR)' },
-            { value: 'USD', label: 'الدولار الأمريكي (USD)' },
           ],
           onChange: (value: string) => handleSimpleSettingChange('currency', value),
         },

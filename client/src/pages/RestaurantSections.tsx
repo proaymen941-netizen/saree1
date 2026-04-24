@@ -44,8 +44,14 @@ export default function RestaurantSections() {
       const response = await fetch('/api/restaurants');
       const data = await response.json();
       setRestaurants(data);
+      
+      // Auto-select Tamtom store
+      if (data.length > 0) {
+        const tamtomStore = data.find((r: any) => r.name.includes('واصل')) || data[0];
+        setSelectedRestaurant(tamtomStore.id);
+      }
     } catch (error) {
-      console.error('خطأ في جلب المطاعم:', error);
+      console.error('خطأ في جلب المتاجر:', error);
     }
   };
 
@@ -132,16 +138,16 @@ export default function RestaurantSections() {
       </div>
 
       {/* Restaurant Selection */}
-      <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          اختر المطعم
+      <div className="mb-6 bg-white p-4 rounded-lg shadow-sm">
+        <label className="block text-sm font-bold mb-2">
+          المتجر الحالي
         </label>
         <select
           value={selectedRestaurant}
           onChange={(e) => setSelectedRestaurant(e.target.value)}
-          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+          className={`w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary ${restaurants.length <= 1 ? 'bg-gray-50 cursor-not-allowed' : ''}`}
+          disabled={restaurants.length <= 1}
         >
-          <option value="">اختر مطعم...</option>
           {restaurants.map(restaurant => (
             <option key={restaurant.id} value={restaurant.id}>
               {restaurant.name}

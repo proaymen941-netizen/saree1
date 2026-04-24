@@ -62,13 +62,27 @@ export default function Delivery() {
   };
 
   const { data: availableOrders, isLoading } = useQuery<Order[]>({
-    queryKey: ['/api/orders', { status: 'confirmed' }],
-    enabled: !!currentDriver?.id
+    queryKey: ['/api/orders', { status: 'confirmed', driverId: currentDriver?.id }],
+    queryFn: async () => {
+      const response = await apiRequest('GET', `/api/orders?status=confirmed&driverId=${currentDriver?.id}`);
+      const data = await response.json();
+      // السماح فقط برؤية الطلبات المعينة لهذا السائق تحديداً من قبل الإدارة
+      return data.filter((order: Order) => order.driverId === currentDriver?.id);
+    },
+    enabled: !!currentDriver?.id,
+    refetchInterval: 5000
   });
 
   const { data: activeOrders } = useQuery<Order[]>({
-    queryKey: ['/api/orders', { driverId: currentDriver?.id, status: 'on_way' }],
-    enabled: !!currentDriver?.id
+    queryKey: ['/api/orders', { driverId: currentDriver?.id }],
+    queryFn: async () => {
+      const response = await apiRequest('GET', `/api/orders?driverId=${currentDriver?.id}`);
+      const data = await response.json();
+      // استبعاد الطلبات المكتملة أو الملغية
+      return data.filter((order: Order) => !['delivered', 'cancelled'].includes(order.status));
+    },
+    enabled: !!currentDriver?.id,
+    refetchInterval: 5000
   });
 
   const acceptOrderMutation = useMutation({
@@ -280,15 +294,23 @@ export default function Delivery() {
                       data-testid={`button-call-${order.id}`}
                     >
                       <Phone className="h-4 w-4" />
-                      اتصال
+                      اتصال بالعميل
                     </Button>
                     <Button 
-                      className="flex-1 gap-2"
+                      variant="outline"
+                      className="flex-1 gap-2 border-red-200 text-red-600 hover:bg-red-50"
+                      onClick={() => window.open(`tel:+967771234567`)}
+                    >
+                      <Phone className="h-4 w-4" />
+                      الإدارة
+                    </Button>
+                    <Button 
+                      className="flex-1 gap-2 bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
                       onClick={() => window.open(`https://maps.google.com/?q=${encodeURIComponent(order.deliveryAddress)}`)}
                       data-testid={`button-navigate-${order.id}`}
                     >
                       <Navigation className="h-4 w-4" />
-                      التنقل
+                      تتبع الموقع
                     </Button>
                     <Button 
                       variant="outline"

@@ -1,6 +1,6 @@
 import { useLocation } from 'wouter';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowRight, Store, ShoppingBag, Truck, ChartLine, Tags, Percent, BarChart } from 'lucide-react';
+import { ArrowRight, Store, ShoppingBag, Truck, ChartLine, Tags, Percent, BarChart, DollarSign, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import type { Restaurant, Order, Driver } from '@shared/schema';
@@ -38,12 +38,12 @@ export default function Admin() {
 
   const adminMenuItems = [
     {
-      icon: Store,
-      title: 'إدارة المتاجر',
-      description: 'إضافة، تعديل وحذف المطاعم',
+      icon: Settings,
+      title: 'إعدادات المتجر',
+      description: 'إدارة إعدادات المتجر الرئيسي والرسوم',
       color: 'text-primary',
-      testId: 'admin-restaurants',
-      path: '/admin/restaurants',
+      testId: 'admin-ui-settings',
+      path: '/admin/ui-settings',
     },
     {
       icon: Tags,
@@ -68,6 +68,14 @@ export default function Admin() {
       color: 'text-orange-500',
       testId: 'admin-drivers',
       path: '/admin/drivers',
+    },
+    {
+      icon: DollarSign,
+      title: 'رسوم التوصيل',
+      description: 'إعدادات رسوم ومناطق التوصيل',
+      color: 'text-yellow-600',
+      testId: 'admin-delivery-fees',
+      path: '/admin/delivery-fees',
     },
     {
       icon: Percent,

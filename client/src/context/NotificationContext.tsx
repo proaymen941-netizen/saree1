@@ -1,9 +1,10 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
-import { AlertCircle, CheckCircle, X } from 'lucide-react';
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import { AlertCircle, CheckCircle, X, Bell } from 'lucide-react';
+import { useAuth } from './AuthContext';
 
 interface Notification {
   id: string;
-  type: 'success' | 'error' | 'info' | 'warning';
+  type: 'success' | 'error' | 'info' | 'warning' | 'promotion';
   title: string;
   message: string;
   duration?: number;
@@ -21,6 +22,7 @@ const NotificationContext = createContext<NotificationContextType | undefined>(u
 
 export function NotificationProvider({ children }: { children: React.ReactNode }) {
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const { user } = useAuth();
 
   const removeNotification = useCallback((id: string) => {
     setNotifications(prev => prev.filter(n => n.id !== id));
@@ -33,7 +35,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     setNotifications(prev => [...prev, newNotification]);
 
     // Auto remove after duration
-    const duration = notification.duration || 4000;
+    const duration = notification.duration || (notification.type === 'promotion' ? 10000 : 4000);
     setTimeout(() => {
       removeNotification(id);
     }, duration);
@@ -46,6 +48,87 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
   const showError = useCallback((title: string, message = '') => {
     showNotification({ type: 'error', title, message });
   }, [showNotification]);
+
+  // WebSocket Listener for real-time notifications
+  useEffect(() => {
+    const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+    const wsUrl = `${protocol}//${window.location.host}/ws`;
+    let ws: WebSocket | null = null;
+    let reconnectTimeout: any = null;
+
+    const connect = () => {
+      ws = new WebSocket(wsUrl);
+
+      ws.onopen = () => {
+        console.log('🔔 Notification WebSocket connected');
+        // Authenticate the socket
+        const phone = localStorage.getItem('customer_phone');
+        if (user || phone) {
+          ws?.send(JSON.stringify({
+            type: 'auth',
+            payload: { 
+              userId: user?.id || phone, 
+              userType: 'customer' 
+            }
+          }));
+        }
+      };
+
+      ws.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          if (data.type === 'NEW_NOTIFICATION') {
+            const notif = data.payload;
+            showNotification({
+              type: notif.type === 'offer' ? 'promotion' : 'info',
+              title: notif.title,
+              message: notif.message,
+              duration: 8000
+            });
+            
+            // Play sound if possible
+            try {
+              const audio = new Audio('/notification.mp3');
+              audio.play();
+            } catch (e) {}
+          } else if (data.type === 'order_status_changed') {
+            const { orderId, status, message } = data.payload;
+            // Show toast for order status change
+            showNotification({
+              type: 'info',
+              title: 'تحديث حالة الطلب',
+              message: message || `تغيرت حالة طلبك رقم ${orderId} إلى ${status}`,
+              duration: 10000
+            });
+            
+            try {
+              const audio = new Audio('/notification.mp3');
+              audio.play();
+            } catch (e) {}
+          } else if (data.type === 'settings_changed') {
+             // Invalidate UI settings if we have access to queryClient here
+             // or just show a message. Better to handle this in useSettingsSync
+          }
+        } catch (e) {
+          console.error('Error parsing notification message', e);
+        }
+      };
+
+      ws.onclose = () => {
+        console.log('🔔 Notification WebSocket disconnected, reconnecting...');
+        reconnectTimeout = setTimeout(connect, 5000);
+      };
+
+      ws.onerror = () => ws?.close();
+    };
+
+    connect();
+
+    return () => {
+      if (reconnectTimeout) clearTimeout(reconnectTimeout);
+      ws?.close();
+    };
+  }, [user, showNotification]);
 
   return (
     <NotificationContext.Provider value={{

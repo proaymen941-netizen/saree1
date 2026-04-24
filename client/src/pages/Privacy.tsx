@@ -2,9 +2,22 @@ import { useLocation } from 'wouter';
 import { ArrowRight, Shield, Eye, Lock, Phone, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useQuery } from '@tanstack/react-query';
 
 export default function Privacy() {
   const [, setLocation] = useLocation();
+
+  const { data: uiSettings } = useQuery<any[]>({
+    queryKey: ['/api/ui-settings'],
+  });
+
+  const getSetting = (key: string, defaultValue: string) => {
+    return uiSettings?.find(s => s.key === key)?.value || defaultValue;
+  };
+
+  const dynamicPrivacyText = getSetting('privacy_policy_text', '');
+  const supportWhatsapp = getSetting('support_whatsapp', '');
+  const supportPhone = getSetting('support_phone', '');
 
   const privacySections = [
     {
@@ -50,8 +63,8 @@ export default function Privacy() {
   ];
 
   const contactInfo = [
-    { icon: Mail, label: 'البريد الإلكتروني', value: 'privacy@alsarie-one.com' },
-    { icon: Phone, label: 'رقم الهاتف', value: '+967-1-234567' },
+    ...(supportPhone ? [{ icon: Phone, label: 'رقم الهاتف', value: supportPhone }] : []),
+    ...(supportWhatsapp ? [{ icon: Phone, label: 'واتساب', value: supportWhatsapp }] : []),
   ];
 
   return (
@@ -80,9 +93,8 @@ export default function Privacy() {
               <h3 className="text-xl font-bold text-foreground mb-2">
                 نحن نحترم خصوصيتك
               </h3>
-              <p className="text-muted-foreground">
-                تطبيق السريع ون ملتزم بحماية خصوصيتك وأمان معلوماتك الشخصية. 
-                هذه السياسة توضح كيفية جمع واستخدام وحماية بياناتك.
+              <p className="text-muted-foreground whitespace-pre-wrap">
+                {dynamicPrivacyText || `تطبيق واصل ملتزم بحماية خصوصيتك وأمان معلوماتك الشخصية. هذه السياسة توضح كيفية جمع واستخدام وحماية بياناتك.`}
               </p>
             </div>
             
@@ -185,7 +197,7 @@ export default function Privacy() {
         <Card>
           <CardContent className="p-6 text-center">
             <p className="text-sm text-muted-foreground mb-4">
-              باستخدام تطبيق السريع ون، فإنك توافق على سياسة الخصوصية هذه 
+              باستخدام تطبيق واصل، فإنك توافق على سياسة الخصوصية هذه 
               وعلى جمع واستخدام معلوماتك وفقاً للممارسات الموضحة أعلاه.
             </p>
             <Button 

@@ -1,939 +1,1020 @@
-import React, { useState, useEffect } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { useToast } from '@/hooks/use-toast';
+import { useState, useEffect } from 'react';
 import { 
-  Truck, 
-  MapPin, 
-  Clock, 
-  DollarSign, 
-  LogOut,
-  Navigation,
-  Phone,
-  CheckCircle,
-  XCircle,
-  Package,
-  Bell,
-  User,
-  Calendar,
-  Target,
-  AlertCircle,
-  RefreshCw,
-  Eye,
-  MessageCircle,
-  Store,
-  Map
+  MapPin, Phone, Clock, CheckCircle, Bell, Package, DollarSign, User, 
+  BarChart3, Navigation, LogOut, Wallet, Menu, X, ChevronRight,
+  TrendingUp, Award, Calendar, Eye, AlertCircle
 } from 'lucide-react';
-import type { Order, Driver } from '@shared/schema';
+import { useToast } from '@/hooks/use-toast';
+import { formatCurrency } from '@/lib/utils';
 
-interface DriverDashboardProps {
-  onLogout: () => void;
+interface OrderItem {
+  id: string;
+  name: string;
+  quantity: number;
+  price: string;
 }
 
-export const DriverDashboard: React.FC<DriverDashboardProps> = ({ onLogout }) => {
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState('available');
-  const [driverStatus, setDriverStatus] = useState<'available' | 'busy' | 'offline'>('offline');
-  const [currentDriver, setCurrentDriver] = useState<Driver | null>(null);
-  const [lastNotificationTime, setLastNotificationTime] = useState<number>(0);
-  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-  const [showOrderDetailsDialog, setShowOrderDetailsDialog] = useState(false);
+interface Order {
+  id: string;
+  orderNumber: string;
+  customerName: string;
+  customerPhone: string;
+  deliveryAddress: string;
+  notes?: string;
+  totalAmount: string;
+  estimatedTime: string;
+  status: string;
+  items: string | OrderItem[];
+  createdAt: string;
+  deliveryFee: string;
+  subtotal: string;
+  customerLocationLat?: string;
+  customerLocationLng?: string;
+}
 
-  // التحقق من تسجيل الدخول عند تحميل المكون
+interface Driver {
+  id: string;
+  name: string;
+  phone: string;
+  earnings: string;
+  isAvailable: boolean;
+  commissionRate?: string;
+}
+
+interface DriverStats {
+  today: {
+    orders: number;
+    earnings: number;
+  };
+  week: {
+    orders: number;
+    earnings: number;
+  };
+  total: {
+    orders: number;
+    earnings: number;
+    rating: number;
+  };
+}
+
+interface Notification {
+  id: string;
+  title: string;
+  message: string;
+  isRead: boolean;
+  createdAt: string;
+  type: string;
+}
+
+interface WalletData {
+  balance: number;
+  totalEarnings: number;
+  withdrawn: number;
+  pending: number;
+}
+
+const STEPS = [
+  { id: 'available', label: 'الطلبات المتاحة', icon: Package },
+  { id: 'accepted', label: 'طلباتي', icon: Navigation },
+  { id: 'stats', label: 'الإحصائيات', icon: BarChart3 },
+  { id: 'wallet', label: 'المحفظة', icon: Wallet },
+  { id: 'profile', label: 'الملف الشخصي', icon: User },
+];
+
+export const DriverDashboard: React.FC<{ onLogout: () => void }> = ({ onLogout }) => {
+  const { toast } = useToast();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<string>('available');
+  const [acceptingOrderId, setAcceptingOrderId] = useState<string | null>(null);
+  const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
+  const [driverId, setDriverId] = useState<string>('');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  const [availableOrders, setAvailableOrders] = useState<Order[]>([]);
+  const [myOrders, setMyOrders] = useState<Order[]>([]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [driver, setDriver] = useState<Driver | null>(null);
+  const [stats, setStats] = useState<DriverStats | null>(null);
+  const [wallet, setWallet] = useState<WalletData | null>(null);
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [withdrawalAmount, setWithdrawalAmount] = useState<string>('');
+
   useEffect(() => {
     const token = localStorage.getItem('driver_token');
     const driverData = localStorage.getItem('driver_user');
     
-    if (!token || !driverData) {
-      window.location.href = '/driver-login';
-      return;
-    }
-
-    try {
-      const driver = JSON.parse(driverData);
-      setCurrentDriver(driver);
-      setDriverStatus(driver.isAvailable ? 'available' : 'offline');
-    } catch (error) {
-      console.error('خطأ في تحليل بيانات السائق:', error);
-      handleLogout();
-    }
-  }, []);
-
-  // جلب الطلبات المتاحة (غير مُعيَّنة لسائق)
-  const { data: availableOrders = [], isLoading: availableLoading, refetch: refetchAvailable } = useQuery<Order[]>({
-    queryKey: ['/api/orders', { status: 'confirmed', available: true }],
-    queryFn: async () => {
-      const response = await fetch('/api/orders?status=confirmed');
-      if (!response.ok) throw new Error('فشل في جلب الطلبات المتاحة');
-      const data = await response.json();
-      // فلترة الطلبات غير المُعيَّنة لسائق
-      const availableOrders = Array.isArray(data) ? data.filter((order: Order) => !order.driverId) : [];
-      return availableOrders;
-    },
-    enabled: !!currentDriver && driverStatus === 'available',
-    refetchInterval: 3000, // تحديث كل 3 ثوانِ
-  });
-
-  // جلب طلبات السائق الحالية
-  const { data: myOrders = [], isLoading: myOrdersLoading, refetch: refetchMyOrders } = useQuery<Order[]>({
-    queryKey: ['/api/orders', { driverId: currentDriver?.id }],
-    queryFn: async () => {
-      if (!currentDriver?.id) return [];
-      const response = await fetch(`/api/orders?driverId=${currentDriver.id}`);
-      if (!response.ok) throw new Error('فشل في جلب طلباتي');
-      const data = await response.json();
-      return Array.isArray(data) ? data : [];
-    },
-    enabled: !!currentDriver,
-    refetchInterval: 2000, // تحديث كل ثانيتين
-  });
-
-  // جلب إحصائيات السائق
-  const { data: driverStats } = useQuery({
-    queryKey: ['/api/drivers', currentDriver?.id, 'stats'],
-    queryFn: async () => {
-      if (!currentDriver?.id) return null;
-      const response = await fetch(`/api/drivers/${currentDriver.id}/stats`);
-      if (!response.ok) return { totalOrders: 0, totalEarnings: 0, completedOrders: 0 };
-      return response.json();
-    },
-    enabled: !!currentDriver,
-    refetchInterval: 30000,
-  });
-
-  // قبول طلب
-  const acceptOrderMutation = useMutation({
-    mutationFn: async (orderId: string) => {
-      if (!currentDriver?.id) throw new Error('معرف السائق غير موجود');
-      
-      const response = await fetch(`/api/orders/${orderId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          driverId: currentDriver.id,
-          status: 'preparing',
-          updatedBy: currentDriver.id,
-          updatedByType: 'driver'
-        }),
-      });
-      
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'فشل في قبول الطلب');
+    if (token && driverData) {
+      try {
+        const user = JSON.parse(driverData);
+        setDriverId(user.id);
+        setDriver(user);
+        setIsAuthenticated(true);
+      } catch (error) {
+        console.error('Error parsing driver data:', error);
+        onLogout();
       }
-      
-      return response.json();
-    },
-    onSuccess: (data, orderId) => {
-      queryClient.invalidateQueries({ queryKey: ['/api/orders'] });
-      setDriverStatus('busy');
-      
-      toast({
-        title: "تم قبول الطلب بنجاح ✅",
-        description: `تم تعيين الطلب ${orderId.slice(0, 8)} لك`,
-      });
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "خطأ في قبول الطلب",
-        description: error.message,
-        variant: "destructive"
-      });
+    } else {
+      onLogout();
     }
-  });
+  }, [onLogout]);
 
-  // تحديث حالة الطلب
-  const updateOrderStatusMutation = useMutation({
-    mutationFn: async ({ orderId, status }: { orderId: string; status: string }) => {
-      const response = await fetch(`/api/orders/${orderId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          status,
-          updatedBy: currentDriver?.id,
-          updatedByType: 'driver'
-        }),
-      });
-      
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'فشل في تحديث حالة الطلب');
-      }
-      
-      return response.json();
-    },
-    onSuccess: (data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['/api/orders'] });
-      
-      if (variables.status === 'delivered') {
-        setDriverStatus('available');
-      }
-      
-      const statusText = getStatusText(variables.status);
-      toast({
-        title: "تم تحديث حالة الطلب ✅",
-        description: `تم تحديث الطلب إلى: ${statusText}`,
-      });
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "خطأ في تحديث الطلب",
-        description: error.message,
-        variant: "destructive"
-      });
-    }
-  });
-
-  // تحديث حالة السائق
-  const updateDriverStatusMutation = useMutation({
-    mutationFn: async (isAvailable: boolean) => {
-      if (!currentDriver?.id) throw new Error('معرف السائق غير موجود');
-      
-      const response = await fetch(`/api/drivers/${currentDriver.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ isAvailable }),
-      });
-      
-      if (!response.ok) throw new Error('فشل في تحديث حالة السائق');
-      return response.json();
-    },
-    onSuccess: (data, isAvailable) => {
-      setDriverStatus(isAvailable ? 'available' : 'offline');
-      
-      if (currentDriver) {
-        const updatedDriver = { ...currentDriver, isAvailable };
-        setCurrentDriver(updatedDriver);
-        localStorage.setItem('driver_user', JSON.stringify(updatedDriver));
-      }
-      
-      toast({
-        title: isAvailable ? "أنت متاح الآن 🟢" : "أنت غير متاح 🔴",
-        description: isAvailable ? "ستتلقى طلبات جديدة" : "لن تتلقى طلبات جديدة",
-      });
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "خطأ في تحديث الحالة",
-        description: error.message,
-        variant: "destructive"
-      });
-    }
-  });
-
-  // مراقبة الطلبات الجديدة للإشعارات
   useEffect(() => {
-    if (availableOrders.length > 0 && driverStatus === 'available') {
-      const latestOrderTime = Math.max(...availableOrders.map(order => 
-        new Date(order.createdAt).getTime()
-      ));
-      
-      if (latestOrderTime > lastNotificationTime) {
-        setLastNotificationTime(latestOrderTime);
-        
-        // إشعار صوتي ومرئي
-        if ('Notification' in window && Notification.permission === 'granted') {
-          new Notification('طلب جديد متاح! 🔔', {
-            body: `يوجد ${availableOrders.length} طلب متاح للتوصيل`,
-            icon: '/logo.png',
-            tag: 'new-order'
-          });
+    if (!isAuthenticated || !driverId) return;
+
+    fetchAllData();
+    
+    const interval = setInterval(() => {
+      fetchAllData();
+    }, 15000);
+
+    return () => clearInterval(interval);
+  }, [isAuthenticated, driverId]);
+
+  const fetchAllData = async () => {
+    await Promise.all([
+      fetchDriverInfo(),
+      fetchAvailableOrders(),
+      fetchMyOrders(),
+      fetchNotifications(),
+      fetchDriverStats(),
+      fetchDriverWallet()
+    ]);
+  };
+
+  const fetchWithAuth = async (url: string, options: RequestInit = {}) => {
+    const token = localStorage.getItem('driver_token');
+    const headers = {
+      'Content-Type': 'application/json',
+      ...(token && { 'Authorization': `Bearer ${token}` }),
+      ...options.headers,
+    };
+    
+    const response = await fetch(url, { ...options, headers });
+    
+    if (response.status === 401) {
+      onLogout();
+      throw new Error('Authentication failed');
+    }
+    
+    return response;
+  };
+
+  const fetchDriverInfo = async () => {
+    try {
+      const response = await fetchWithAuth(`/api/drivers/${driverId}`);
+      const data = await response.json();
+      setDriver(data);
+    } catch (error) {
+      console.error('Error fetching driver info:', error);
+    }
+  };
+
+  const fetchAvailableOrders = async () => {
+    try {
+      const response = await fetchWithAuth(`/api/orders?available=true&driverId=${driverId}`);
+      const data = await response.json();
+      setAvailableOrders(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error('Error fetching available orders:', error);
+    }
+  };
+
+  const fetchMyOrders = async () => {
+    try {
+      const response = await fetchWithAuth(`/api/orders?driverId=${driverId}`);
+      const data = await response.json();
+      setMyOrders(Array.isArray(data) ? data.filter((o: Order) => ['confirmed', 'assigned', 'picked_up', 'on_way'].includes(o.status)) : []);
+    } catch (error) {
+      console.error('Error fetching my orders:', error);
+    }
+  };
+
+  const fetchNotifications = async () => {
+    try {
+      const response = await fetchWithAuth(`/api/notifications?recipientType=driver&recipientId=${driverId}`);
+      const data = await response.json();
+      setNotifications(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error('Error fetching notifications:', error);
+    }
+  };
+
+  const fetchDriverStats = async () => {
+    try {
+      const response = await fetchWithAuth(`/api/drivers/${driverId}/balance`);
+      const data = await response.json();
+      // Simple mapping for UI
+      setStats({
+        today: { orders: 0, earnings: 0 },
+        week: { orders: 0, earnings: 0 },
+        total: { 
+          orders: 0, 
+          earnings: parseFloat(data.totalEarned || '0'), 
+          rating: 5.0 
         }
-        
+      });
+    } catch (error) {
+      console.error('Error fetching stats:', error);
+    }
+  };
+
+  const fetchDriverWallet = async () => {
+    try {
+      const response = await fetchWithAuth(`/api/drivers/${driverId}/balance`);
+      const data = await response.json();
+      setWallet({
+        balance: parseFloat(data.availableBalance || '0'),
+        totalEarnings: parseFloat(data.totalEarned || '0'),
+        withdrawn: parseFloat(data.withdrawnAmount || '0'),
+        pending: 0
+      });
+    } catch (error) {
+      console.error('Error fetching wallet:', error);
+    }
+  };
+
+  const acceptOrder = async (orderId: string) => {
+    setAcceptingOrderId(orderId);
+    try {
+      // السائق يؤكد استلام الطلب الذي عينه له المدير
+      const response = await fetchWithAuth(`/api/orders/${orderId}`, {
+        method: 'PUT',
+        body: JSON.stringify({ 
+          status: 'confirmed', 
+          updatedBy: driverId, 
+          updatedByType: 'driver' 
+        })
+      });
+      
+      if (response.ok) {
         toast({
-          title: "طلب جديد متاح! 🔔",
-          description: `يوجد ${availableOrders.length} طلب جديد متاح للتوصيل`,
+          title: "✅ تم استلام الطلب",
+          description: "تم نقل الطلب إلى قائمة طلباتك الجارية",
+        });
+        await fetchAllData();
+        setActiveTab('accepted');
+      } else {
+        const err = await response.json();
+        toast({
+          title: "❌ خطأ",
+          description: err.error || "فشل في استلام الطلب",
+          variant: "destructive",
         });
       }
+    } catch (error) {
+      toast({
+        title: "❌ خطأ",
+        description: "حدث خطأ أثناء الاتصال بالسيرفر",
+        variant: "destructive",
+      });
+    } finally {
+      setAcceptingOrderId(null);
     }
-  }, [availableOrders, driverStatus, lastNotificationTime, toast]);
-
-  // طلب إذن الإشعارات
-  useEffect(() => {
-    if ('Notification' in window && Notification.permission === 'default') {
-      Notification.requestPermission();
-    }
-  }, []);
-
-  const handleLogout = () => {
-    localStorage.removeItem('driver_token');
-    localStorage.removeItem('driver_user');
-    onLogout();
   };
+
+  const updateOrderStatus = async (orderId: string, status: string) => {
+    setUpdatingOrderId(orderId);
+    try {
+      const response = await fetchWithAuth(`/api/orders/${orderId}`, {
+        method: 'PUT',
+        body: JSON.stringify({ status, updatedBy: driverId, updatedByType: 'driver' })
+      });
+      
+      if (response.ok) {
+        toast({
+          title: "✅ تم التحديث",
+          description: `تم تحديث حالة الطلب بنجاح`,
+        });
+        await fetchAllData();
+      }
+    } catch (error) {
+      toast({
+        title: "❌ خطأ",
+        description: "فشل في تحديث حالة الطلب",
+        variant: "destructive",
+      });
+    } finally {
+      setUpdatingOrderId(null);
+    }
+  };
+
+  const toggleAvailability = async () => {
+    if (!driver) return;
+    
+    try {
+      const response = await fetchWithAuth(`/api/drivers/${driverId}`, {
+        method: 'PUT',
+        body: JSON.stringify({ isAvailable: !driver.isAvailable })
+      });
+      
+      if (response.ok) {
+        setDriver({ ...driver, isAvailable: !driver.isAvailable });
+        toast({
+          title: !driver.isAvailable ? "🟢 أنت الآن متاح لاستلام الطلبات" : "🔴 تم تغيير الحالة إلى غير متاح",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "❌ خطأ في تحديث الحالة",
+        variant: "destructive",
+      });
+    }
+  };
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 font-medium">جاري التحميل...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50 flex flex-col" dir="rtl">
+      {/* Desktop Top Navigation Bar */}
+      <div className="hidden lg:block bg-white shadow-sm border-b sticky top-0 z-40">
+        <div className="px-6 py-2 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-6">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg">
+                <Navigation size={24} />
+              </div>
+              <h1 className="text-xl font-black text-gray-900 tracking-tight">تطبيق السائق</h1>
+            </div>
+            
+            <div className="h-10 w-px bg-gray-100 mx-2" />
+            
+            <nav className="flex items-center gap-1">
+              {STEPS.map((step) => {
+                const Icon = step.icon;
+                const isActive = activeTab === step.id;
+                return (
+                  <button
+                    key={step.id}
+                    onClick={() => setActiveTab(step.id)}
+                    className={`px-4 py-2 rounded-xl font-bold transition-all duration-200 flex items-center gap-2 ${
+                      isActive
+                        ? 'bg-blue-50 text-blue-700 shadow-sm'
+                        : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
+                    }`}
+                  >
+                    <Icon size={18} />
+                    <span>{step.label}</span>
+                    {step.id === 'available' && availableOrders.length > 0 && (
+                      <span className="bg-red-500 text-white text-[10px] rounded-full px-1.5 py-0.5 font-black">
+                        {availableOrders.length}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </nav>
+          </div>
+          
+          <div className="flex items-center gap-4">
+            <div className="text-left">
+              <p className="text-xs text-gray-500 font-bold leading-none mb-1 text-left">مرحباً بك</p>
+              <p className="text-sm font-black text-gray-900 leading-none">{driver?.name}</p>
+            </div>
+
+            <button 
+              onClick={toggleAvailability}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold transition-all shadow-sm ${
+                driver?.isAvailable
+                  ? 'bg-green-100 text-green-700 border border-green-200 hover:bg-green-200'
+                  : 'bg-gray-100 text-gray-700 border border-gray-200 hover:bg-gray-200'
+              }`}
+            >
+              <div className={`h-2.5 w-2.5 rounded-full animate-pulse ${driver?.isAvailable ? 'bg-green-600' : 'bg-gray-400'}`} />
+              {driver?.isAvailable ? 'متصل ومتاح' : 'غير متصل'}
+            </button>
+
+            <button
+              onClick={onLogout}
+              className="p-2.5 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition-all border border-red-100"
+              title="تسجيل الخروج"
+            >
+              <LogOut size={20} />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile Sidebar */}
+      {sidebarOpen && (
+        <div className="fixed inset-0 bg-black/50 lg:hidden z-40" onClick={() => setSidebarOpen(false)} />
+      )}
+      <div className={`fixed top-0 right-0 h-full w-64 bg-white shadow-lg transform transition-transform duration-300 z-50 lg:hidden ${
+        sidebarOpen ? 'translate-x-0' : 'translate-x-full'
+      }`}>
+        <SidebarContent 
+          activeTab={activeTab} 
+          onTabChange={(tabId: string) => {
+            setActiveTab(tabId);
+            setSidebarOpen(false);
+          }}
+          availableOrders={availableOrders}
+          myOrders={myOrders}
+        />
+      </div>
+
+      {/* Mobile Header */}
+      <div className="lg:hidden bg-white shadow-sm border-b sticky top-0 z-40">
+        <div className="px-4 py-4">
+          <div className="flex items-center justify-between gap-4">
+            <button 
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="p-2 hover:bg-gray-100 rounded-lg"
+            >
+              {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+
+            <div className="flex-1 min-w-0 text-center">
+              <h1 className="text-lg font-bold text-gray-900 truncate">
+                مرحباً {driver?.name}
+              </h1>
+              <p className="text-xs text-gray-600 font-bold">
+                {driver?.isAvailable ? '🟢 متصل حالياً' : '🔴 غير متصل'}
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <div className="relative p-2">
+                <Bell className="text-gray-600" size={20} />
+                {notifications.filter(n => !n.isRead).length > 0 && (
+                  <span className="absolute top-1 right-1 bg-red-500 text-white text-[10px] rounded-full h-4 w-4 flex items-center justify-center font-black">
+                    {notifications.filter(n => !n.isRead).length}
+                  </span>
+                )}
+              </div>
+              <button
+                onClick={onLogout}
+                className="p-2 text-red-600 rounded-lg"
+              >
+                <LogOut size={20} />
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content Area */}
+      <div className="flex-1 overflow-auto">
+        <div className="p-4 sm:p-6 max-w-6xl mx-auto">
+          {activeTab === 'available' && (
+            <AvailableOrdersSection orders={availableOrders} acceptingOrderId={acceptingOrderId} onAccept={acceptOrder} driver={driver} />
+          )}
+          {activeTab === 'accepted' && (
+            <MyOrdersSection orders={myOrders} onStatusUpdate={updateOrderStatus} updatingOrderId={updatingOrderId} selectedOrder={selectedOrder} setSelectedOrder={setSelectedOrder} />
+          )}
+          {activeTab === 'stats' && (
+            <StatsSection stats={stats} />
+          )}
+          {activeTab === 'wallet' && (
+            <WalletSection wallet={wallet} withdrawalAmount={withdrawalAmount} setWithdrawalAmount={setWithdrawalAmount} driverId={driverId} fetchWallet={fetchDriverWallet} />
+          )}
+          {activeTab === 'profile' && (
+            <ProfileSection driver={driver} />
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+function SidebarContent({ activeTab, onTabChange, availableOrders, myOrders }: any) {
+  return (
+    <div className="h-full flex flex-col">
+      <div className="p-6 border-b bg-gradient-to-r from-blue-50 to-indigo-50">
+        <h2 className="text-xl font-bold text-gray-900">📍 تطبيق السائق</h2>
+        <p className="text-sm text-gray-600 font-bold">نظام واصل للتوصيل</p>
+      </div>
+
+      <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+        {STEPS.map((step) => {
+          const Icon = step.icon;
+          const isActive = activeTab === step.id;
+          return (
+            <button
+              key={step.id}
+              onClick={() => onTabChange(step.id)}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-bold text-right ${
+                isActive
+                  ? 'bg-blue-600 text-white shadow-lg'
+                  : 'text-gray-700 hover:bg-gray-100'
+              }`}
+            >
+              <ChevronRight size={18} className={isActive ? 'translate-x-1' : ''} />
+              <Icon size={20} />
+              <span className="flex-1">{step.label}</span>
+              {step.id === 'available' && availableOrders.filter((o: any) => o.status === 'assigned').length > 0 && (
+                <span className="bg-red-500 text-white text-xs rounded-full px-2 py-0.5 font-black">
+                  {availableOrders.filter((o: any) => o.status === 'assigned').length}
+                </span>
+              )}
+              {step.id === 'accepted' && myOrders.filter((o: any) => ['confirmed', 'picked_up', 'on_way'].includes(o.status)).length > 0 && (
+                <span className="bg-orange-500 text-white text-xs rounded-full px-2 py-0.5 font-black">
+                  {myOrders.filter((o: any) => ['confirmed', 'picked_up', 'on_way'].includes(o.status)).length}
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </nav>
+    </div>
+  );
+}
+
+function AvailableOrdersSection({ orders, acceptingOrderId, onAccept, driver }: any) {
+  // تصفية الطلبات المعينة لهذا السائق فقط والتي لم يقبلها بعد
+  const filteredOrders = orders.filter((o: Order) => o.status === 'assigned');
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
+        <h2 className="text-xl font-black text-gray-900 flex items-center gap-2">
+          <Package className="text-blue-600" />
+          طلبات تم تكليفك بها
+        </h2>
+        <span className="bg-blue-600 text-white px-3 py-1 rounded-full font-black text-sm">
+          {filteredOrders.length} طلب جديد
+        </span>
+      </div>
+
+      {!driver?.isAvailable && (
+        <div className="bg-orange-50 border-r-4 border-orange-500 p-4 rounded-xl shadow-sm">
+          <div className="flex gap-3">
+            <AlertCircle className="text-orange-600 flex-shrink-0" size={24} />
+            <div>
+              <p className="text-orange-900 font-bold text-sm">أنت غير متصل الآن!</p>
+              <p className="text-orange-800 text-xs mt-1">يجب تفعيل حالة "متصل" من الأعلى لتتمكن من استلام الطلبات الجديدة.</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {filteredOrders.length === 0 ? (
+        <div className="bg-white rounded-2xl border-2 border-dashed border-gray-200 p-12 text-center">
+          <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Package className="text-gray-300" size={40} />
+          </div>
+          <p className="text-gray-500 font-bold text-lg">لا توجد طلبات معينة لك حالياً</p>
+          <p className="text-gray-400 text-sm mt-1">سيتم إخطارك من قبل الإدارة فور تكليفك بطلب جديد</p>
+        </div>
+      ) : (
+        <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
+          {filteredOrders.map((order: Order) => (
+            <OrderCard key={order.id} order={order} isLoading={acceptingOrderId === order.id} onAccept={onAccept} actionType="accept" />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function MyOrdersSection({ orders, onStatusUpdate, updatingOrderId, selectedOrder, setSelectedOrder }: any) {
+  // تصفية الطلبات النشطة فقط (المستلمة وفي الطريق)
+  const filteredOrders = orders.filter((o: Order) => 
+    ['confirmed', 'picked_up', 'on_way'].includes(o.status)
+  );
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
+        <h2 className="text-xl font-black text-gray-900 flex items-center gap-2">
+          <Navigation className="text-orange-600" />
+          طلباتي الجارية
+        </h2>
+        <span className="bg-orange-600 text-white px-3 py-1 rounded-full font-black text-sm">
+          {filteredOrders.length} طلب نشط
+        </span>
+      </div>
+
+      {filteredOrders.length === 0 ? (
+        <div className="bg-white rounded-2xl border-2 border-dashed border-gray-200 p-12 text-center">
+          <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Navigation className="text-gray-300" size={40} />
+          </div>
+          <p className="text-gray-500 font-bold text-lg">ليس لديك طلبات نشطة حالياً</p>
+          <p className="text-gray-400 text-sm mt-1">توجه إلى قسم "الطلبات المتاحة" لتأكيد الطلبات المكلف بها</p>
+        </div>
+      ) : (
+        <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
+          {filteredOrders.map((order: Order) => (
+            <OrderCard 
+              key={order.id} 
+              order={order} 
+              onStatusUpdate={onStatusUpdate} 
+              isLoading={updatingOrderId === order.id}
+              actionType="status"
+              isSelected={selectedOrder?.id === order.id}
+              onSelect={() => setSelectedOrder(selectedOrder?.id === order.id ? null : order)}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function OrderCard({ order, isLoading, onAccept, onStatusUpdate, actionType, isSelected, onSelect }: any) {
+  const items = typeof order.items === 'string' ? JSON.parse(order.items) : order.items || [];
+  const nextAction = actionType === 'status' ? getNextAction(order.status) : null;
+  const adminPhone = "770000000"; // رقم الإدارة الافتراضي
 
   const getStatusText = (status: string) => {
     const statusMap: Record<string, string> = {
-      pending: 'في الانتظار',
-      confirmed: 'مؤكد',
-      preparing: 'قيد التحضير',
-      ready: 'جاهز للاستلام',
-      picked_up: 'تم الاستلام',
-      on_way: 'في الطريق',
-      delivered: 'تم التسليم',
-      cancelled: 'ملغي'
+      'assigned': '✓ تم التكليف',
+      'picked_up': '📦 تم الاستلام',
+      'on_way': '🚗 في الطريق',
+      'delivered': '✅ تم التسليم',
+      'confirmed': '⏳ بانتظار التحرك',
+      'pending': '⏳ بانتظار الموافقة',
     };
     return statusMap[status] || status;
   };
 
-  const getStatusColor = (status: string) => {
-    const colorMap: Record<string, string> = {
-      pending: 'bg-yellow-100 text-yellow-800',
-      confirmed: 'bg-blue-100 text-blue-800',
-      preparing: 'bg-orange-100 text-orange-800',
-      ready: 'bg-purple-100 text-purple-800',
-      picked_up: 'bg-indigo-100 text-indigo-800',
-      on_way: 'bg-green-100 text-green-800',
-      delivered: 'bg-emerald-100 text-emerald-800',
-      cancelled: 'bg-red-100 text-red-800'
-    };
-    return colorMap[status] || 'bg-gray-100 text-gray-800';
-  };
+  return (
+    <div className={`bg-white rounded-2xl border-2 transition-all duration-300 ${
+      isSelected 
+        ? 'border-blue-600 shadow-xl ring-4 ring-blue-50' 
+        : 'border-gray-100 hover:border-blue-200 shadow-sm'
+    }`}>
+      <div className="p-5 sm:p-6">
+        {/* Header */}
+        <div className="flex items-start justify-between gap-4 mb-4" onClick={onSelect}>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="bg-blue-50 text-blue-700 text-[10px] font-black px-2 py-0.5 rounded">#{order.orderNumber?.split('-')[1]?.substring(0, 6) || order.id?.substring(0, 6)}</span>
+              <h3 className="text-lg font-black text-gray-900 truncate">{order.customerName}</h3>
+            </div>
+            <p className="text-xs text-gray-500 font-bold flex items-center gap-1">
+              <Clock size={12} />
+              {new Date(order.createdAt).toLocaleTimeString('ar-YE', { hour: '2-digit', minute: '2-digit' })}
+            </p>
+          </div>
+          <div className="text-right">
+            <div className="text-2xl font-black text-green-600 tracking-tighter">{formatCurrency(order.totalAmount)}</div>
+            <span className={`text-[10px] font-black px-2 py-0.5 rounded-full inline-block mt-1 ${
+              order.status === 'delivered' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'
+            }`}>
+              {getStatusText(order.status)}
+            </span>
+          </div>
+        </div>
 
-  const getNextStatus = (currentStatus: string) => {
-    const statusFlow: Record<string, string> = {
-      confirmed: 'preparing',
-      preparing: 'ready',
-      ready: 'picked_up',
-      picked_up: 'on_way',
-      on_way: 'delivered'
-    };
-    return statusFlow[currentStatus];
-  };
-
-  const getNextStatusLabel = (currentStatus: string) => {
-    const labels: Record<string, string> = {
-      confirmed: 'بدء التحضير',
-      preparing: 'جاهز للاستلام',
-      ready: 'تم الاستلام',
-      picked_up: 'في الطريق',
-      on_way: 'تم التسليم'
-    };
-    return labels[currentStatus] || 'تحديث الحالة';
-  };
-
-  const getOrderItems = (itemsString: string) => {
-    try {
-      return JSON.parse(itemsString);
-    } catch {
-      return [];
-    }
-  };
-
-  const formatCurrency = (amount: string | number) => {
-    const num = typeof amount === 'string' ? parseFloat(amount) : amount;
-    return `${num.toFixed(2)} ريال`;
-  };
-
-  // فتح خرائط جوجل للمطعم
-  const openRestaurantLocation = (order: Order) => {
-    // في التطبيق الحقيقي، سنجلب موقع المطعم من قاعدة البيانات
-    // للآن نستخدم موقع افتراضي لصنعاء
-    const restaurantLat = 15.3694;
-    const restaurantLng = 44.1910;
-    const url = `https://www.google.com/maps/dir/?api=1&destination=${restaurantLat},${restaurantLng}`;
-    window.open(url, '_blank');
-  };
-
-  // فتح خرائط جوجل للعميل
-  const openCustomerLocation = (order: Order) => {
-    if (order.customerLocationLat && order.customerLocationLng) {
-      const url = `https://www.google.com/maps/dir/?api=1&destination=${order.customerLocationLat},${order.customerLocationLng}`;
-      window.open(url, '_blank');
-    } else {
-      // استخدام العنوان النصي
-      const encodedAddress = encodeURIComponent(order.deliveryAddress);
-      const url = `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`;
-      window.open(url, '_blank');
-    }
-  };
-
-  // عرض تفاصيل الطلب
-  const handleShowOrderDetails = (order: Order) => {
-    setSelectedOrder(order);
-    setShowOrderDetailsDialog(true);
-  };
-
-  // فتح خرائط جوجل للتنقل
-  const openGoogleMaps = (address: string) => {
-    const encodedAddress = encodeURIComponent(address);
-    const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`;
-    
-    // محاولة فتح التطبيق أولاً، ثم المتصفح
-    const mobileAppUrl = `comgooglemaps://?q=${encodedAddress}`;
-    
-    // للأجهزة المحمولة، محاولة فتح التطبيق
-    if (/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-      window.location.href = mobileAppUrl;
-      // إذا فشل فتح التطبيق، فتح المتصفح بعد ثانية
-      setTimeout(() => {
-        window.open(googleMapsUrl, '_blank');
-      }, 1000);
-    } else {
-      // للحاسوب، فتح في المتصفح
-      window.open(googleMapsUrl, '_blank');
-    }
-  };
-
-  // تصنيف الطلبات حسب الحالة
-  const categorizeOrders = (orders: Order[]) => {
-    return {
-      available: orders.filter(order => 
-        order.status === 'confirmed' && !order.driverId
-      ),
-      accepted: orders.filter(order => 
-        order.driverId === currentDriver?.id && 
-        ['preparing', 'ready'].includes(order.status || '')
-      ),
-      inProgress: orders.filter(order => 
-        order.driverId === currentDriver?.id && 
-        ['picked_up', 'on_way'].includes(order.status || '')
-      ),
-      completed: orders.filter(order => 
-        order.driverId === currentDriver?.id && 
-        order.status === 'delivered'
-      )
-    };
-  };
-
-  const allOrders = [...availableOrders, ...myOrders];
-  const categorizedOrders = categorizeOrders(allOrders);
-
-  // مكون عرض الطلب
-  const OrderCard = ({ order, type }: { order: Order; type: 'available' | 'accepted' | 'inProgress' | 'completed' }) => {
-    const items = getOrderItems(order.items);
-    const totalAmount = parseFloat(order.totalAmount || '0');
-    const commission = Math.round(totalAmount * 0.15); // 15% عمولة
-
-    return (
-      <Card key={order.id} className="hover:shadow-md transition-shadow">
-        <CardHeader className="pb-3">
-          <div className="flex justify-between items-start">
+        {/* Info Grid */}
+        <div className="grid grid-cols-1 gap-3 mb-5" onClick={onSelect}>
+          <div className="flex items-start gap-3 bg-gray-50 p-3 rounded-xl border border-gray-100">
+            <MapPin className="text-red-500 flex-shrink-0 mt-0.5" size={18} />
             <div>
-              <h4 className="font-bold text-lg">طلب #{order.id.slice(0, 8)}</h4>
-              <p className="text-sm text-muted-foreground">{order.customerName}</p>
-              <p className="text-xs text-muted-foreground">
-                {new Date(order.createdAt).toLocaleString('ar-YE')}
-              </p>
-            </div>
-            <div className="text-left">
-              <Badge className={getStatusColor(order.status || 'pending')}>
-                {getStatusText(order.status || 'pending')}
-              </Badge>
-              <div className="mt-2">
-                <p className="font-bold text-lg text-green-600">{formatCurrency(totalAmount)}</p>
-                <p className="text-sm text-muted-foreground">عمولة: {formatCurrency(commission)}</p>
-              </div>
+              <p className="text-[10px] text-gray-400 font-black uppercase">عنوان التوصيل:</p>
+              <p className="text-sm text-gray-800 font-bold leading-tight mt-0.5">{order.deliveryAddress}</p>
             </div>
           </div>
-        </CardHeader>
-        
-        <CardContent className="space-y-4">
-          {/* معلومات العميل */}
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <Store className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm font-medium">من: مطعم تجريبي</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Phone className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm">{order.customerPhone}</span>
-            </div>
-            <div className="flex items-start gap-2">
-              <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
-              <span className="text-sm">{order.deliveryAddress}</span>
-            </div>
-            {order.notes && (
-              <div className="flex items-start gap-2">
-                <MessageCircle className="h-4 w-4 text-muted-foreground mt-0.5" />
-                <span className="text-sm text-blue-600">ملاحظات: {order.notes}</span>
-              </div>
-            )}
-          </div>
+        </div>
 
-          {/* تفاصيل الطلب */}
-          <div className="bg-gray-50 p-3 rounded-lg">
-            <h5 className="font-medium mb-2">تفاصيل الطلب:</h5>
-            <div className="space-y-1">
-              {items.slice(0, 3).map((item: any, index: number) => (
-                <div key={index} className="flex justify-between text-sm">
-                  <span>{item.name} × {item.quantity}</span>
-                  <span>{formatCurrency(item.price * item.quantity)}</span>
+        {/* Detailed View - Opens when selected */}
+        {isSelected && (
+          <div className="mt-5 pt-5 border-t-2 border-dashed border-gray-100 animate-in fade-in slide-in-from-top-4 duration-300">
+            {/* Items List */}
+            <div className="bg-blue-50/50 p-4 rounded-2xl mb-5 border border-blue-100">
+              <h4 className="font-black text-blue-900 mb-4 flex items-center gap-2 text-sm">
+                <Package size={18} />
+                تفاصيل الطلب:
+              </h4>
+              <div className="space-y-2">
+                {items.map((item: any, idx: number) => (
+                  <div key={idx} className="flex justify-between items-center bg-white p-3 rounded-xl shadow-sm border border-blue-50">
+                    <span className="text-sm font-bold text-gray-800">
+                      {item.name} <span className="text-blue-600 mx-1">×</span> {item.quantity}
+                    </span>
+                    <span className="text-sm font-black text-gray-900">
+                      {formatCurrency(parseFloat(item.price) * item.quantity)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Financial Details */}
+            <div className="bg-white border-2 border-green-50 p-4 rounded-2xl mb-5 shadow-sm">
+              <h4 className="font-black text-green-900 mb-4 flex items-center gap-2 text-sm">
+                <DollarSign size={18} />
+                الحساب والعمولة:
+              </h4>
+              <div className="space-y-3 text-sm">
+                <div className="flex justify-between text-gray-500 font-bold">
+                  <span>قيمة المشتريات:</span>
+                  <span>{formatCurrency(order.subtotal)}</span>
                 </div>
-              ))}
-              {items.length > 3 && (
-                <p className="text-xs text-muted-foreground">
-                  و {items.length - 3} عنصر آخر...
-                </p>
+                <div className="flex justify-between text-gray-500 font-bold">
+                  <span>أجرة التوصيل:</span>
+                  <span className="text-green-600">{formatCurrency(order.deliveryFee)}</span>
+                </div>
+                <div className="h-px bg-gray-100 my-1"></div>
+                <div className="flex justify-between items-center bg-green-50 p-3 rounded-xl border border-green-100">
+                  <span className="font-black text-green-800 text-xs">عمولتك الصافية (70%):</span>
+                  <span className="text-xl font-black text-green-700">
+                    {formatCurrency((parseFloat(order.deliveryFee) * 70) / 100)}
+                  </span>
+                </div>
+                <div className="flex justify-between text-[10px] text-gray-400 font-black px-1 mt-1 uppercase">
+                  <span>الإجمالي المطلوب من الزبون:</span>
+                  <span className="text-gray-700">{formatCurrency(order.totalAmount)}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Contact & Map Buttons */}
+            <div className="grid grid-cols-2 gap-4 mb-6">
+              <a
+                href={`tel:${order.customerPhone}`}
+                className="flex flex-col items-center justify-center gap-2 bg-green-600 text-white p-4 rounded-2xl font-black hover:bg-green-700 transition-all shadow-lg active:scale-95"
+              >
+                <Phone size={24} />
+                <span className="text-xs">اتصال بالزبون</span>
+              </a>
+              <a
+                href={`tel:${adminPhone}`}
+                className="flex flex-col items-center justify-center gap-2 bg-gray-900 text-white p-4 rounded-2xl font-black hover:bg-black transition-all shadow-lg active:scale-95"
+              >
+                <User size={24} />
+                <span className="text-xs">اتصال بالإدارة</span>
+              </a>
+              {order.customerLocationLat && order.customerLocationLng && (
+                <a
+                  href={`https://www.google.com/maps?q=${order.customerLocationLat},${order.customerLocationLng}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="col-span-2 flex items-center justify-center gap-3 bg-blue-600 text-white p-5 rounded-2xl font-black hover:bg-blue-700 transition-all shadow-lg active:scale-95"
+                >
+                  <Navigation size={24} />
+                  <span>تتبع موقع الزبون على الخرائط</span>
+                </a>
               )}
             </div>
-          </div>
 
-          {/* أزرار الإجراءات */}
-          <div className="flex gap-2">
-            {type === 'available' && (
-              <>
-                <Button
-                  variant="outline"
-                  onClick={() => handleShowOrderDetails(order)}
-                  className="gap-2"
-                  data-testid={`view-details-${order.id}`}
-                >
-                  <Eye className="h-4 w-4" />
-                  التفاصيل
-                </Button>
-                <Button
-                  onClick={() => acceptOrderMutation.mutate(order.id)}
-                  disabled={acceptOrderMutation.isPending}
-                  className="flex-1 bg-green-600 hover:bg-green-700"
-                  data-testid={`accept-order-${order.id}`}
-                >
-                  <CheckCircle className="h-4 w-4 mr-2" />
-                  قبول الطلب
-                </Button>
-              </>
-            )}
-
-            {(type === 'accepted' || type === 'inProgress') && (
-              <>
-                <Button
-                  variant="outline"
-                  onClick={() => openRestaurantLocation(order)}
-                  className="gap-2"
-                  data-testid={`restaurant-location-${order.id}`}
-                >
-                  <Store className="h-4 w-4" />
-                  المطعم
-                </Button>
-                
-                <Button
-                  variant="outline"
-                  onClick={() => window.open(`tel:${order.customerPhone}`)}
-                  className="gap-2"
-                  data-testid={`call-customer-${order.id}`}
-                >
-                  <Phone className="h-4 w-4" />
-                  اتصال
-                </Button>
-                
-                <Button
-                  variant="outline"
-                  onClick={() => openCustomerLocation(order)}
-                  className="gap-2"
-                  data-testid={`navigate-${order.id}`}
-                >
-                  <Navigation className="h-4 w-4" />
-                  التنقل
-                </Button>
-
-                {getNextStatus(order.status || '') && (
-                  <Button
-                    onClick={() => updateOrderStatusMutation.mutate({ 
-                      orderId: order.id, 
-                      status: getNextStatus(order.status || '') 
-                    })}
-                    disabled={updateOrderStatusMutation.isPending}
-                    className="flex-1"
-                    data-testid={`update-status-${order.id}`}
-                  >
-                    {getNextStatusLabel(order.status || '')}
-                  </Button>
-                )}
-              </>
-            )}
-
-            {type === 'completed' && (
-              <div className="flex-1 text-center">
-                <Badge className="bg-green-100 text-green-800">
-                  <CheckCircle className="h-3 w-3 mr-1" />
-                  مكتمل
-                </Badge>
+            {order.notes && (
+              <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-2xl shadow-inner">
+                <p className="text-[10px] font-black text-yellow-700 mb-1 uppercase tracking-wider">📝 ملاحظات إضافية:</p>
+                <p className="text-sm text-yellow-900 font-bold">{order.notes}</p>
               </div>
             )}
           </div>
-        </CardContent>
-      </Card>
-    );
+        )}
+
+        {/* Quick Action Buttons */}
+        <div className="flex gap-3">
+          {actionType === 'accept' ? (
+            <button
+              onClick={() => onAccept(order.id)}
+              disabled={isLoading}
+              className={`flex-1 py-4 rounded-2xl font-black text-lg transition-all flex items-center justify-center gap-3 shadow-xl ${
+                isLoading 
+                  ? 'bg-gray-200 text-gray-500 cursor-not-allowed' 
+                  : 'bg-green-600 text-white hover:bg-green-700 active:scale-95'
+              }`}
+            >
+              {isLoading ? (
+                <div className="h-6 w-6 border-3 border-gray-400 border-t-transparent animate-spin rounded-full"></div>
+              ) : (
+                <>
+                  <CheckCircle size={24} />
+                  <span>قبول وتوصيل الطلب</span>
+                </>
+              )}
+            </button>
+          ) : nextAction ? (
+            <button
+              onClick={() => onStatusUpdate(order.id, nextAction.action)}
+              disabled={isLoading}
+              className={`flex-1 py-4 rounded-2xl font-black text-lg transition-all flex items-center justify-center gap-3 shadow-xl ${
+                isLoading
+                  ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                  : 'bg-orange-600 text-white hover:bg-orange-700 active:scale-95 animate-pulse'
+              }`}
+            >
+              {isLoading ? (
+                <div className="h-6 w-6 border-3 border-white border-t-transparent animate-spin rounded-full"></div>
+              ) : (
+                <>
+                  {nextAction.action === 'picked_up' && <Package size={24} />}
+                  {nextAction.action === 'on_way' && <Navigation size={24} />}
+                  {nextAction.action === 'delivered' && <CheckCircle size={24} />}
+                  <span>{nextAction.label}</span>
+                </>
+              )}
+            </button>
+          ) : order.status === 'delivered' ? (
+            <div className="w-full bg-green-50 border-2 border-green-200 rounded-2xl p-4 text-center">
+              <p className="text-green-800 font-black flex items-center justify-center gap-2">
+                <CheckCircle size={24} />
+                تم التوصيل بنجاح ✓
+              </p>
+            </div>
+          ) : null}
+          
+          {!isSelected && (
+            <button
+              onClick={onSelect}
+              className="px-5 bg-gray-100 text-gray-700 rounded-2xl font-black hover:bg-gray-200 transition-all flex items-center justify-center shadow-sm"
+            >
+              <Eye size={24} />
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function StatsSection({ stats }: any) {
+  return (
+    <div className="space-y-6">
+      <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+        <h2 className="text-2xl font-black text-gray-900 flex items-center gap-2">
+          <BarChart3 className="text-blue-600" />
+          إحصائيات الأداء
+        </h2>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <StatCard
+          title="إجمالي الأرباح"
+          value={formatCurrency(stats?.total?.earnings || 0)}
+          icon={<TrendingUp className="text-green-600" size={32} />}
+          bgColor="bg-green-50"
+          borderColor="border-green-100"
+        />
+        <StatCard
+          title="إجمالي الطلبات"
+          value={stats?.total?.orders || 0}
+          icon={<Package className="text-blue-600" size={32} />}
+          bgColor="bg-blue-50"
+          borderColor="border-blue-100"
+        />
+        <StatCard
+          title="التقييم العام"
+          value={`${stats?.total?.rating?.toFixed(1) || '5.0'}`}
+          icon={<Award className="text-yellow-600" size={32} />}
+          bgColor="bg-yellow-50"
+          borderColor="border-yellow-100"
+        />
+      </div>
+    </div>
+  );
+}
+
+function StatCard({ title, value, icon, bgColor, borderColor }: any) {
+  return (
+    <div className={`${bgColor} ${borderColor} border-2 rounded-2xl p-6 shadow-sm`}>
+      <div className="flex items-start justify-between">
+        <div>
+          <p className="text-gray-500 text-xs font-black uppercase tracking-wider">{title}</p>
+          <p className="text-3xl font-black text-gray-900 mt-2">{value}</p>
+        </div>
+        <div className="p-3 bg-white/50 rounded-xl shadow-inner">
+          {icon}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function WalletSection({ wallet, withdrawalAmount, setWithdrawalAmount, driverId, fetchWallet }: any) {
+  const { toast } = useToast();
+
+  const handleWithdrawal = async () => {
+    if (!withdrawalAmount || parseFloat(withdrawalAmount) <= 0) {
+      toast({ title: "خطأ", description: "الرجاء إدخال مبلغ صحيح", variant: "destructive" });
+      return;
+    }
+
+    if (wallet && parseFloat(withdrawalAmount) > wallet.balance) {
+      toast({ title: "رصيد غير كافي", description: "المبلغ المطلوب أكبر من الرصيد المتاح", variant: "destructive" });
+      return;
+    }
+
+    toast({ title: "جاري المعالجة", description: "سيتم تحويل طلبك للإدارة للمراجعة" });
+    setWithdrawalAmount('');
   };
 
   return (
-    <div className="min-h-screen bg-gray-50" dir="rtl">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b sticky top-0 z-10">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center">
-                <Truck className="h-6 w-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-gray-900">تطبيق السائق</h1>
-                <p className="text-sm text-gray-500">مرحباً {currentDriver?.name}</p>
-              </div>
-            </div>
-            
-            <div className="flex items-center gap-4">
-              {/* مؤشر الطلبات الجديدة */}
-              {categorizedOrders.available.length > 0 && driverStatus === 'available' && (
-                <div className="flex items-center gap-2 bg-red-50 px-3 py-1 rounded-full">
-                  <Bell className="h-4 w-4 text-red-500 animate-pulse" />
-                  <span className="text-sm font-medium text-red-700">
-                    {categorizedOrders.available.length} طلب جديد
-                  </span>
-                </div>
-              )}
-
-              {/* حالة السائق */}
-              <div className="flex items-center gap-2">
-                <Label htmlFor="driver-status" className="text-sm">متاح للعمل</Label>
-                <Switch
-                  id="driver-status"
-                  checked={driverStatus === 'available'}
-                  onCheckedChange={(checked) => updateDriverStatusMutation.mutate(checked)}
-                  disabled={updateDriverStatusMutation.isPending}
-                  data-testid="driver-status-toggle"
-                />
-              </div>
-
-              <Button 
-                variant="outline" 
-                onClick={handleLogout}
-                className="flex items-center gap-2"
-                data-testid="logout-button"
-              >
-                <LogOut className="h-4 w-4" />
-                خروج
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* إحصائيات سريعة */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          <Card>
-            <CardContent className="p-4 text-center">
-              <Package className="h-6 w-6 text-blue-500 mx-auto mb-2" />
-              <p className="text-lg font-bold">{driverStats?.totalOrders || 0}</p>
-              <p className="text-xs text-muted-foreground">إجمالي الطلبات</p>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-4 text-center">
-              <DollarSign className="h-6 w-6 text-green-500 mx-auto mb-2" />
-              <p className="text-lg font-bold">{formatCurrency(driverStats?.totalEarnings || 0)}</p>
-              <p className="text-xs text-muted-foreground">إجمالي الأرباح</p>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-4 text-center">
-              <CheckCircle className="h-6 w-6 text-emerald-500 mx-auto mb-2" />
-              <p className="text-lg font-bold">{driverStats?.completedOrders || 0}</p>
-              <p className="text-xs text-muted-foreground">طلبات مكتملة</p>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-4 text-center">
-              <Target className="h-6 w-6 text-purple-500 mx-auto mb-2" />
-              <p className="text-lg font-bold">
-                {driverStatus === 'available' ? '🟢 متاح' : 
-                 driverStatus === 'busy' ? '🟡 مشغول' : '🔴 غير متاح'}
-              </p>
-              <p className="text-xs text-muted-foreground">الحالة الحالية</p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* التبويبات */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="available" className="relative">
-              الطلبات المتاحة
-              {categorizedOrders.available.length > 0 && (
-                <Badge className="absolute -top-2 -right-2 bg-red-500 text-white text-xs h-5 w-5 rounded-full p-0 flex items-center justify-center">
-                  {categorizedOrders.available.length}
-                </Badge>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="accepted" className="relative">
-              طلباتي المقبولة
-              {categorizedOrders.accepted.length > 0 && (
-                <Badge className="absolute -top-2 -right-2 bg-blue-500 text-white text-xs h-5 w-5 rounded-full p-0 flex items-center justify-center">
-                  {categorizedOrders.accepted.length}
-                </Badge>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="inProgress" className="relative">
-              قيد التوصيل
-              {categorizedOrders.inProgress.length > 0 && (
-                <Badge className="absolute -top-2 -right-2 bg-orange-500 text-white text-xs h-5 w-5 rounded-full p-0 flex items-center justify-center">
-                  {categorizedOrders.inProgress.length}
-                </Badge>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="completed">
-              مكتملة
-            </TabsTrigger>
-          </TabsList>
-
-          {/* الطلبات المتاحة */}
-          <TabsContent value="available" className="space-y-4">
-            <div className="flex justify-between items-center">
-              <h2 className="text-xl font-bold">الطلبات المتاحة ({categorizedOrders.available.length})</h2>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => refetchAvailable()}
-                disabled={availableLoading}
-                data-testid="refresh-available-orders"
-              >
-                <RefreshCw className={`h-4 w-4 ${availableLoading ? 'animate-spin' : ''}`} />
-                تحديث
-              </Button>
-            </div>
-
-            {driverStatus !== 'available' && (
-              <Card className="border-yellow-200 bg-yellow-50">
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-2">
-                    <AlertCircle className="h-5 w-5 text-yellow-600" />
-                    <p className="text-yellow-800">
-                      يجب تفعيل حالة "متاح للعمل" لرؤية الطلبات الجديدة
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {availableLoading ? (
-              <div className="space-y-4">
-                {[...Array(3)].map((_, i) => (
-                  <Card key={i} className="animate-pulse">
-                    <CardContent className="p-6">
-                      <div className="h-4 bg-gray-200 rounded w-3/4 mb-2" />
-                      <div className="h-3 bg-gray-200 rounded w-1/2 mb-3" />
-                      <div className="h-3 bg-gray-200 rounded w-2/3" />
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            ) : categorizedOrders.available.length === 0 ? (
-              <Card>
-                <CardContent className="p-8 text-center">
-                  <Package className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">لا توجد طلبات متاحة</h3>
-                  <p className="text-muted-foreground">سيتم إشعارك عند توفر طلبات جديدة</p>
-                </CardContent>
-              </Card>
-            ) : (
-              <div className="space-y-4">
-                {categorizedOrders.available.map(order => (
-                  <OrderCard key={order.id} order={order} type="available" />
-                ))}
-              </div>
-            )}
-          </TabsContent>
-
-          {/* الطلبات المقبولة */}
-          <TabsContent value="accepted" className="space-y-4">
-            <div className="flex justify-between items-center">
-              <h2 className="text-xl font-bold">طلباتي المقبولة ({categorizedOrders.accepted.length})</h2>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => refetchMyOrders()}
-                disabled={myOrdersLoading}
-              >
-                <RefreshCw className={`h-4 w-4 ${myOrdersLoading ? 'animate-spin' : ''}`} />
-                تحديث
-              </Button>
-            </div>
-
-            {categorizedOrders.accepted.length === 0 ? (
-              <Card>
-                <CardContent className="p-8 text-center">
-                  <Clock className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">لا توجد طلبات مقبولة</h3>
-                  <p className="text-muted-foreground">الطلبات التي تقبلها ستظهر هنا</p>
-                </CardContent>
-              </Card>
-            ) : (
-              <div className="space-y-4">
-                {categorizedOrders.accepted.map(order => (
-                  <OrderCard key={order.id} order={order} type="accepted" />
-                ))}
-              </div>
-            )}
-          </TabsContent>
-
-          {/* الطلبات قيد التوصيل */}
-          <TabsContent value="inProgress" className="space-y-4">
-            <div className="flex justify-between items-center">
-              <h2 className="text-xl font-bold">قيد التوصيل ({categorizedOrders.inProgress.length})</h2>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => refetchMyOrders()}
-                disabled={myOrdersLoading}
-              >
-                <RefreshCw className={`h-4 w-4 ${myOrdersLoading ? 'animate-spin' : ''}`} />
-                تحديث
-              </Button>
-            </div>
-
-            {categorizedOrders.inProgress.length === 0 ? (
-              <Card>
-                <CardContent className="p-8 text-center">
-                  <Navigation className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">لا توجد طلبات قيد التوصيل</h3>
-                  <p className="text-muted-foreground">الطلبات التي تقوم بتوصيلها ستظهر هنا</p>
-                </CardContent>
-              </Card>
-            ) : (
-              <div className="space-y-4">
-                {categorizedOrders.inProgress.map(order => (
-                  <OrderCard key={order.id} order={order} type="inProgress" />
-                ))}
-              </div>
-            )}
-          </TabsContent>
-
-          {/* الطلبات المكتملة */}
-          <TabsContent value="completed" className="space-y-4">
-            <div className="flex justify-between items-center">
-              <h2 className="text-xl font-bold">الطلبات المكتملة</h2>
-              <p className="text-sm text-muted-foreground">
-                آخر 10 طلبات مكتملة
-              </p>
-            </div>
-
-            {categorizedOrders.completed.length === 0 ? (
-              <Card>
-                <CardContent className="p-8 text-center">
-                  <CheckCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">لا توجد طلبات مكتملة</h3>
-                  <p className="text-muted-foreground">الطلبات المكتملة ستظهر هنا</p>
-                </CardContent>
-              </Card>
-            ) : (
-              <div className="space-y-4">
-                {categorizedOrders.completed.slice(0, 10).map(order => (
-                  <OrderCard key={order.id} order={order} type="completed" />
-                ))}
-              </div>
-            )}
-          </TabsContent>
-        </Tabs>
+    <div className="space-y-6">
+      <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+        <h2 className="text-2xl font-black text-gray-900 flex items-center gap-2">
+          <Wallet className="text-blue-600" />
+          المحفظة المالية
+        </h2>
       </div>
-      
-      {/* نافذة تفاصيل الطلب */}
-      <Dialog open={showOrderDetailsDialog} onOpenChange={setShowOrderDetailsDialog}>
-        <DialogContent className="max-w-md" dir="rtl">
-          <DialogHeader>
-            <DialogTitle>تفاصيل الطلب #{selectedOrder?.id?.slice(0, 8)}</DialogTitle>
-          </DialogHeader>
-          
-          {selectedOrder && (
-            <div className="space-y-4">
-              {/* معلومات المطعم */}
-              <Card>
-                <CardContent className="p-4">
-                  <h4 className="font-medium mb-2 flex items-center gap-2">
-                    <Store className="h-4 w-4" />
-                    معلومات المطعم
-                  </h4>
-                  <div className="space-y-2 text-sm">
-                    <p><strong>اسم المطعم:</strong> مطعم تجريبي</p>
-                    <p><strong>رقم الهاتف:</strong> +967771234567</p>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => openRestaurantLocation(selectedOrder)}
-                      className="w-full mt-2"
-                    >
-                      <Map className="h-4 w-4 mr-2" />
-                      عرض موقع المطعم على الخريطة
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-              
-              {/* معلومات العميل */}
-              <Card>
-                <CardContent className="p-4">
-                  <h4 className="font-medium mb-2 flex items-center gap-2">
-                    <User className="h-4 w-4" />
-                    معلومات العميل
-                  </h4>
-                  <div className="space-y-2 text-sm">
-                    <p><strong>الاسم:</strong> {selectedOrder.customerName}</p>
-                    <p><strong>الهاتف:</strong> {selectedOrder.customerPhone}</p>
-                    <p><strong>العنوان:</strong> {selectedOrder.deliveryAddress}</p>
-                    {selectedOrder.notes && (
-                      <p><strong>ملاحظات:</strong> {selectedOrder.notes}</p>
-                    )}
-                    <div className="flex gap-2 mt-3">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => window.open(`tel:${selectedOrder.customerPhone}`)}
-                        className="flex-1"
-                      >
-                        <Phone className="h-4 w-4 mr-2" />
-                        اتصال
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => openCustomerLocation(selectedOrder)}
-                        className="flex-1"
-                      >
-                        <Navigation className="h-4 w-4 mr-2" />
-                        التوجيه
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-              
-              {/* تفاصيل الطلب */}
-              <Card>
-                <CardContent className="p-4">
-                  <h4 className="font-medium mb-2">تفاصيل الطلب</h4>
-                  <div className="space-y-2">
-                    {getOrderItems(selectedOrder.items).map((item: any, index: number) => (
-                      <div key={index} className="flex justify-between text-sm">
-                        <span>{item.name} × {item.quantity}</span>
-                        <span>{formatCurrency(item.price * item.quantity)}</span>
-                      </div>
-                    ))}
-                    <div className="border-t pt-2 mt-2">
-                      <div className="flex justify-between font-medium">
-                        <span>المجموع:</span>
-                        <span className="text-green-600">{formatCurrency(selectedOrder.totalAmount)}</span>
-                      </div>
-                      <div className="flex justify-between text-sm text-muted-foreground">
-                        <span>عمولتك:</span>
-                        <span className="text-green-600">{formatCurrency(Math.round(parseFloat(selectedOrder.totalAmount || '0') * 0.15))}</span>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <StatCard
+          title="الرصيد المتاح للسحب"
+          value={formatCurrency(wallet?.balance || 0)}
+          icon={<Wallet className="text-blue-600" size={32} />}
+          bgColor="bg-blue-50"
+          borderColor="border-blue-100"
+        />
+        <StatCard
+          title="إجمالي الأرباح"
+          value={formatCurrency(wallet?.totalEarnings || 0)}
+          icon={<TrendingUp className="text-green-600" size={32} />}
+          bgColor="bg-green-50"
+          borderColor="border-green-100"
+        />
+        <StatCard
+          title="مبالغ تم سحبها"
+          value={formatCurrency(wallet?.withdrawn || 0)}
+          icon={<CheckCircle className="text-gray-600" size={32} />}
+          bgColor="bg-gray-50"
+          borderColor="border-gray-200"
+        />
+      </div>
+
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+        <h3 className="text-xl font-black text-gray-900 mb-6 flex items-center gap-2">
+          <DollarSign className="text-blue-600" />
+          طلب سحب الرصيد
+        </h3>
+        <div className="max-w-md space-y-4">
+          <div>
+            <label className="block text-xs font-black text-gray-400 mb-2 uppercase">المبلغ المراد سحبه:</label>
+            <div className="relative">
+              <input
+                type="number"
+                value={withdrawalAmount}
+                onChange={(e) => setWithdrawalAmount(e.target.value)}
+                className="w-full px-5 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl focus:ring-4 focus:ring-blue-50 focus:border-blue-500 outline-none font-black text-lg transition-all"
+                placeholder="0.00"
+              />
+              <span className="absolute left-5 top-1/2 -translate-y-1/2 font-black text-gray-400">ريال</span>
             </div>
-          )}
-        </DialogContent>
-      </Dialog>
+            <p className="text-[10px] text-gray-400 mt-2 font-bold italic">متاح للسحب: {formatCurrency(wallet?.balance || 0)}</p>
+          </div>
+          <button
+            onClick={handleWithdrawal}
+            className="w-full bg-blue-600 text-white py-5 rounded-2xl font-black text-lg hover:bg-blue-700 transition-all shadow-lg active:scale-95"
+          >
+            تأكيد طلب السحب
+          </button>
+        </div>
+      </div>
     </div>
   );
-};
+}
+
+function ProfileSection({ driver }: any) {
+  return (
+    <div className="space-y-6">
+      <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+        <h2 className="text-2xl font-black text-gray-900 flex items-center gap-2">
+          <User className="text-blue-600" />
+          معلومات الحساب
+        </h2>
+      </div>
+
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 space-y-8 max-w-2xl">
+        <div className="flex items-center gap-6">
+          <div className="w-24 h-24 bg-blue-100 rounded-3xl flex items-center justify-center text-blue-600 shadow-inner">
+            <User size={48} />
+          </div>
+          <div>
+            <h3 className="text-2xl font-black text-gray-900 leading-tight">{driver?.name}</h3>
+            <p className="text-blue-600 font-bold">{driver?.phone}</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 pt-4 border-t border-gray-50">
+          <div>
+            <label className="block text-[10px] font-black text-gray-400 mb-1 uppercase tracking-widest">نوع المركبة:</label>
+            <p className="text-lg font-bold text-gray-800">{driver?.vehicle || 'سيارة'}</p>
+          </div>
+          <div>
+            <label className="block text-[10px] font-black text-gray-400 mb-1 uppercase tracking-widest">حالة الحساب:</label>
+            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black ${
+              driver?.isAvailable ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
+            }`}>
+              <div className={`h-2 w-2 rounded-full ${driver?.isAvailable ? 'bg-green-600' : 'bg-gray-400'}`} />
+              {driver?.isAvailable ? 'نشط ومتاح' : 'غير متصل'}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function getNextAction(status: string) {
+  switch (status) {
+    case 'confirmed': return { action: 'picked_up', label: '📦 تم الاستلام من المتجر' };
+    case 'assigned': return { action: 'picked_up', label: '📦 تم الاستلام من المتجر' };
+    case 'picked_up': return { action: 'on_way', label: '🚗 في الطريق للزبون' };
+    case 'on_way': return { action: 'delivered', label: '✅ تم التسليم للزبون' };
+    default: return null;
+  }
+}

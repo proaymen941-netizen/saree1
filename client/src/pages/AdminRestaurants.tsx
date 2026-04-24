@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Edit, Trash2, Store, Save, X, Clock, Star, Search, MapPin, Phone } from 'lucide-react';
+import { Plus, Edit, Trash2, Store, Save, X, Clock, Star, Search, MapPin, Phone, Layers, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -15,31 +15,36 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import type { Restaurant, Category } from '@shared/schema';
-import ImageUpload from '@/components/ImageUpload';
+import LocationPicker from '@/components/maps/GoogleMapPicker';
 
 export default function AdminRestaurants() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [editingRestaurant, setEditingRestaurant] = useState<Restaurant | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isLocationPickerOpen, setIsLocationPickerOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [sectionsRestaurant, setSectionsRestaurant] = useState<Restaurant | null>(null);
+  const [isSectionsDialogOpen, setIsSectionsDialogOpen] = useState(false);
+  const [newSectionName, setNewSectionName] = useState('');
+  const [editingSectionId, setEditingSectionId] = useState<string | null>(null);
+  const [editingSectionName, setEditingSectionName] = useState('');
   
   const [formData, setFormData] = useState({
     name: '',
     description: '',
     image: '',
-    phone: '', // إضافة رقم الهاتف
+    phone: '',
     deliveryTime: '',
-    deliveryFee: '0',
+    commissionRate: '10',
     minimumOrder: '0',
     isOpen: true,
     categoryId: '',
     openingTime: '08:00',
     closingTime: '23:00',
-    workingDays: '0,1,2,3,4,5,6', // Sunday=0, Monday=1, ..., Saturday=6
+    workingDays: '0,1,2,3,4,5,6',
     isTemporarilyClosed: false,
     temporaryCloseReason: '',
-    // الحقول المفقودة من قاعدة البيانات
     latitude: '',
     longitude: '',
     address: '',
@@ -50,7 +55,6 @@ export default function AdminRestaurants() {
 
   const { data: restaurantsData, isLoading: restaurantsLoading } = useQuery<{restaurants: Restaurant[], pagination: any}>({
     queryKey: ['/api/admin/restaurants'],
-    refetchInterval: 10000, // تحديث كل 10 ثوانِ
   });
 
   const restaurants = restaurantsData?.restaurants || [];
@@ -59,13 +63,63 @@ export default function AdminRestaurants() {
     queryKey: ['/api/admin/categories'],
   });
 
+  const { data: restaurantSections = [], refetch: refetchSections } = useQuery<any[]>({
+    queryKey: ['/api/admin/restaurants', sectionsRestaurant?.id, 'sections'],
+    queryFn: async () => {
+      if (!sectionsRestaurant?.id) return [];
+      const res = await apiRequest('GET', `/api/admin/restaurants/${sectionsRestaurant.id}/sections`);
+      return res.json();
+    },
+    enabled: !!sectionsRestaurant?.id && isSectionsDialogOpen,
+  });
+
+  const createSectionMutation = useMutation({
+    mutationFn: async ({ restaurantId, name }: { restaurantId: string; name: string }) => {
+      const res = await apiRequest('POST', '/api/admin/restaurant-sections', { restaurantId, name, isActive: true });
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/restaurants', sectionsRestaurant?.id, 'sections'] });
+      setNewSectionName('');
+      toast({ title: 'تم إضافة القسم', description: 'تم إضافة القسم الجديد بنجاح' });
+    },
+    onError: () => toast({ variant: 'destructive', title: 'خطأ', description: 'فشل في إضافة القسم' }),
+  });
+
+  const updateSectionMutation = useMutation({
+    mutationFn: async ({ id, name, isActive }: { id: string; name: string; isActive?: boolean }) => {
+      const res = await apiRequest('PUT', `/api/admin/restaurant-sections/${id}`, { name, isActive });
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/restaurants', sectionsRestaurant?.id, 'sections'] });
+      setEditingSectionId(null);
+      setEditingSectionName('');
+      toast({ title: 'تم تحديث القسم' });
+    },
+    onError: () => toast({ variant: 'destructive', title: 'خطأ', description: 'فشل في تحديث القسم' }),
+  });
+
+  const deleteSectionMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const res = await apiRequest('DELETE', `/api/admin/restaurant-sections/${id}`);
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/restaurants', sectionsRestaurant?.id, 'sections'] });
+      toast({ title: 'تم حذف القسم' });
+    },
+    onError: () => toast({ variant: 'destructive', title: 'خطأ', description: 'فشل في حذف القسم' }),
+  });
+
   const createRestaurantMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
       const submitData = {
         ...data,
-        deliveryFee: parseFloat(data.deliveryFee) || 0,
+        deliveryFee: 0,
+        perKmFee: 0,
+        commissionRate: data.commissionRate ? parseFloat(data.commissionRate) : 10,
         minimumOrder: parseFloat(data.minimumOrder) || 0,
-        // تحويل إحداثيات الموقع للأرقام مع التحقق
         latitude: data.latitude ? parseFloat(data.latitude) : null,
         longitude: data.longitude ? parseFloat(data.longitude) : null,
       };
@@ -75,8 +129,8 @@ export default function AdminRestaurants() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/restaurants'] });
       toast({
-        title: "تم إضافة المطعم",
-        description: "تم إضافة المطعم الجديد بنجاح",
+        title: "تم إضافة المتجر",
+        description: "تم إضافة المتجر الجديد بنجاح",
       });
       resetForm();
       setIsDialogOpen(false);
@@ -87,9 +141,8 @@ export default function AdminRestaurants() {
     mutationFn: async ({ id, data }: { id: string; data: Partial<typeof formData> }) => {
       const submitData = {
         ...data,
-        deliveryFee: data.deliveryFee != null ? parseFloat(data.deliveryFee) : undefined,
+        commissionRate: data.commissionRate != null ? parseFloat(data.commissionRate) : undefined,
         minimumOrder: data.minimumOrder != null ? parseFloat(data.minimumOrder) : undefined,
-        // تحويل إحداثيات الموقع للأرقام مع التحقق - يسمح بالمسح
         latitude: data.latitude === '' ? null : data.latitude != null ? parseFloat(data.latitude) : undefined,
         longitude: data.longitude === '' ? null : data.longitude != null ? parseFloat(data.longitude) : undefined,
       };
@@ -99,8 +152,8 @@ export default function AdminRestaurants() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/restaurants'] });
       toast({
-        title: "تم تحديث المطعم",
-        description: "تم تحديث بيانات المطعم بنجاح",
+        title: "تم تحديث المتجر",
+        description: "تم تحديث بيانات المتجر بنجاح",
       });
       resetForm();
       setEditingRestaurant(null);
@@ -116,8 +169,8 @@ export default function AdminRestaurants() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/restaurants'] });
       toast({
-        title: "تم حذف المطعم",
-        description: "تم حذف المطعم بنجاح",
+        title: "تم حذف المتجر",
+        description: "تم حذف المتجر بنجاح",
       });
     },
   });
@@ -129,7 +182,7 @@ export default function AdminRestaurants() {
       image: '',
       phone: '',
       deliveryTime: '',
-      deliveryFee: '0',
+      commissionRate: '10',
       minimumOrder: '0',
       isOpen: true,
       categoryId: '',
@@ -157,7 +210,7 @@ export default function AdminRestaurants() {
       phone: restaurant.phone || '',
       image: restaurant.image,
       deliveryTime: restaurant.deliveryTime,
-      deliveryFee: restaurant.deliveryFee || '0',
+      commissionRate: restaurant.commissionRate || '10',
       minimumOrder: restaurant.minimumOrder || '0',
       isOpen: restaurant.isOpen,
       categoryId: restaurant.categoryId || '',
@@ -166,13 +219,12 @@ export default function AdminRestaurants() {
       workingDays: restaurant.workingDays || '0,1,2,3,4,5,6',
       isTemporarilyClosed: restaurant.isTemporarilyClosed || false,
       temporaryCloseReason: restaurant.temporaryCloseReason || '',
-      // الحقول المفقودة من قاعدة البيانات
       latitude: restaurant.latitude || '',
       longitude: restaurant.longitude || '',
       address: restaurant.address || '',
       isFeatured: restaurant.isFeatured || false,
       isNew: restaurant.isNew || false,
-      isActive: restaurant.isActive !== false, // قيمة افتراضية true
+      isActive: restaurant.isActive !== false,
     });
     setIsDialogOpen(true);
   };
@@ -184,7 +236,7 @@ export default function AdminRestaurants() {
     if (!formData.name.trim()) {
       toast({
         title: "خطأ",
-        description: "يرجى إدخال اسم المطعم",
+        description: "يرجى إدخال اسم المتجر",
         variant: "destructive",
       });
       return;
@@ -200,13 +252,13 @@ export default function AdminRestaurants() {
     }
 
     // Validate numeric fields
-    const deliveryFee = parseFloat(formData.deliveryFee);
     const minimumOrder = parseFloat(formData.minimumOrder);
-    
-    if (isNaN(deliveryFee) || deliveryFee < 0) {
+    const commissionRate = parseFloat(formData.commissionRate);
+
+    if (isNaN(commissionRate) || commissionRate < 0 || commissionRate > 100) {
       toast({
         title: "خطأ",
-        description: "يرجى إدخال رسوم توصيل صحيحة",
+        description: "يرجى إدخال نسبة عمولة صحيحة (0-100)",
         variant: "destructive",
       });
       return;
@@ -278,15 +330,15 @@ export default function AdminRestaurants() {
     const category = categories?.find(c => c.id === categoryId);
     return category?.name || 'غير محدد';
   };
-  // فلترة المطاعم حسب البحث
+  // فلترة المتاجر حسب البحث
   const filteredRestaurants = restaurants.filter((restaurant) =>
     restaurant.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    getCategoryName(restaurant.categoryId).toLowerCase().includes(searchTerm.toLowerCase()) ||
+    getCategoryName(restaurant.categoryId || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
     restaurant.address?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     restaurant.phone?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // فتح موقع المطعم على خرائط جوجل
+  // فتح موقع المتجر على خرائط جوجل
   const openRestaurantOnMap = (restaurant: Restaurant) => {
     if (restaurant.latitude && restaurant.longitude) {
       const url = `https://www.google.com/maps?q=${restaurant.latitude},${restaurant.longitude}`;
@@ -298,7 +350,7 @@ export default function AdminRestaurants() {
     } else {
       toast({
         title: "موقع غير متوفر",
-        description: "لم يتم تحديد موقع لهذا المطعم",
+        description: "لم يتم تحديد موقع لهذا المتجر",
         variant: "destructive",
       });
     }
@@ -318,8 +370,8 @@ export default function AdminRestaurants() {
         <div className="flex items-center gap-3">
           <Store className="h-8 w-8 text-primary" />
           <div>
-            <h1 className="text-2xl font-bold text-foreground">إدارة المطاعم</h1>
-            <p className="text-muted-foreground">إدارة المطاعم والمتاجر</p>
+            <h1 className="text-2xl font-bold text-foreground">إدارة المتاجر</h1>
+            <p className="text-muted-foreground">إدارة المتاجر والعلامات التجارية</p>
           </div>
         </div>
         
@@ -334,32 +386,32 @@ export default function AdminRestaurants() {
               data-testid="button-add-restaurant"
             >
               <Plus className="h-4 w-4" />
-              إضافة مطعم جديد
+              إضافة متجر جديد
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>
-                {editingRestaurant ? 'تعديل بيانات المطعم' : 'إضافة مطعم جديد'}
+                {editingRestaurant ? 'تعديل بيانات المتجر' : 'إضافة متجر جديد'}
               </DialogTitle>
             </DialogHeader>
             
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="name">اسم المطعم</Label>
+                  <Label htmlFor="name">اسم المتجر</Label>
                   <Input
                     id="name"
                     value={formData.name}
                     onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                    placeholder="أدخل اسم المطعم"
+                    placeholder="أدخل اسم المتجر"
                     required
                     data-testid="input-restaurant-name"
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor="phone">رقم هاتف المطعم</Label>
+                  <Label htmlFor="phone">رقم هاتف المتجر</Label>
                   <Input
                     id="phone"
                     value={formData.phone}
@@ -373,7 +425,7 @@ export default function AdminRestaurants() {
                   <Label htmlFor="category">القسم</Label>
                   <Select value={formData.categoryId} onValueChange={(value) => setFormData(prev => ({ ...prev, categoryId: value }))}>
                     <SelectTrigger data-testid="select-restaurant-category">
-                      <SelectValue placeholder="اختر قسم المطعم" />
+                      <SelectValue placeholder="اختر قسم المتجر" />
                     </SelectTrigger>
                     <SelectContent>
                       {categories?.map((category) => (
@@ -392,22 +444,50 @@ export default function AdminRestaurants() {
                   id="description"
                   value={formData.description}
                   onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                  placeholder="وصف المطعم"
+                  placeholder="وصف المتجر"
                   rows={3}
                   data-testid="input-restaurant-description"
                 />
               </div>
 
               <div>
-                <ImageUpload
-                  label="صورة المطعم *"
-                  value={formData.image}
-                  onChange={(url) => setFormData(prev => ({ ...prev, image: url }))}
-                  category="restaurants"
-                  placeholder="رابط الصورة أو ارفع صورة من جهازك"
-                  required={true}
-                  data-testid="input-restaurant-image"
-                />
+                <Label htmlFor="image">رابط الصورة</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="image"
+                    value={formData.image}
+                    onChange={(e) => setFormData(prev => ({ ...prev, image: e.target.value }))}
+                    placeholder="https://example.com/image.jpg"
+                    required
+                    data-testid="input-restaurant-image"
+                    className="flex-1"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => document.getElementById('restaurant-file-upload')?.click()}
+                    data-testid="button-select-image"
+                  >
+                    اختيار صورة
+                  </Button>
+                  <input
+                    id="restaurant-file-upload"
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                          const result = event.target?.result as string;
+                          setFormData(prev => ({ ...prev, image: result }));
+                        };
+                        reader.readAsDataURL(file);
+                      }
+                    }}
+                  />
+                </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -424,15 +504,16 @@ export default function AdminRestaurants() {
                 </div>
 
                 <div>
-                  <Label htmlFor="deliveryFee">رسوم التوصيل (ريال)</Label>
+                  <Label htmlFor="commissionRate">نسبة عمولة الشركة (%)</Label>
                   <Input
-                    id="deliveryFee"
+                    id="commissionRate"
                     type="number"
                     min="0"
-                    step="0.01"
-                    value={formData.deliveryFee}
-                    onChange={(e) => setFormData(prev => ({ ...prev, deliveryFee: e.target.value }))}
-                    data-testid="input-restaurant-delivery-fee"
+                    max="100"
+                    step="0.1"
+                    value={formData.commissionRate}
+                    onChange={(e) => setFormData(prev => ({ ...prev, commissionRate: e.target.value }))}
+                    data-testid="input-restaurant-commission-rate"
                   />
                 </div>
 
@@ -572,7 +653,7 @@ export default function AdminRestaurants() {
                     id="address"
                     value={formData.address}
                     onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
-                    placeholder="عنوان المطعم الكامل"
+                    placeholder="عنوان المتجر الكامل"
                     rows={2}
                     data-testid="input-restaurant-address"
                   />
@@ -611,36 +692,44 @@ export default function AdminRestaurants() {
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => {
-                      const address = formData.address || formData.name;
-                      if (address) {
-                        const encodedAddress = encodeURIComponent(address);
-                        const url = `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`;
-                        window.open(url, '_blank');
-                        toast({
-                          title: "تم فتح الخريطة",
-                          description: "يمكنك نسخ الإحداثيات من الخريطة وإدخالها في الحقول أعلاه",
-                        });
-                      } else {
-                        toast({
-                          title: "أدخل العنوان أولاً",
-                          description: "يرجى إدخال عنوان المطعم للبحث في الخريطة",
-                          variant: "destructive",
-                        });
-                      }
-                    }}
+                    onClick={() => setIsLocationPickerOpen(true)}
                     className="flex-1"
                     data-testid="button-open-maps"
                   >
                     <MapPin className="h-4 w-4 mr-2" />
-                    تحديد الموقع عبر الخريطة
+                    تحديد الموقع عبر الخريطة (مدمج)
                   </Button>
                 </div>
+
+                {isLocationPickerOpen && (
+                  <LocationPicker
+                    isOpen={isLocationPickerOpen}
+                    onClose={() => setIsLocationPickerOpen(false)}
+                    onLocationSelect={(location) => {
+                      setFormData(prev => ({
+                        ...prev,
+                        latitude: location.lat.toString(),
+                        longitude: location.lng.toString(),
+                        address: location.address || prev.address
+                      }));
+                      setIsLocationPickerOpen(false);
+                      toast({
+                        title: "تم تحديد الموقع",
+                        description: "تم تحديث الإحداثيات والعنوان بنجاح",
+                      });
+                    }}
+                    initialLocation={
+                      formData.latitude && formData.longitude
+                        ? { lat: parseFloat(formData.latitude), lng: parseFloat(formData.longitude) }
+                        : undefined
+                    }
+                  />
+                )}
 
                 {/* Status Flags */}
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="isActive">المطعم مفعل</Label>
+                    <Label htmlFor="isActive">المتجر مفعل</Label>
                     <Switch
                       id="isActive"
                       checked={formData.isActive}
@@ -650,7 +739,7 @@ export default function AdminRestaurants() {
                   </div>
                   
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="isFeatured">مطعم مميز</Label>
+                    <Label htmlFor="isFeatured">متجر مميز</Label>
                     <Switch
                       id="isFeatured"
                       checked={formData.isFeatured}
@@ -660,7 +749,7 @@ export default function AdminRestaurants() {
                   </div>
                   
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="isNew">مطعم جديد</Label>
+                    <Label htmlFor="isNew">متجر جديد</Label>
                     <Switch
                       id="isNew"
                       checked={formData.isNew}
@@ -699,13 +788,123 @@ export default function AdminRestaurants() {
         </Dialog>
       </div>
 
+      {/* حوار إدارة الأقسام */}
+      <Dialog open={isSectionsDialogOpen} onOpenChange={(open) => {
+        setIsSectionsDialogOpen(open);
+        if (!open) { setNewSectionName(''); setEditingSectionId(null); setEditingSectionName(''); }
+      }}>
+        <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto" dir="rtl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Layers className="h-5 w-5" />
+              إدارة أقسام: {sectionsRestaurant?.name}
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div className="flex gap-2">
+              <Input
+                value={newSectionName}
+                onChange={(e) => setNewSectionName(e.target.value)}
+                placeholder="اسم القسم الجديد (مثال: قسم البيتزا)"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && newSectionName.trim() && sectionsRestaurant) {
+                    createSectionMutation.mutate({ restaurantId: sectionsRestaurant.id, name: newSectionName.trim() });
+                  }
+                }}
+              />
+              <Button
+                onClick={() => {
+                  if (newSectionName.trim() && sectionsRestaurant) {
+                    createSectionMutation.mutate({ restaurantId: sectionsRestaurant.id, name: newSectionName.trim() });
+                  }
+                }}
+                disabled={!newSectionName.trim() || createSectionMutation.isPending}
+                size="sm"
+                className="gap-1"
+              >
+                <Plus className="h-4 w-4" />
+                إضافة
+              </Button>
+            </div>
+
+            <div className="space-y-2">
+              {restaurantSections.length === 0 ? (
+                <div className="text-center py-6 text-muted-foreground">
+                  <Layers className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                  <p className="text-sm">لا توجد أقسام بعد</p>
+                  <p className="text-xs">أضف أقساماً مثل: قسم البروست، قسم البيتزا...</p>
+                </div>
+              ) : (
+                restaurantSections.map((section: any) => (
+                  <div key={section.id} className="flex items-center gap-2 p-2 border rounded-lg">
+                    {editingSectionId === section.id ? (
+                      <>
+                        <Input
+                          value={editingSectionName}
+                          onChange={(e) => setEditingSectionName(e.target.value)}
+                          className="flex-1 h-8"
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' && editingSectionName.trim()) {
+                              updateSectionMutation.mutate({ id: section.id, name: editingSectionName.trim(), isActive: section.isActive });
+                            }
+                          }}
+                        />
+                        <Button size="sm" variant="ghost" onClick={() => updateSectionMutation.mutate({ id: section.id, name: editingSectionName.trim(), isActive: section.isActive })}>
+                          <Save className="h-3 w-3" />
+                        </Button>
+                        <Button size="sm" variant="ghost" onClick={() => { setEditingSectionId(null); setEditingSectionName(''); }}>
+                          <X className="h-3 w-3" />
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                        <div className="flex-1">
+                          <span className="text-sm font-medium">{section.name}</span>
+                          {!section.isActive && <Badge variant="outline" className="mr-2 text-xs">مخفي</Badge>}
+                        </div>
+                        <Switch
+                          checked={section.isActive}
+                          onCheckedChange={(checked) => updateSectionMutation.mutate({ id: section.id, name: section.name, isActive: checked })}
+                          className="scale-75"
+                        />
+                        <Button size="sm" variant="ghost" onClick={() => { setEditingSectionId(section.id); setEditingSectionName(section.name); }}>
+                          <Edit className="h-3 w-3" />
+                        </Button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button size="sm" variant="ghost" className="text-destructive">
+                              <Trash2 className="h-3 w-3" />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent dir="rtl">
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>حذف القسم</AlertDialogTitle>
+                              <AlertDialogDescription>هل أنت متأكد من حذف قسم "{section.name}"؟</AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>إلغاء</AlertDialogCancel>
+                              <AlertDialogAction onClick={() => deleteSectionMutation.mutate(section.id)} className="bg-destructive text-destructive-foreground">حذف</AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </>
+                    )}
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* شريط البحث */}
       <Card>
         <CardContent className="p-4">
           <div className="relative">
             <Search className="absolute right-3 top-3 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="البحث في المطاعم..."
+              placeholder="البحث في المتاجر..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pr-10"
@@ -803,6 +1002,17 @@ export default function AdminRestaurants() {
                 </div>
 
                 <div className="grid grid-cols-2 gap-2 pt-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="gap-1 col-span-2 bg-purple-50 text-purple-700 hover:bg-purple-100 border-purple-200"
+                    onClick={() => { setSectionsRestaurant(restaurant); setIsSectionsDialogOpen(true); }}
+                    data-testid={`button-sections-${restaurant.id}`}
+                  >
+                    <Layers className="h-3 w-3" />
+                    إدارة الأقسام
+                  </Button>
+
                   {(restaurant.latitude && restaurant.longitude) || restaurant.address ? (
                     <Button
                       variant="outline"
@@ -838,18 +1048,18 @@ export default function AdminRestaurants() {
                         data-testid={`button-delete-restaurant-${restaurant.id}`}
                       >
                         <Trash2 className="h-3 w-3" />
-                        حذف المطعم
+                        حذف المتجر
                       </Button>
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                       <AlertDialogHeader>
                         <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
                         <AlertDialogDescription>
-                          هل أنت متأكد من حذف المطعم "{restaurant.name}" نهائياً؟
+                          هل أنت متأكد من حذف المتجر "{restaurant.name}" نهائياً؟
                           <br /><br />
                           <strong className="text-red-600">تحذير:</strong> سيتم حذف:
                           <ul className="list-disc list-inside mt-2 text-sm">
-                            <li>جميع وجبات المطعم</li>
+                            <li>جميع منتجات المتجر</li>
                             <li>جميع أقسام القائمة</li>
                             <li>جميع البيانات المرتبطة</li>
                           </ul>
@@ -879,10 +1089,10 @@ export default function AdminRestaurants() {
               {searchTerm ? 'لا توجد نتائج' : 'لا توجد مطاعم'}
             </h3>
             <p className="text-muted-foreground mb-4">
-              {searchTerm ? 'جرب البحث بكلمات مختلفة' : 'ابدأ بإضافة المطاعم والمتاجر'}
+              {searchTerm ? 'جرب البحث بكلمات مختلفة' : 'ابدأ بإضافة المتاجر والمتاجر'}
             </p>
             <Button onClick={() => setIsDialogOpen(true)} data-testid="button-add-first-restaurant">
-              إضافة المطعم الأول
+              إضافة المتجر الأول
             </Button>
           </div>
         )}

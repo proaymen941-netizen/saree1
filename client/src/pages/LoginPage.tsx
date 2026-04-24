@@ -26,11 +26,12 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess }) => {
     setError('');
 
     try {
-      const result = await login(email, password);
+      const userType = activeTab === 'admin' ? 'admin' : 'driver';
+      const result = await login(email, password, userType);
       if (result.success) {
         onSuccess();
       } else {
-        setError(result.message);
+        setError(result.message || 'بيانات الدخول غير صحيحة');
       }
     } catch (error) {
       setError('خطأ في تسجيل الدخول');

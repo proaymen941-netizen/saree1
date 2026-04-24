@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
-import { ArrowRight, User, Phone, Mail, MapPin, Settings, Shield, Star, Clock, Receipt, Truck } from 'lucide-react';
+import { ArrowRight, User, Phone, Mail, MapPin, Settings, Shield, Star, Clock, Receipt, Truck, MessageCircle, Share2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -10,7 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { useAuth } from '@/context/AuthContext';
-import type { User as UserType } from '@shared/schema';
+import type { User as UserType, UiSettings } from '@shared/schema';
 
 export default function Profile() {
   const [, setLocation] = useLocation();
@@ -18,8 +18,17 @@ export default function Profile() {
   const queryClient = useQueryClient();
   const { user: currentUser, isAuthenticated, loading: authLoading } = useAuth();
   
-  // Use the actual logged-in user's ID
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      setLocation('/auth');
+    }
+  }, [authLoading, isAuthenticated, setLocation]);
+
   const userId = currentUser?.id;
+
+  const { data: uiSettings } = useQuery<UiSettings[]>({
+    queryKey: ['/api/admin/ui-settings'],
+  });
   
   const [profile, setProfile] = useState({
     username: '',
@@ -31,14 +40,22 @@ export default function Profile() {
 
   const [isEditing, setIsEditing] = useState(false);
 
-  // Fetch user data only if authenticated and have userId
   const { data: user, isLoading } = useQuery({
     queryKey: ['/api/users', userId],
     enabled: !!userId && isAuthenticated,
     retry: false,
   });
 
-  // Update profile mutation
+  const { data: userOrders = [] } = useQuery({
+    queryKey: ['/api/orders/customer', profile.phone],
+    enabled: !!profile.phone,
+    queryFn: async () => {
+      const response = await fetch(`/api/orders/customer/${profile.phone}`);
+      if (!response.ok) return [];
+      return response.json();
+    }
+  });
+
   const updateProfileMutation = useMutation({
     mutationFn: async (profileData: Partial<UserType>) => {
       if (!userId) throw new Error('يجب تسجيل الدخول أولاً');
@@ -62,7 +79,6 @@ export default function Profile() {
     },
   });
 
-  // Update profile state when user data is loaded
   useEffect(() => {
     if (user) {
       setProfile({
@@ -76,20 +92,15 @@ export default function Profile() {
   }, [user]);
 
   const handleSave = () => {
-    if (isGuestMode) {
-      handleGuestSave();
-    } else {
-      updateProfileMutation.mutate({
-        username: profile.username,
-        name: profile.name,
-        phone: profile.phone,
-        email: profile.email,
-        address: profile.address,
-      });
-    }
+    updateProfileMutation.mutate({
+      username: profile.username,
+      name: profile.name,
+      phone: profile.phone,
+      email: profile.email,
+      address: profile.address,
+    } as any);
   };
 
-  // Show loading if auth is loading or data is loading
   if (authLoading || isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -101,52 +112,31 @@ export default function Profile() {
     );
   }
 
-  // Use local storage for guest users
-  const isGuestMode = !isAuthenticated || !userId;
+  // تم إزالة وضع الضيف (Guest Mode) بناءً على طلب المستخدم لإجبار تسجيل الدخول
 
-  // Load profile from localStorage for guest users
-  useEffect(() => {
-    if (isGuestMode) {
-      const guestProfile = localStorage.getItem('guest_profile');
-      if (guestProfile) {
-        try {
-          const parsedProfile = JSON.parse(guestProfile);
-          setProfile(prev => ({ ...prev, ...parsedProfile }));
-        } catch (error) {
-          console.error('Error loading guest profile:', error);
-        }
-      }
-    }
-  }, [isGuestMode]);
-
-  // Save to localStorage for guest users
-  const handleGuestSave = () => {
-    try {
-      localStorage.setItem('guest_profile', JSON.stringify({
-        username: profile.username,
-        name: profile.name,
-        phone: profile.phone,
-        email: profile.email,
-        address: profile.address,
-      }));
-      setIsEditing(false);
-      toast({
-        title: "تم حفظ البيانات محلياً",
-        description: "تم حفظ معلوماتك محلياً. للحفظ الدائم، يمكنك تسجيل حساب جديد.",
-      });
-    } catch (error) {
-      toast({
-        title: "خطأ في الحفظ",
-        description: "حدث خطأ أثناء حفظ البيانات محلياً",
-        variant: "destructive",
-      });
-    }
+  const getSetting = (key: string, defaultValue: string = '') => {
+    return uiSettings?.find(s => s.key === key)?.value || defaultValue;
   };
 
+  const supportWhatsapp = getSetting('support_whatsapp', '');
+  const supportPhone = getSetting('support_phone', '');
+  const shareUrl = getSetting('share_url', '');
+  const shareText = getSetting('share_text', 'انضم إلى تطبيق واصل الآن!');
+
   const profileStats = [
-    { icon: Receipt, label: 'إجمالي الطلبات', value: '42', color: 'text-primary' },
+    { 
+      icon: Receipt, 
+      label: 'إجمالي الطلبات', 
+      value: userOrders?.length?.toString() || '0', 
+      color: 'text-primary' 
+    },
     { icon: Star, label: 'التقييم', value: '4.8', color: 'text-yellow-500' },
-    { icon: Clock, label: 'عضو منذ', value: '6 أشهر', color: 'text-green-500' },
+    { 
+      icon: Clock, 
+      label: 'عضو منذ', 
+      value: user?.createdAt ? new Date(user.createdAt).toLocaleDateString('ar-YE', { month: 'short', year: 'numeric' }) : 'جديد', 
+      color: 'text-green-500' 
+    },
   ];
 
   const menuItems = [
@@ -154,185 +144,176 @@ export default function Profile() {
     { icon: Truck, label: 'تطبيق الدلفري', path: '/driver', description: 'انتقال إلى تطبيق السائقين', testId: 'profile-delivery-app', onClick: () => { window.location.href = '/driver'; } },
     { icon: MapPin, label: 'العناوين المحفوظة', path: '/addresses', description: 'إدارة عناوين التوصيل', testId: 'profile-addresses' },
     { icon: Settings, label: 'الإعدادات', path: '/settings', description: 'إعدادات التطبيق والحساب', testId: 'profile-settings' },
+    ...(supportWhatsapp ? [{
+      icon: MessageCircle,
+      label: 'دعم واتساب',
+      path: '#',
+      description: 'تواصل معنا عبر واتساب',
+      testId: 'profile-whatsapp',
+      onClick: () => { window.open(`https://wa.me/${supportWhatsapp.replace(/\D/g, '')}`, '_blank'); }
+    }] : []),
+    ...(supportPhone ? [{
+      icon: Phone,
+      label: 'اتصل بنا',
+      path: '#',
+      description: 'اتصل برقم الدعم المباشر',
+      testId: 'profile-call',
+      onClick: () => { window.open(`tel:${supportPhone}`, '_blank'); }
+    }] : []),
+    ...(shareUrl ? [{
+      icon: Share2,
+      label: 'مشاركة التطبيق',
+      path: '#',
+      description: 'شارك التطبيق مع أصدقائك',
+      testId: 'profile-share',
+      onClick: () => {
+        if (navigator.share) {
+          navigator.share({ title: 'واصل', text: shareText, url: shareUrl });
+        } else {
+          toast({ title: 'نسخ الرابط', description: shareUrl });
+        }
+      }
+    }] : []),
     { icon: Shield, label: 'سياسة الخصوصية', path: '/privacy', description: 'سياسة الخصوصية وشروط الاستخدام', testId: 'profile-privacy' },
   ];
 
   return (
-    <div>
-      {/* Header */}
-      <header className="bg-card border-b border-border p-4">
-        <div className="flex items-center gap-3">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setLocation('/')}
-            data-testid="button-profile-back"
-          >
-            <ArrowRight className="h-5 w-5" />
-          </Button>
-          <h2 className="text-xl font-bold text-foreground">الملف الشخصي</h2>
+    <div className="container mx-auto px-4 py-8">
+      <div className="max-w-4xl mx-auto space-y-8">
+        <div className="flex flex-col items-center mb-8 border-b pb-6">
+          <h1 className="text-4xl font-black uppercase tracking-tighter text-primary">واصل</h1>
+          <p className="text-sm font-bold text-muted-foreground mt-1">لخدمات التوصيل</p>
         </div>
-      </header>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2 space-y-6">
+            <Card className="rounded-none border-2">
+              <CardHeader className="text-center">
+                <div className="w-20 h-20 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
+                  <User className="h-10 w-10 text-primary-foreground" />
+                </div>
+                <CardTitle className="text-xl text-foreground">
+                  {profile.name || (!isAuthenticated ? 'مستخدم ضيف' : 'المستخدم')}
+                </CardTitle>
+                <Badge variant={!isAuthenticated ? "outline" : "secondary"} className="mx-auto">
+                  {!isAuthenticated ? 'مستخدم ضيف' : 'عضو مميز'}
+                </Badge>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {isEditing ? (
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="name" className="text-foreground">الاسم</Label>
+                      <Input
+                        id="name"
+                        value={profile.name}
+                        onChange={(e) => setProfile(prev => ({ ...prev, name: e.target.value }))}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="username" className="text-foreground">اسم المستخدم</Label>
+                      <Input
+                        id="username"
+                        value={profile.username}
+                        onChange={(e) => setProfile(prev => ({ ...prev, username: e.target.value }))}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="phone" className="text-foreground">رقم الهاتف</Label>
+                      <Input
+                        id="phone"
+                        value={profile.phone}
+                        onChange={(e) => setProfile(prev => ({ ...prev, phone: e.target.value }))}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="email" className="text-foreground">البريد الإلكتروني (اختياري)</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        value={profile.email}
+                        onChange={(e) => setProfile(prev => ({ ...prev, email: e.target.value }))}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="address" className="text-foreground">العنوان</Label>
+                      <Input
+                        id="address"
+                        value={profile.address}
+                        onChange={(e) => setProfile(prev => ({ ...prev, address: e.target.value }))}
+                      />
+                    </div>
+                    <div className="flex gap-2">
+                      <Button onClick={handleSave} className="flex-1" disabled={updateProfileMutation.isPending}>
+                        {updateProfileMutation.isPending ? 'جاري الحفظ...' : 'حفظ التغييرات'}
+                      </Button>
+                      <Button variant="outline" onClick={() => setIsEditing(false)}>إلغاء</Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
+                      <User className="h-5 w-5 text-muted-foreground" />
+                      <span className="text-foreground">{profile.username}</span>
+                    </div>
+                    <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
+                      <Phone className="h-5 w-5 text-muted-foreground" />
+                      <span className="text-foreground">{profile.phone}</span>
+                    </div>
+                    <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
+                      <Mail className="h-5 w-5 text-muted-foreground" />
+                      <span className="text-foreground">{profile.email || 'لا يوجد بريد إلكتروني'}</span>
+                    </div>
+                    <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
+                      <MapPin className="h-5 w-5 text-muted-foreground" />
+                      <span className="text-foreground">{profile.address}</span>
+                    </div>
+                    <Button onClick={() => setIsEditing(true)} className="w-full">تعديل المعلومات</Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
 
-      <section className="p-4 space-y-6">
-        {/* Profile Info Card */}
-        <Card>
-          <CardHeader className="text-center">
-            <div className="w-20 h-20 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
-              <User className="h-10 w-10 text-primary-foreground" />
+            <div className="grid grid-cols-3 gap-3">
+              {profileStats.map((stat, index) => {
+                const Icon = stat.icon;
+                return (
+                  <Card key={index} className="text-center">
+                    <CardContent className="p-4">
+                      <Icon className={`h-6 w-6 ${stat.color} mx-auto mb-2`} />
+                      <div className="text-lg font-bold text-foreground">{stat.value}</div>
+                      <div className="text-xs text-muted-foreground">{stat.label}</div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
             </div>
-            <CardTitle className="text-xl text-foreground">
-              {profile.name || (isGuestMode ? 'مستخدم ضيف' : 'المستخدم')}
-            </CardTitle>
-            <Badge variant={isGuestMode ? "outline" : "secondary"} className="mx-auto">
-              {isGuestMode ? 'مستخدم ضيف' : 'عضو مميز'}
-            </Badge>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {isEditing ? (
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="name" className="text-foreground">الاسم</Label>
-                  <Input
-                    id="name"
-                    value={profile.name}
-                    onChange={(e) => setProfile(prev => ({ ...prev, name: e.target.value }))}
-                    data-testid="input-profile-name"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="username" className="text-foreground">اسم المستخدم</Label>
-                  <Input
-                    id="username"
-                    value={profile.username}
-                    onChange={(e) => setProfile(prev => ({ ...prev, username: e.target.value }))}
-                    data-testid="input-profile-username"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="phone" className="text-foreground">رقم الهاتف</Label>
-                  <Input
-                    id="phone"
-                    value={profile.phone}
-                    onChange={(e) => setProfile(prev => ({ ...prev, phone: e.target.value }))}
-                    data-testid="input-profile-phone"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="email" className="text-foreground">البريد الإلكتروني</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={profile.email}
-                    onChange={(e) => setProfile(prev => ({ ...prev, email: e.target.value }))}
-                    data-testid="input-profile-email"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="address" className="text-foreground">العنوان</Label>
-                  <Input
-                    id="address"
-                    value={profile.address}
-                    onChange={(e) => setProfile(prev => ({ ...prev, address: e.target.value }))}
-                    data-testid="input-profile-address"
-                  />
-                </div>
-                <div className="flex gap-2">
-                  <Button 
-                    onClick={handleSave} 
-                    className="flex-1" 
-                    disabled={!isGuestMode && updateProfileMutation.isPending}
-                    data-testid="button-save-profile"
-                  >
-                    {!isGuestMode && updateProfileMutation.isPending 
-                      ? 'جاري الحفظ...' 
-                      : isGuestMode 
-                        ? 'حفظ محلياً'
-                        : 'حفظ التغييرات'
-                    }
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    onClick={() => setIsEditing(false)}
-                    data-testid="button-cancel-edit"
-                  >
-                    إلغاء
-                  </Button>
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
-                  <User className="h-5 w-5 text-muted-foreground" />
-                  <span className="text-foreground" data-testid="profile-username">{profile.username}</span>
-                </div>
-                <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
-                  <Phone className="h-5 w-5 text-muted-foreground" />
-                  <span className="text-foreground" data-testid="profile-phone">{profile.phone}</span>
-                </div>
-                <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
-                  <Mail className="h-5 w-5 text-muted-foreground" />
-                  <span className="text-foreground" data-testid="profile-email">{profile.email}</span>
-                </div>
-                <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
-                  <MapPin className="h-5 w-5 text-muted-foreground" />
-                  <span className="text-foreground" data-testid="profile-address">{profile.address}</span>
-                </div>
-                <Button 
-                  onClick={() => setIsEditing(true)} 
-                  className="w-full"
-                  data-testid="button-edit-profile"
-                >
-                  تعديل المعلومات
-                </Button>
-              </div>
-            )}
-          </CardContent>
-        </Card>
 
-        {/* Stats */}
-        <div className="grid grid-cols-3 gap-3">
-          {profileStats.map((stat, index) => {
-            const Icon = stat.icon;
-            return (
-              <Card key={index} className="text-center">
-                <CardContent className="p-4">
-                  <Icon className={`h-6 w-6 ${stat.color} mx-auto mb-2`} />
-                  <div className="text-lg font-bold text-foreground" data-testid={`stat-${index}`}>
-                    {stat.value}
-                  </div>
-                  <div className="text-xs text-muted-foreground">{stat.label}</div>
-                </CardContent>
-              </Card>
-            );
-          })}
+            <div className="space-y-3">
+              {menuItems.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <Button
+                    key={item.path}
+                    variant="ghost"
+                    className="w-full h-auto p-4 justify-between hover:bg-accent"
+                    onClick={() => item.onClick ? item.onClick() : setLocation(item.path)}
+                  >
+                    <div className="flex items-center gap-3">
+                      <Icon className="h-6 w-6 text-primary" />
+                      <div className="text-right">
+                        <div className="font-medium text-foreground">{item.label}</div>
+                        <div className="text-sm text-muted-foreground">{item.description}</div>
+                      </div>
+                    </div>
+                    <ArrowRight className="h-5 w-5 text-muted-foreground rotate-180" />
+                  </Button>
+                );
+              })}
+            </div>
+          </div>
         </div>
-
-        {/* Menu Items */}
-        <div className="space-y-3">
-          {menuItems.map((item) => {
-            const Icon = item.icon;
-            return (
-              <Button
-                key={item.path}
-                variant="ghost"
-                className="w-full h-auto p-4 justify-between hover:bg-accent"
-                onClick={() => item.onClick ? item.onClick() : setLocation(item.path)}
-                data-testid={item.testId}
-              >
-                <div className="flex items-center gap-3">
-                  <Icon className="h-6 w-6 text-primary" />
-                  <div className="text-right">
-                    <div className="font-medium text-foreground">{item.label}</div>
-                    <div className="text-sm text-muted-foreground">{item.description}</div>
-                  </div>
-                </div>
-                <ArrowRight className="h-5 w-5 text-muted-foreground rotate-180" />
-              </Button>
-            );
-          })}
-        </div>
-      </section>
+      </div>
     </div>
   );
 }

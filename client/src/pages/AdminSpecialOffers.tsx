@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ArrowRight, Plus, Edit, Trash2, Save, X, Percent } from 'lucide-react';
+import ImageUpload from '@/components/ImageUpload';
 import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -27,6 +28,9 @@ export function AdminSpecialOffers() {
     discountAmount: '',
     minimumOrder: '',
     validUntil: '',
+    showBadge: true,
+    badgeText1: 'طازج يومياً',
+    badgeText2: 'عروض حصرية',
     isActive: true
   });
 
@@ -106,6 +110,9 @@ export function AdminSpecialOffers() {
       discountAmount: '',
       minimumOrder: '',
       validUntil: '',
+      showBadge: true,
+      badgeText1: 'طازج يومياً',
+      badgeText2: 'عروض حصرية',
       isActive: true
     });
   };
@@ -122,6 +129,9 @@ export function AdminSpecialOffers() {
       discountAmount: formData.discountAmount ? parseFloat(formData.discountAmount) : null,
       minimumOrder: formData.minimumOrder ? parseFloat(formData.minimumOrder) : 0,
       validUntil: formData.validUntil ? new Date(formData.validUntil) : null,
+      showBadge: formData.showBadge,
+      badgeText1: formData.badgeText1,
+      badgeText2: formData.badgeText2,
       isActive: formData.isActive
     };
     
@@ -142,6 +152,9 @@ export function AdminSpecialOffers() {
       discountAmount: offer.discountAmount?.toString() || '',
       minimumOrder: offer.minimumOrder?.toString() || '',
       validUntil: offer.validUntil ? new Date(offer.validUntil).toISOString().slice(0, 16) : '',
+      showBadge: offer.showBadge ?? true,
+      badgeText1: offer.badgeText1 || 'طازج يومياً',
+      badgeText2: offer.badgeText2 || 'عروض حصرية',
       isActive: offer.isActive
     });
     setShowAddForm(false);
@@ -154,7 +167,7 @@ export function AdminSpecialOffers() {
   };
 
   const formatDate = (date: string | Date) => {
-    return new Date(date).toLocaleDateString('ar-SA', {
+    return new Date(date).toLocaleDateString('ar-YE', {
       year: 'numeric',
       month: 'short',
       day: 'numeric'
@@ -235,12 +248,13 @@ export function AdminSpecialOffers() {
                 </div>
                 
                 <div>
-                  <Label htmlFor="image">رابط الصورة (اختياري)</Label>
-                  <Input
-                    id="image"
+                  <ImageUpload
+                    label="صورة العرض (اختياري)"
                     value={formData.image}
-                    onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                    placeholder="https://example.com/image.jpg"
+                    onChange={(url) => setFormData({ ...formData, image: url })}
+                    bucket="offers"
+                    required={false}
+                    data-testid="input-special-offer-image"
                   />
                 </div>
               </div>
@@ -309,13 +323,46 @@ export function AdminSpecialOffers() {
                 />
               </div>
 
-              <div className="flex items-center space-x-2">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 border p-4 rounded-lg bg-muted/20">
+                <div className="flex items-center space-x-2 space-x-reverse h-full pt-6">
+                  <Switch
+                    id="showBadge"
+                    checked={formData.showBadge}
+                    onCheckedChange={(checked) => setFormData({ ...formData, showBadge: checked })}
+                  />
+                  <Label htmlFor="showBadge">إظهار الملصقات الترويجية</Label>
+                </div>
+
+                <div>
+                  <Label htmlFor="badgeText1">نص الملصق 1</Label>
+                  <Input
+                    id="badgeText1"
+                    value={formData.badgeText1}
+                    onChange={(e) => setFormData({ ...formData, badgeText1: e.target.value })}
+                    placeholder="طازج يومياً"
+                    disabled={!formData.showBadge}
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="badgeText2">نص الملصق 2</Label>
+                  <Input
+                    id="badgeText2"
+                    value={formData.badgeText2}
+                    onChange={(e) => setFormData({ ...formData, badgeText2: e.target.value })}
+                    placeholder="عروض حصرية"
+                    disabled={!formData.showBadge}
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center space-x-2 space-x-reverse">
                 <Switch
                   id="isActive"
                   checked={formData.isActive}
                   onCheckedChange={(checked) => setFormData({ ...formData, isActive: checked })}
                 />
-                <Label htmlFor="isActive">نشط</Label>
+                <Label htmlFor="isActive">نشط (ظهور العرض للعملاء)</Label>
               </div>
 
               <div className="flex gap-2">

@@ -1,20 +1,34 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useLocation } from 'wouter';
 import RestaurantCard from '../components/RestaurantCard';
+import MenuItemCard from '../components/MenuItemCard';
 import { Button } from '@/components/ui/button';
+import { formatCurrency } from '@/lib/utils';
 import type { Restaurant, Category, MenuItem } from '../../../shared/schema.js';
 
 export default function SearchPage() {
-  const [selectedTab, setSelectedTab] = useState<'all' | 'restaurants' | 'categories' | 'menuItems'>('all');
+  const [location] = useLocation();
+  const [selectedTab, setSelectedTab] = useState<'all' | 'categories' | 'menuItems'>('all');
   const [searchResults, setSearchResults] = useState<{
-    restaurants: Restaurant[];
     categories: Category[];
     menuItems: MenuItem[];
-  }>({ restaurants: [], categories: [], menuItems: [] });
+  }>({ categories: [], menuItems: [] });
   const [hasSearched, setHasSearched] = useState(false);
+  const [inputValue, setInputValue] = useState('');
+
+  // Extract query from URL
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const query = params.get('q');
+    if (query) {
+      setInputValue(query);
+      handleSearch(query);
+    }
+  }, [window.location.search]);
 
   const handleSearch = async (query: string) => {
     if (query.length < 2) {
-      setSearchResults({ restaurants: [], categories: [], menuItems: [] });
+      setSearchResults({ categories: [], menuItems: [] });
       setHasSearched(false);
       return;
     }
@@ -24,56 +38,36 @@ export default function SearchPage() {
     try {
       const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
       const data = await response.json();
-      setSearchResults(data);
+      setSearchResults({
+        categories: data.categories || [],
+        menuItems: data.menuItems || []
+      });
     } catch (error) {
       console.error('خطأ في البحث:', error);
     }
   };
 
-  // Actually handle search from SearchBar
-  const handleSearchBarInput = (type: 'restaurant' | 'category' | 'menuItem', item: any) => {
-    // This is called when the search input changes, so we need to handle it differently
-    if (typeof item === 'string') {
-      handleSearch(item);
-    }
-  };
-
-  const handleResultSelect = (type: 'restaurant' | 'category' | 'menuItem', item: any) => {
-    if (type === 'restaurant') {
-      window.location.href = `/restaurant/${item.id}`;
-    }
-  };
-
-  const totalResults = searchResults.restaurants.length + searchResults.categories.length + searchResults.menuItems.length;
+  const totalResults = searchResults.categories.length + searchResults.menuItems.length;
 
   const tabs = [
     { id: 'all', label: 'الكل', count: totalResults },
-    { id: 'restaurants', label: 'المطاعم', count: searchResults.restaurants.length },
     { id: 'categories', label: 'التصنيفات', count: searchResults.categories.length },
-    { id: 'menuItems', label: 'الأطباق', count: searchResults.menuItems.length },
+    { id: 'menuItems', label: 'المنتجات', count: searchResults.menuItems.length },
   ];
 
-  const filteredRestaurants = selectedTab === 'all' || selectedTab === 'restaurants' ? searchResults.restaurants : [];
   const filteredCategories = selectedTab === 'all' || selectedTab === 'categories' ? searchResults.categories : [];
   const filteredMenuItems = selectedTab === 'all' || selectedTab === 'menuItems' ? searchResults.menuItems : [];
 
   return (
-    <div className="max-w-md mx-auto bg-background min-h-screen">
-      {/* Header */}
-      <div className="sticky top-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b p-4">
-        <h1 className="text-lg font-semibold text-center mb-4">البحث</h1>
-        <div className="relative">
-          <input
-            type="text"
-            placeholder="ابحث عن مطاعم، أطباق أو فئات..."
-            onChange={(e) => handleSearch(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-          />
-        </div>
-      </div>
-
+    <div className="container mx-auto px-4 py-8 min-h-screen">
       {/* Content */}
-      <div className="p-4">
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-10 flex flex-col items-center">
+          <h1 className="text-4xl font-black mb-2 uppercase tracking-tighter">نتائج البحث</h1>
+          <p className="text-gray-500 font-bold italic">عن: "{inputValue}"</p>
+          <div className="h-1.5 w-24 bg-primary rounded-full mt-4" />
+        </div>
+
         {hasSearched && (
           <>
             {/* Tabs */}
@@ -100,31 +94,27 @@ export default function SearchPage() {
               </div>
             ) : (
               <div className="space-y-4">
-                {/* Restaurants */}
-                {filteredRestaurants.length > 0 && (
-                  <div>
-                    {selectedTab === 'all' && <h2 className="text-md font-semibold mb-3">المطاعم</h2>}
-                    <div className="grid gap-3">
-                      {filteredRestaurants.map((restaurant) => (
-                        <RestaurantCard key={restaurant.id} restaurant={restaurant} />
-                      ))}
-                    </div>
-                  </div>
-                )}
-
                 {/* Categories */}
                 {filteredCategories.length > 0 && (
                   <div>
                     {selectedTab === 'all' && <h2 className="text-md font-semibold mb-3">التصنيفات</h2>}
-                    <div className="grid gap-2">
+                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
                       {filteredCategories.map((category) => (
                         <div
                           key={category.id}
-                          className="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-muted/50"
+                          className="flex flex-col items-center p-3 border rounded-lg cursor-pointer hover:bg-muted/50 transition-all"
                           onClick={() => window.location.href = `/?category=${category.id}`}
                         >
-                          <span className="text-2xl mr-3">{category.icon}</span>
-                          <span className="font-medium">{category.name}</span>
+                          <div className="w-16 h-16 rounded-full overflow-hidden mb-2">
+                            {category.image ? (
+                              <img src={category.image} alt={category.name} className="w-full h-full object-cover" />
+                            ) : (
+                              <div className="w-full h-full bg-primary/10 flex items-center justify-center">
+                                <span className="text-2xl">{category.icon}</span>
+                              </div>
+                            )}
+                          </div>
+                          <span className="font-bold text-sm text-center">{category.name}</span>
                         </div>
                       ))}
                     </div>
@@ -134,26 +124,15 @@ export default function SearchPage() {
                 {/* Menu Items */}
                 {filteredMenuItems.length > 0 && (
                   <div>
-                    {selectedTab === 'all' && <h2 className="text-md font-semibold mb-3">الأطباق</h2>}
-                    <div className="grid gap-3">
+                    {selectedTab === 'all' && <h2 className="text-md font-semibold mb-3 mt-8">المنتجات</h2>}
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                       {filteredMenuItems.map((item) => (
-                        <div
-                          key={item.id}
-                          className="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-muted/50"
-                        >
-                          {item.image && (
-                            <img
-                              src={item.image}
-                              alt={item.name}
-                              className="w-16 h-16 object-cover rounded-lg ml-3"
-                            />
-                          )}
-                          <div className="flex-1">
-                            <h4 className="font-medium">{item.name}</h4>
-                            <p className="text-sm text-muted-foreground">{item.description}</p>
-                            <p className="text-sm font-semibold text-primary">{item.price} ر.س</p>
-                          </div>
-                        </div>
+                        <MenuItemCard 
+                          key={item.id} 
+                          item={item} 
+                          restaurantId={item.restaurantId || ''} 
+                          restaurantName="متجر واصل"
+                        />
                       ))}
                     </div>
                   </div>
