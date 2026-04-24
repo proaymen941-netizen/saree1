@@ -11,14 +11,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/hooks/use-toast'
 import { apiRequest, queryClient } from '@/lib/queryClient'
 import { Restaurant, Category } from '@shared/schema'
-import { Plus, Search, Edit, Trash2, Store, MapPin, Clock, Star } from 'lucide-react'
-import ImageUploadComponent from './ImageUploadComponent'
+import { Plus, Search, Edit, Trash2, Store, MapPin, Clock, Star, Map as MapIcon } from 'lucide-react'
+import ImageUpload from '@/components/ImageUpload'
+import MapComponent from './maps/MapComponent'
 
 export default function RestaurantManagement() {
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedRestaurant, setSelectedRestaurant] = useState<Restaurant | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
+  const [isMapOpen, setIsMapOpen] = useState(false)
   const { toast } = useToast()
 
   // Form state
@@ -57,13 +59,13 @@ export default function RestaurantManagement() {
     mutationFn: (data: Partial<Restaurant>) => 
       apiRequest('POST', '/api/restaurants', data),
     onSuccess: () => {
-      toast({ title: 'تم إنشاء المطعم بنجاح' })
+      toast({ title: 'تم إنشاء المتجر بنجاح' })
       setIsDialogOpen(false)
       resetForm()
       queryClient.invalidateQueries({ queryKey: ['/api/restaurants'] })
     },
     onError: () => {
-      toast({ title: 'خطأ في إنشاء المطعم', variant: 'destructive' })
+      toast({ title: 'خطأ في إنشاء المتجر', variant: 'destructive' })
     }
   })
 
@@ -72,13 +74,13 @@ export default function RestaurantManagement() {
     mutationFn: ({ id, data }: { id: string; data: Partial<Restaurant> }) => 
       apiRequest('PUT', `/api/restaurants/${id}`, data),
     onSuccess: () => {
-      toast({ title: 'تم تحديث المطعم بنجاح' })
+      toast({ title: 'تم تحديث المتجر بنجاح' })
       setIsDialogOpen(false)
       resetForm()
       queryClient.invalidateQueries({ queryKey: ['/api/restaurants'] })
     },
     onError: () => {
-      toast({ title: 'خطأ في تحديث المطعم', variant: 'destructive' })
+      toast({ title: 'خطأ في تحديث المتجر', variant: 'destructive' })
     }
   })
 
@@ -87,11 +89,11 @@ export default function RestaurantManagement() {
     mutationFn: (id: string) => 
       apiRequest('DELETE', `/api/restaurants/${id}`),
     onSuccess: () => {
-      toast({ title: 'تم حذف المطعم بنجاح' })
+      toast({ title: 'تم حذف المتجر بنجاح' })
       queryClient.invalidateQueries({ queryKey: ['/api/restaurants'] })
     },
     onError: () => {
-      toast({ title: 'خطأ في حذف المطعم', variant: 'destructive' })
+      toast({ title: 'خطأ في حذف المتجر', variant: 'destructive' })
     }
   })
 
@@ -172,8 +174,18 @@ export default function RestaurantManagement() {
     setIsDialogOpen(true)
   }
 
+  const handleMapSelect = (lat: number, lng: number, address: string) => {
+    setFormData(prev => ({
+      ...prev,
+      latitude: lat.toString(),
+      longitude: lng.toString(),
+      address: address || prev.address
+    }))
+    setIsMapOpen(false)
+  }
+
   const handleDelete = (id: string) => {
-    if (window.confirm('هل أنت متأكد من حذف هذا المطعم؟')) {
+    if (window.confirm('هل أنت متأكد من حذف هذا المتجر؟')) {
       deleteMutation.mutate(id)
     }
   }
@@ -194,7 +206,7 @@ export default function RestaurantManagement() {
     return (
       <Card>
         <CardContent className="p-6">
-          <div className="text-center">جاري تحميل المطاعم...</div>
+          <div className="text-center">جاري تحميل المتاجر...</div>
         </CardContent>
       </Card>
     )
@@ -208,7 +220,7 @@ export default function RestaurantManagement() {
           <CardTitle className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Store className="h-5 w-5" />
-              إدارة المطاعم
+              إدارة المتاجر
             </div>
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
@@ -220,26 +232,26 @@ export default function RestaurantManagement() {
                   data-testid="button-add-restaurant"
                 >
                   <Plus className="h-4 w-4 ml-2" />
-                  إضافة مطعم جديد
+                  إضافة متجر جديد
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" dir="rtl">
                 <DialogHeader>
                   <DialogTitle>
-                    {isEditing ? 'تعديل المطعم' : 'إضافة مطعم جديد'}
+                    {isEditing ? 'تعديل المتجر' : 'إضافة متجر جديد'}
                   </DialogTitle>
                   <DialogDescription>
-                    {isEditing ? 'قم بتحديث بيانات المطعم' : 'أدخل بيانات المطعم الجديد'}
+                    {isEditing ? 'قم بتحديث بيانات المتجر' : 'أدخل بيانات المتجر الجديد'}
                   </DialogDescription>
                 </DialogHeader>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4">
                   <div className="space-y-2">
-                    <Label htmlFor="name">اسم المطعم *</Label>
+                    <Label htmlFor="name">اسم المتجر *</Label>
                     <Input
                       id="name"
                       value={formData.name || ''}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      placeholder="اسم المطعم"
+                      placeholder="اسم المتجر"
                       data-testid="input-restaurant-name"
                     />
                   </div>
@@ -264,7 +276,7 @@ export default function RestaurantManagement() {
                       id="description"
                       value={formData.description || ''}
                       onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                      placeholder="وصف المطعم"
+                      placeholder="وصف المتجر"
                       data-testid="input-restaurant-description"
                     />
                   </div>
@@ -274,7 +286,7 @@ export default function RestaurantManagement() {
                       id="address"
                       value={formData.address || ''}
                       onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                      placeholder="عنوان المطعم"
+                      placeholder="عنوان المتجر"
                       data-testid="input-restaurant-address"
                     />
                   </div>
@@ -325,26 +337,51 @@ export default function RestaurantManagement() {
                     />
                   </div>
                   <div className="space-y-2 md:col-span-2">
-                    <ImageUploadComponent
-                      label="صورة المطعم *"
+                    <ImageUpload
+                      label="صورة المتجر *"
                       value={formData.image || ''}
-                      onChange={(url) => setFormData({...formData, image: url})}
-                      category="restaurants"
-                      placeholder="رابط الصورة أو ارفع صورة من جهازك"
+                      onChange={(url) => setFormData({ ...formData, image: url })}
+                      bucket="restaurants"
                       required={true}
                       data-testid="input-restaurant-image"
-                      showPreview={true}
                     />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="latitude">خط العرض</Label>
-                    <Input
-                      id="latitude"
-                      value={formData.latitude || ''}
-                      onChange={(e) => setFormData({ ...formData, latitude: e.target.value })}
-                      placeholder="31.5204"
-                      data-testid="input-latitude"
-                    />
+                    <div className="flex gap-2">
+                      <Input
+                        id="latitude"
+                        value={formData.latitude || ''}
+                        onChange={(e) => setFormData({ ...formData, latitude: e.target.value })}
+                        placeholder="31.5204"
+                        data-testid="input-latitude"
+                      />
+                      <Dialog open={isMapOpen} onOpenChange={setIsMapOpen}>
+                        <DialogTrigger asChild>
+                          <Button variant="outline" size="icon" title="تحديد من الخريطة">
+                            <MapIcon className="h-4 w-4" />
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-[600px] p-0 overflow-hidden">
+                          <DialogHeader className="p-4 border-b">
+                            <DialogTitle>تحديد موقع المتجر</DialogTitle>
+                          </DialogHeader>
+                          <div className="h-[400px] w-full">
+                            <MapComponent 
+                              center={[
+                                formData.latitude ? parseFloat(formData.latitude) : 15.3694, 
+                                formData.longitude ? parseFloat(formData.longitude) : 44.1910
+                              ]}
+                              zoom={14}
+                              onLocationSelect={handleMapSelect}
+                            />
+                          </div>
+                          <div className="p-4 bg-gray-50 text-xs text-center text-gray-500">
+                            انقر على الخريطة لتحديد موقع المتجر بدقة
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+                    </div>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="longitude">خط الطول</Label>
@@ -365,7 +402,7 @@ export default function RestaurantManagement() {
                         onChange={(e) => setFormData({ ...formData, isOpen: e.target.checked })}
                         data-testid="checkbox-is-open"
                       />
-                      <Label htmlFor="isOpen">المطعم مفتوح</Label>
+                      <Label htmlFor="isOpen">المتجر مفتوح</Label>
                     </div>
                     <div className="flex items-center space-x-2">
                       <input
@@ -375,7 +412,7 @@ export default function RestaurantManagement() {
                         onChange={(e) => setFormData({ ...formData, isFeatured: e.target.checked })}
                         data-testid="checkbox-is-featured"
                       />
-                      <Label htmlFor="isFeatured">مطعم مفضل</Label>
+                      <Label htmlFor="isFeatured">متجر مفضل</Label>
                     </div>
                     <div className="flex items-center space-x-2">
                       <input
@@ -385,7 +422,7 @@ export default function RestaurantManagement() {
                         onChange={(e) => setFormData({ ...formData, isNew: e.target.checked })}
                         data-testid="checkbox-is-new"
                       />
-                      <Label htmlFor="isNew">مطعم جديد</Label>
+                      <Label htmlFor="isNew">متجر جديد</Label>
                     </div>
                   </div>
                 </div>
@@ -414,7 +451,7 @@ export default function RestaurantManagement() {
             <div className="relative flex-1">
               <Search className="absolute right-3 top-3 h-4 w-4 text-gray-400" />
               <Input
-                placeholder="البحث في المطاعم..."
+                placeholder="البحث في المتاجر..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pr-10"
@@ -435,7 +472,7 @@ export default function RestaurantManagement() {
                 {searchTerm ? 'لا توجد نتائج' : 'لا توجد مطاعم'}
               </h3>
               <p className="text-gray-600">
-                {searchTerm ? 'جرب البحث بكلمات مختلفة' : 'ابدأ بإضافة مطعم جديد'}
+                {searchTerm ? 'جرب البحث بكلمات مختلفة' : 'ابدأ بإضافة متجر جديد'}
               </p>
             </div>
           ) : (
@@ -488,8 +525,8 @@ export default function RestaurantManagement() {
                         </div>
                       </div>
                       <div className="flex items-center justify-between text-sm">
-                        <span>رسوم التوصيل: {restaurant.deliveryFee} ₪</span>
-                        <span>الحد الأدنى: {restaurant.minimumOrder} ₪</span>
+                        <span>رسوم التوصيل: {restaurant.deliveryFee} </span>
+                        <span>الحد الأدنى: {restaurant.minimumOrder} </span>
                       </div>
                     </div>
 

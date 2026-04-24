@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Search, X } from 'lucide-react';
 import { searchService } from '../services/searchService';
+import { formatCurrency } from '@/lib/utils';
 import type { Restaurant, Category, MenuItem } from '../../../shared/schema.js';
 
 interface SearchBarProps {
@@ -163,7 +164,7 @@ export function SearchBar({ onResultSelect, placeholder = "ابحث عن مطا�
                         <h4 className="text-sm font-medium">{item.name}</h4>
                         <p className="text-xs text-gray-500">{item.category}</p>
                       </div>
-                      <span className="text-sm font-semibold text-red-500">{item.price} ر.س</span>
+                      <span className="text-sm font-semibold text-red-500">{formatCurrency(item.price)}</span>
                     </div>
                   ))}
                 </div>

@@ -1,7 +1,15 @@
 import { useState, useEffect } from 'react';
-import { MapPin, Navigation, ChevronDown, Check } from 'lucide-react';
+import { MapPin, Navigation, ChevronDown, Check, Map as MapIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import MapComponent from './maps/MapComponent';
 
 export interface LocationData {
   lat: number;
@@ -25,6 +33,7 @@ export function LocationPicker({
   const [selectedLocation, setSelectedLocation] = useState<LocationData | null>(null);
   const [isGettingLocation, setIsGettingLocation] = useState(false);
   const [showLocationMenu, setShowLocationMenu] = useState(false);
+  const [isMapOpen, setIsMapOpen] = useState(false);
   const [savedLocations] = useState<LocationData[]>([
     { lat: 15.3694, lng: 44.1910, address: 'صنعاء القديمة، باب اليمن', area: 'باب اليمن', city: 'صنعاء' },
     { lat: 15.3547, lng: 44.2066, address: 'صنعاء الجديدة، شارع الزبيري', area: 'الزبيري', city: 'صنعاء' },
@@ -48,7 +57,7 @@ export function LocationPicker({
           const location: LocationData = {
             lat: position.coords.latitude,
             lng: position.coords.longitude,
-            address: `الموقع الحالي (${position.coords.latitude.toFixed(4)}, ${position.coords.longitude.toFixed(4)})`,
+            address: `الموقع المختار: (${position.coords.latitude.toFixed(6)}, ${position.coords.longitude.toFixed(6)})`,
             area: 'الموقع الحالي',
             city: 'صنعاء'
           };
@@ -87,6 +96,20 @@ export function LocationPicker({
 
   const refreshCurrentLocation = () => {
     getCurrentLocation();
+  };
+
+  const handleMapSelect = (lat: number, lng: number, address: string) => {
+    const location: LocationData = {
+      lat,
+      lng,
+      address,
+      area: address.split(',')[0],
+      city: 'صنعاء'
+    };
+    setSelectedLocation(location);
+    onLocationSelect?.(location);
+    setIsMapOpen(false);
+    setShowLocationMenu(false);
   };
 
   return (
@@ -144,6 +167,43 @@ export function LocationPicker({
                   </div>
                 </div>
               </Button>
+
+              {/* Map Selection Option */}
+              <Dialog open={isMapOpen} onOpenChange={setIsMapOpen}>
+                <DialogTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start h-auto p-3 hover:bg-gray-50 dark:hover:bg-gray-800"
+                    onClick={() => setShowLocationMenu(false)}
+                    data-testid="button-open-map"
+                  >
+                    <MapIcon className="h-4 w-4 text-orange-500 ml-3" />
+                    <div className="text-right">
+                      <div className="font-medium text-orange-600 dark:text-orange-400">
+                        تحديد من الخريطة
+                      </div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">
+                        اختر موقعك بدقة على الخريطة
+                      </div>
+                    </div>
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[600px] p-0 overflow-hidden">
+                  <DialogHeader className="p-4 border-b">
+                    <DialogTitle>اختر موقع التوصيل</DialogTitle>
+                  </DialogHeader>
+                  <div className="h-[400px] w-full">
+                    <MapComponent 
+                      center={[selectedLocation?.lat || 15.3694, selectedLocation?.lng || 44.1910]}
+                      zoom={14}
+                      onLocationSelect={handleMapSelect}
+                    />
+                  </div>
+                  <div className="p-4 bg-gray-50 text-xs text-center text-gray-500">
+                    انقر على الخريطة لتحديد موقعك بدقة
+                  </div>
+                </DialogContent>
+              </Dialog>
 
               <div className="border-t border-gray-100 dark:border-gray-700 my-2" />
 

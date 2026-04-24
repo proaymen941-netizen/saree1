@@ -1,12 +1,18 @@
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { ShoppingBag, Star, Heart, Plus } from 'lucide-react';
 import type { MenuItem } from '@shared/schema';
-import { useCart } from '../contexts/CartContext';
+import { useCart } from '../context/CartContext';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '../context/AuthContext';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { apiRequest } from '@/lib/queryClient';
+import { useLocation } from 'wouter';
+import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 
 interface MenuItemCardProps {
-  item: MenuItem;
+  item: any; // Using any to support both MenuItem and Mapped SpecialOffer
   disabled?: boolean;
   disabledMessage?: string;
   restaurantId?: string;
@@ -18,14 +24,100 @@ export default function MenuItemCard({
   disabled = false, 
   disabledMessage, 
   restaurantId = 'unknown', 
-  restaurantName = 'مطعم غير محدد' 
+  restaurantName = 'متجر غير محدد' 
 }: MenuItemCardProps) {
   const { addItem } = useCart();
   const { toast } = useToast();
+  const { user, isAuthenticated } = useAuth();
+  const queryClient = useQueryClient();
+  const [, setLocation] = useLocation();
+  const { isOnline } = useNetworkStatus();
+
+  // Check if item is in favorites
+  const { data: favoriteStatus } = useQuery<{ isFavorite: boolean }>({
+    queryKey: ['/api/favorites/check', user?.id, item.id],
+    queryFn: async () => {
+      if (!user?.id || item.isBannerOffer) return { isFavorite: false };
+      const res = await fetch(`/api/favorites/check?userId=${user.id}&menuItemId=${item.id}`);
+      if (!res.ok) return { isFavorite: false };
+      return res.json();
+    },
+    enabled: !!user?.id && !item.isBannerOffer,
+  });
+
+  const toggleFavorite = useMutation({
+    mutationFn: async () => {
+      if (item.isBannerOffer) return;
+      if (!isAuthenticated) {
+        throw new Error('not_authenticated');
+      }
+      if (!isOnline) {
+        throw new Error('no_connection');
+      }
+
+      if (favoriteStatus?.isFavorite) {
+        await apiRequest('DELETE', `/api/favorites?userId=${user?.id}&menuItemId=${item.id}`);
+      } else {
+        await apiRequest('POST', '/api/favorites', {
+          userId: user?.id,
+          menuItemId: item.id,
+        });
+      }
+    },
+    onSuccess: () => {
+      if (item.isBannerOffer) return;
+      queryClient.invalidateQueries({ queryKey: ['/api/favorites/check', user?.id, item.id] });
+      queryClient.invalidateQueries({ queryKey: ['/api/favorites/products', user?.id] });
+      
+      toast({
+        title: favoriteStatus?.isFavorite ? "تمت الإزالة من المفضلة" : "تمت الإضافة للمفضلة",
+        description: favoriteStatus?.isFavorite ? `تمت إزالة ${item.name} من قائمة مفضلاتك` : `تم إضافة ${item.name} إلى قائمة مفضلاتك`,
+      });
+    },
+    onError: (error: any) => {
+      if (error?.message === 'not_authenticated') {
+        toast({
+          title: "يجب تسجيل الدخول",
+          description: "يرجى إنشاء حساب أو تسجيل الدخول لإضافة المنتجات إلى المفضلة",
+          variant: "destructive",
+        });
+        return;
+      }
+      if (error?.message === 'no_connection') {
+        toast({
+          title: "لا يوجد اتصال بالإنترنت",
+          description: "يرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى",
+          variant: "destructive",
+        });
+        return;
+      }
+      toast({
+        title: "خطأ في المفضلة",
+        description: "حدث خطأ أثناء تحديث المفضلة، يرجى المحاولة مرة أخرى",
+        variant: "destructive",
+      });
+    },
+  });
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.stopPropagation();
     
+    if (item.isBannerOffer) {
+      if (item.menuItemId) {
+        setLocation(`/product/${item.menuItemId}`);
+      }
+      return;
+    }
+
+    if (!isOnline) {
+      toast({
+        title: "لا يوجد اتصال بالإنترنت",
+        description: "يرجى التحقق من اتصالك بالإنترنت لإضافة المنتجات",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (disabled && disabledMessage) {
       toast({
         title: "لا يمكن الطلب",
@@ -36,69 +128,113 @@ export default function MenuItemCard({
     }
     
     addItem(item, restaurantId, restaurantName);
-    toast({
-      title: "تمت الإضافة للسلة",
-      description: `تم إضافة ${item.name} للسلة من ${restaurantName}`,
-    });
   };
 
-  const isSpecialOffer = item.isSpecialOffer && item.originalPrice;
-  const savings = isSpecialOffer ? parseFloat(String(item.originalPrice!)) - parseFloat(String(item.price)) : 0;
+  const handleToggleFavorite = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!item.isBannerOffer) {
+      toggleFavorite.mutate();
+    }
+  };
+
+  const handleClick = () => {
+    if (item.isBannerOffer) {
+      if (item.menuItemId) {
+        setLocation(`/product/${item.menuItemId}`);
+      }
+    } else {
+      setLocation(`/product/${item.id}`);
+    }
+  };
+
+  const discountPercent = item.originalPrice 
+    ? Math.round((1 - parseFloat(String(item.price)) / parseFloat(String(item.originalPrice))) * 100)
+    : 0;
+
+  const colors = item.colors ? item.colors.split(',') : [];
 
   return (
-    <Card 
-      className={`p-4 flex gap-4 hover:shadow-md transition-shadow ${
-        isSpecialOffer ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200' : ''
-      }`}
-      data-testid={`menu-item-${item.id}`}
+    <div 
+      id={item.isBannerOffer ? `offer-${item.id}` : `product-${item.id}`}
+      className="group relative bg-white cursor-pointer border border-gray-100 rounded-xl overflow-hidden hover:shadow-lg transition-all duration-300" 
+      onClick={handleClick}
     >
-      {isSpecialOffer && (
-        <Badge className="absolute top-2 left-2 bg-green-500 text-white">
-          عرض خاص
-        </Badge>
-      )}
-      
-      <img
-        src={item.image}
-        alt={item.name}
-        className="w-20 h-20 object-cover rounded-lg flex-shrink-0"
-      />
-      
-      <div className="flex-1">
-        <h4 className="font-bold text-foreground mb-1" data-testid={`menu-item-name-${item.id}`}>
-          {item.name}
-        </h4>
-        <p className="text-sm text-muted-foreground mb-2" data-testid={`menu-item-description-${item.id}`}>
-          {item.description}
-        </p>
+      {/* Product Image Container */}
+      <div className="relative aspect-square overflow-hidden bg-gray-50">
+        <img
+          src={item.image}
+          alt={item.name}
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+        />
         
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className={`text-lg font-bold ${isSpecialOffer ? 'text-green-600' : 'text-primary'}`}>
-              {item.price} ريال
-            </span>
-            {isSpecialOffer && (
-              <>
-                <span className="text-sm text-muted-foreground line-through">
-                  {item.originalPrice} ريال
-                </span>
-                <Badge variant="secondary" className="text-xs bg-green-100 text-green-700">
-                  توفير {savings} ريال
-                </Badge>
-              </>
-            )}
-          </div>
-          
-          <Button
+        {/* Badges */}
+        <div className="absolute top-1.5 right-1.5 flex flex-col gap-1">
+          {item.isBannerOffer && (
+            <Badge className="bg-primary text-white border-none rounded-sm text-[8px] px-1.5 py-0 font-black">
+              عرض خاص
+            </Badge>
+          )}
+          {item.isFeatured && (
+            <Badge className="bg-black/80 text-white border-none rounded-sm text-[8px] px-1.5 py-0 font-black">
+              M-S
+            </Badge>
+          )}
+          {discountPercent > 0 && (
+            <Badge className="bg-red-600 text-white border-none rounded-sm text-[8px] px-1.5 py-0 font-black">
+              -{discountPercent}%
+            </Badge>
+          )}
+        </div>
+
+        {/* Quick Add Button - App Style */}
+        <div className="absolute bottom-2 right-2 translate-y-12 group-hover:translate-y-0 transition-transform duration-300">
+          <Button 
+            size="icon"
+            className="h-8 w-8 rounded-full bg-primary hover:bg-primary/90 text-white shadow-lg"
             onClick={handleAddToCart}
-            className={isSpecialOffer ? 'bg-green-500 hover:bg-green-600 text-white' : ''}
-            disabled={!item.isAvailable || disabled}
-            data-testid={`button-add-to-cart-${item.id}`}
+            disabled={(!item.isAvailable && !item.isBannerOffer) || disabled}
           >
-            {item.isAvailable ? 'إضافة' : 'غير متوفر'}
+            {item.isBannerOffer ? <ShoppingBag className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
           </Button>
         </div>
+
+        {/* Favorite Icon */}
+        {!item.isBannerOffer && (
+          <button 
+            className="absolute top-1.5 left-1.5 p-1.5 bg-white/80 hover:bg-white rounded-full transition-colors z-10 shadow-sm"
+            onClick={handleToggleFavorite}
+            disabled={toggleFavorite.isPending}
+          >
+            <Heart className={`h-3.5 w-3.5 ${favoriteStatus?.isFavorite ? 'text-red-600 fill-current' : 'text-gray-400'}`} />
+          </button>
+        )}
       </div>
-    </Card>
+
+      {/* Product Info */}
+      <div className="p-2">
+        <h4 className="text-[11px] md:text-sm font-bold text-gray-800 line-clamp-1 mb-0.5 group-hover:text-primary transition-colors">
+          {item.name}
+        </h4>
+
+        <div className="flex items-center gap-1.5 mb-1">
+          <span className="text-xs md:text-base font-black text-gray-900">{item.price} ريال</span>
+          {item.originalPrice && (
+            <span className="text-[9px] md:text-xs text-gray-400 line-through">{item.originalPrice} ريال</span>
+          )}
+        </div>
+
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-0.5 text-yellow-400">
+            <Star className="h-2.5 w-2.5 fill-current" />
+            <span className="text-[9px] text-gray-500 font-bold">{item.rating || '4.8'}</span>
+          </div>
+          {(item.salesCount !== undefined || item.isBannerOffer) && (
+            <span className="text-[8px] text-gray-400 font-bold">
+              {item.isBannerOffer ? 'متوفر الآن' : `باع ${item.salesCount}+`}
+            </span>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }

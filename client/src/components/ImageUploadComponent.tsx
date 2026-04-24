@@ -279,7 +279,7 @@ export default function ImageUploadComponent({
         
         toast({
           title: "تم حذف الصورة",
-          description: "تم حذف الصورة من Supabase",
+          description: "تم حذف الصورة بنجاح",
         });
       }
     } catch (error) {
