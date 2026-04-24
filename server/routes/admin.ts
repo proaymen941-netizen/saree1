@@ -1,7 +1,7 @@
 import express from "express";
+import bcrypt from "bcryptjs";
 import { storage } from "../storage";
-// تم حذف نظام المصادقة
-// تم حذف bcrypt - لا حاجة لتشفير كلمات المرور بعد إزالة نظام المصادقة
+import { broadcastSettingsChanged, broadcastEvent } from "../broadcast";
 import { z } from "zod";
 import { eq, and, desc, sql, or, like, asc, inArray } from "drizzle-orm";
 import {
@@ -11,6 +11,13 @@ import {
   insertAdminUserSchema,
   insertDriverSchema,
   insertMenuItemSchema,
+  insertEmployeeSchema,
+  insertAttendanceSchema,
+  insertLeaveRequestSchema,
+  insertDriverBalanceSchema,
+  insertDriverTransactionSchema,
+  insertDriverCommissionSchema,
+  insertDriverWithdrawalSchema,
   adminUsers,
   // تم حذف adminSessions
   categories,
@@ -28,68 +35,22 @@ import {
   drivers,
   orderTracking,
   cart,
-  favorites
+  favorites,
+  employees,
+  attendance,
+  leaveRequests,
+  driverBalances,
+  driverTransactions,
+  driverCommissions,
+  driverWithdrawals,
+  auditLogs
 } from "@shared/schema";
 import { DatabaseStorage } from "../db";
+import { coerceRequestData } from "../utils/coercion";
 
 const router = express.Router();
 const dbStorage = new DatabaseStorage();
 const db = dbStorage.db;
-
-// Helper function to coerce request data for proper Zod validation
-function coerceRequestData(data: any) {
-  const coerced = { ...data };
-  
-  // Convert decimal fields to strings (Zod expects strings for decimal fields)
-  ['minimumOrder', 'deliveryFee', 'latitude', 'longitude', 'discountAmount', 'rating'].forEach(field => {
-    if (coerced[field] !== undefined && coerced[field] !== null && coerced[field] !== '') {
-      coerced[field] = String(coerced[field]);
-    } else {
-      coerced[field] = undefined; // Use undefined instead of null for optional fields
-    }
-  });
-  
-  // Convert integer fields properly
-  ['reviewCount', 'discountPercent'].forEach(field => {
-    if (coerced[field] !== undefined && coerced[field] !== null && coerced[field] !== '') {
-      const parsed = parseInt(coerced[field]);
-      coerced[field] = isNaN(parsed) ? undefined : parsed;
-    } else {
-      coerced[field] = undefined;
-    }
-  });
-  
-  // Properly parse boolean fields
-  ['isOpen', 'isActive', 'isFeatured', 'isNew', 'isTemporarilyClosed'].forEach(field => {
-    if (coerced[field] !== undefined && coerced[field] !== null) {
-      const value = coerced[field];
-      if (typeof value === 'string') {
-        coerced[field] = value === 'true' || value === '1';
-      } else if (typeof value === 'number') {
-        coerced[field] = !!value;
-      } else {
-        coerced[field] = Boolean(value);
-      }
-    }
-  });
-  
-  // Parse date fields
-  if (coerced.validUntil !== undefined && coerced.validUntil !== null && coerced.validUntil !== '') {
-    const date = new Date(coerced.validUntil);
-    coerced.validUntil = isNaN(date.getTime()) ? undefined : date;
-  } else {
-    coerced.validUntil = undefined;
-  }
-  
-  // Convert optional text/UUID fields to undefined instead of null
-  ['categoryId', 'temporaryCloseReason', 'address'].forEach(field => {
-    if (coerced[field] === null || coerced[field] === '') {
-      coerced[field] = undefined;
-    }
-  });
-  
-  return coerced;
-}
 
 // Schema object for direct database operations
 const schema = {
@@ -110,12 +71,58 @@ const schema = {
   drivers,
   orderTracking,
   cart,
-  favorites
+  favorites,
+  employees,
+  attendance,
+  leaveRequests,
+  driverBalances,
+  driverTransactions,
+  driverCommissions,
+  driverWithdrawals
 };
 
-// تم حذف middleware المصادقة - يمكن الوصول المباشر للبيانات بدون مصادقة
+// Middleware للمصادقة - يُضيف req.admin إذا كان التوكن صحيحاً
+router.use(async (req: any, res, next) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.split(' ')[1];
+      const adminUser = await dbStorage.getAdminById(token);
+      if (adminUser && adminUser.isActive) {
+        req.admin = adminUser;
+        // تحليل الصلاحيات للمدير الفرعي
+        if (adminUser.userType === 'sub_admin') {
+          try {
+            req.adminPermissions = adminUser.permissions ? JSON.parse(adminUser.permissions) : [];
+          } catch {
+            req.adminPermissions = [];
+          }
+        } else {
+          req.adminPermissions = null; // null = all permissions (main admin)
+        }
+      }
+    }
+  } catch (e) {
+    // ignore auth errors - proceed without admin context
+  }
+  next();
+});
 
-// تم حذف جميع عمليات المصادقة - الوصول مباشر للبيانات بدون مصادقة
+// دالة للتحقق من صلاحيات المدير الفرعي
+function requirePermission(permission: string) {
+  return (req: any, res: any, next: any) => {
+    // إذا لم يكن هناك مدير مسجل دخوله، تجاوز (لا توجد مصادقة إلزامية)
+    if (!req.admin) return next();
+    // المدير الرئيسي له جميع الصلاحيات
+    if (req.admin.userType === 'admin') return next();
+    // المدير الفرعي: التحقق من الصلاحية
+    const perms: string[] = req.adminPermissions || [];
+    if (!perms.includes(permission)) {
+      return res.status(403).json({ error: "ليس لديك صلاحية للوصول إلى هذه الوظيفة" });
+    }
+    next();
+  };
+}
 
 // لوحة المعلومات
 router.get("/dashboard", async (req, res) => {
@@ -151,14 +158,14 @@ router.get("/dashboard", async (req, res) => {
     // حساب الإيرادات
     const deliveredOrders = orders.filter(order => order.status === "delivered");
     const totalRevenue = deliveredOrders.reduce((sum, order) => 
-      sum + parseFloat(order.total || "0"), 0
+      sum + parseFloat(order.totalAmount || order.total || "0"), 0
     );
     
     const todayDeliveredOrders = deliveredOrders.filter(order => 
       order.createdAt.toDateString() === today
     );
     const todayRevenue = todayDeliveredOrders.reduce((sum, order) => 
-      sum + parseFloat(order.total || "0"), 0
+      sum + parseFloat(order.totalAmount || order.total || "0"), 0
     );
 
     // الطلبات الأخيرة (أحدث 10 طلبات)
@@ -208,12 +215,15 @@ router.get("/categories", async (req, res) => {
 
 router.post("/categories", async (req, res) => {
   try {
+    // تنظيف وتحويل البيانات باستخدام helper function
+    const coercedData = coerceRequestData(req.body);
+    
     // التحقق من صحة البيانات مع الحقول المطلوبة
     const validatedData = insertCategorySchema.parse({
-      ...req.body,
+      ...coercedData,
       // التأكد من وجود الحقول المطلوبة
-      sortOrder: req.body.sortOrder || 0,
-      isActive: req.body.isActive !== undefined ? req.body.isActive : true
+      sortOrder: coercedData.sortOrder || 0,
+      isActive: coercedData.isActive !== undefined ? coercedData.isActive : true
     });
     
     const newCategory = await storage.createCategory(validatedData);
@@ -234,8 +244,11 @@ router.put("/categories/:id", async (req, res) => {
   try {
     const { id } = req.params;
     
+    // تنظيف وتحويل البيانات باستخدام helper function
+    const coercedData = coerceRequestData(req.body);
+    
     // التحقق من صحة البيانات المحدثة (جزئي)
-    const validatedData = insertCategorySchema.partial().parse(req.body);
+    const validatedData = insertCategorySchema.partial().parse(coercedData);
     
     const updatedCategory = await storage.updateCategory(id, {
       ...validatedData, 
@@ -337,6 +350,8 @@ router.post("/restaurants", async (req, res) => {
       reviewCount: coercedData.reviewCount || 0,
       minimumOrder: coercedData.minimumOrder || "0",
       deliveryFee: coercedData.deliveryFee || "0",
+      perKmFee: coercedData.perKmFee || "0",
+      commissionRate: coercedData.commissionRate || "10",
       categoryId: coercedData.categoryId,
       
       // أوقات العمل
@@ -367,6 +382,7 @@ router.post("/restaurants", async (req, res) => {
     const validatedData = insertRestaurantSchema.parse(restaurantData);
     
     const newRestaurant = await storage.createRestaurant(validatedData);
+    broadcastSettingsChanged('restaurants');
     res.status(201).json(newRestaurant);
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -400,6 +416,7 @@ router.put("/restaurants/:id", async (req, res) => {
       return res.status(404).json({ error: "المطعم غير موجود" });
     }
     
+    broadcastSettingsChanged('restaurants');
     res.json(updatedRestaurant);
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -431,6 +448,62 @@ router.delete("/restaurants/:id", async (req, res) => {
 });
 
 // إدارة عناصر القائمة
+router.get("/menu-items", async (req, res) => {
+  try {
+    const items = await storage.getAllMenuItems();
+    res.json(items);
+  } catch (error) {
+    console.error("خطأ في جلب المنتجات:", error);
+    res.status(500).json({ error: "خطأ في الخادم" });
+  }
+});
+
+// ── Restaurant Sections CRUD ───────────────────────────────────────────────
+router.get("/restaurants/:restaurantId/sections", async (req, res) => {
+  try {
+    const { restaurantId } = req.params;
+    const sections = await storage.getRestaurantSections(restaurantId);
+    res.json(sections);
+  } catch (error) {
+    console.error("خطأ في جلب أقسام المطعم:", error);
+    res.status(500).json({ error: "خطأ في الخادم" });
+  }
+});
+
+router.post("/restaurant-sections", async (req, res) => {
+  try {
+    const section = await storage.createRestaurantSection(req.body);
+    res.status(201).json(section);
+  } catch (error) {
+    console.error("خطأ في إضافة قسم المطعم:", error);
+    res.status(500).json({ error: "خطأ في الخادم" });
+  }
+});
+
+router.put("/restaurant-sections/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const section = await storage.updateRestaurantSection(id, req.body);
+    if (!section) return res.status(404).json({ error: "القسم غير موجود" });
+    res.json(section);
+  } catch (error) {
+    console.error("خطأ في تحديث قسم المطعم:", error);
+    res.status(500).json({ error: "خطأ في الخادم" });
+  }
+});
+
+router.delete("/restaurant-sections/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const success = await storage.deleteRestaurantSection(id);
+    if (!success) return res.status(404).json({ error: "القسم غير موجود" });
+    res.json({ success: true });
+  } catch (error) {
+    console.error("خطأ في حذف قسم المطعم:", error);
+    res.status(500).json({ error: "خطأ في الخادم" });
+  }
+});
+
 router.get("/restaurants/:restaurantId/menu", async (req, res) => {
   try {
     const { restaurantId } = req.params;
@@ -447,54 +520,16 @@ router.get("/restaurants/:restaurantId/menu", async (req, res) => {
   }
 });
 
-// جلب جميع عناصر القائمة للإدارة
-router.get("/menu-items", async (req, res) => {
-  try {
-    const { restaurantId, page = 1, limit = 50 } = req.query;
-    
-    if (restaurantId) {
-      // جلب عناصر قائمة مطعم محدد
-      const menuItems = await storage.getMenuItems(restaurantId as string);
-      const sortedItems = menuItems.sort((a, b) => a.name.localeCompare(b.name));
-      res.json(sortedItems);
-    } else {
-      // جلب جميع عناصر القائمة مع pagination  
-      const allRestaurants = await storage.getRestaurants();
-      let allMenuItems: any[] = [];
-      
-      for (const restaurant of allRestaurants) {
-        const restaurantMenuItems = await storage.getMenuItems(restaurant.id);
-        allMenuItems = allMenuItems.concat(restaurantMenuItems);
-      }
-      
-      const sortedItems = allMenuItems.sort((a: any, b: any) => a.name.localeCompare(b.name));
-      
-      // تطبيق pagination
-      const startIndex = (Number(page) - 1) * Number(limit);
-      const endIndex = startIndex + Number(limit);
-      const paginatedItems = sortedItems.slice(startIndex, endIndex);
-      
-      res.json({
-        menuItems: paginatedItems,
-        total: sortedItems.length,
-        page: Number(page),
-        limit: Number(limit),
-        totalPages: Math.ceil(sortedItems.length / Number(limit))
-      });
-    }
-  } catch (error) {
-    console.error("خطأ في جلب عناصر القائمة:", error);
-    res.status(500).json({ error: "خطأ في الخادم" });
-  }
-});
-
 router.post("/menu-items", async (req, res) => {
   try {
+    // تنظيف وتحويل البيانات باستخدام helper function
+    const coercedData = coerceRequestData(req.body);
+    
     // التحقق من صحة البيانات
     const validatedData = insertMenuItemSchema.parse({
-      ...req.body,
+      ...coercedData,
       // إضافة صورة افتراضية إذا لم تكن موجودة
-      image: req.body.image || "https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg"
+      image: coercedData.image || "https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg"
     });
     
     const newMenuItem = await storage.createMenuItem(validatedData);
@@ -515,8 +550,11 @@ router.put("/menu-items/:id", async (req, res) => {
   try {
     const { id } = req.params;
     
+    // تنظيف وتحويل البيانات باستخدام helper function
+    const coercedData = coerceRequestData(req.body);
+    
     // التحقق من صحة البيانات المحدثة (جزئي)
-    const validatedData = insertMenuItemSchema.partial().parse(req.body);
+    const validatedData = insertMenuItemSchema.partial().parse(coercedData);
     
     const updatedMenuItem = await storage.updateMenuItem(id, validatedData);
     
@@ -620,8 +658,53 @@ router.put("/orders/:id/status", async (req: any, res) => {
       return res.status(404).json({ error: "الطلب غير موجود" });
     }
     
-    // Note: تتبع الطلبات (order tracking) ليس منفذاً في MemStorage بعد
-    // يمكن إضافته لاحقاً إذا لزم الأمر
+    // بث التحديث عبر WebSocket
+    const ws = req.app.get('ws');
+    if (ws) {
+      ws.broadcast('order_update', { 
+        orderId: id, 
+        status,
+        orderNumber: updatedOrder.orderNumber,
+        type: 'regular'
+      });
+    }
+
+    // إنشاء رسالة الحالة للتتبع والإشعارات
+    let statusMessage = '';
+    switch (status) {
+      case 'confirmed': statusMessage = 'تم تأكيد الطلب'; break;
+      case 'preparing': statusMessage = 'جاري تحضير الطلب'; break;
+      case 'ready': statusMessage = 'الطلب جاهز للاستلام'; break;
+      case 'picked_up': statusMessage = 'تم استلام الطلب من المطعم'; break;
+      case 'on_way': statusMessage = 'السائق في الطريق إليك'; break;
+      case 'delivered': statusMessage = 'تم تسليم الطلب بنجاح'; break;
+      case 'cancelled': statusMessage = 'تم إلغاء الطلب من قبل الإدارة'; break;
+      default: statusMessage = `تم تحديث حالة الطلب إلى ${status}`;
+    }
+
+    try {
+      // إنشاء قيد تتبع
+      await storage.createOrderTracking({
+        orderId: id,
+        status,
+        message: statusMessage,
+        createdBy: req.admin?.id || 'admin',
+        createdByType: 'admin'
+      });
+
+      // إشعار للعميل
+      await storage.createNotification({
+        type: 'order_status_update',
+        title: 'تحديث حالة الطلب',
+        message: `طلبك رقم ${updatedOrder.orderNumber}: ${statusMessage}`,
+        recipientType: 'customer',
+        recipientId: updatedOrder.customerId || updatedOrder.customerPhone,
+        orderId: id,
+        isRead: false
+      });
+    } catch (err) {
+      console.error("Error creating tracking/notification in admin update:", err);
+    }
     
     res.json(updatedOrder);
   } catch (error) {
@@ -630,20 +713,476 @@ router.put("/orders/:id/status", async (req: any, res) => {
   }
 });
 
-// إدارة السائقين
+// جلب إحصائيات تقارير المطاعم
+router.get("/reports/restaurants", async (req, res) => {
+  try {
+    const { startDate, endDate, categoryId } = req.query;
+    
+    const allRestaurants = await storage.getRestaurants({ categoryId: categoryId as string });
+    const allOrders = await storage.getOrders();
+    
+    const reports = allRestaurants.map(restaurant => {
+      const restaurantOrders = allOrders.filter(order => 
+        order.restaurantId === restaurant.id &&
+        (order.status === 'delivered') &&
+        (!startDate || new Date(order.createdAt) >= new Date(startDate as string)) &&
+        (!endDate || new Date(order.createdAt) <= new Date(endDate as string))
+      );
+      
+      const totalSales = restaurantOrders.reduce((sum, order) => sum + parseFloat(order.totalAmount || order.total || "0"), 0);
+      const totalOrders = restaurantOrders.length;
+      const avgOrderValue = totalOrders > 0 ? totalSales / totalOrders : 0;
+      const commissionRate = 0.15; // 15% عمولة افتراضية
+      const totalCommission = totalSales * commissionRate;
+      const amountDue = totalSales - totalCommission;
+      
+      return {
+        id: restaurant.id,
+        name: restaurant.name,
+        category: restaurant.categoryId,
+        totalOrders,
+        totalSales,
+        avgOrderValue,
+        commissionRate: commissionRate * 100,
+        amountDue
+      };
+    });
+    
+    res.json(reports);
+  } catch (error) {
+    console.error("Error in restaurant reports:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// تقارير الطلبات
+router.get("/reports/orders", async (req, res) => {
+  try {
+    const { from, to } = req.query;
+    const fromDate = from ? new Date(from as string) : new Date(new Date().setDate(new Date().getDate() - 30));
+    const toDate = to ? new Date(to as string) : new Date();
+
+    const orders = await storage.getOrders();
+    const filteredOrders = orders.filter(o => {
+      const orderDate = new Date(o.createdAt);
+      return orderDate >= fromDate && orderDate <= toDate;
+    });
+
+    const statusCounts = filteredOrders.reduce((acc: any, o) => {
+      acc[o.status] = (acc[o.status] || 0) + 1;
+      return acc;
+    }, {});
+
+    const totalRevenue = filteredOrders
+      .filter(o => o.status === 'delivered')
+      .reduce((sum, o) => sum + parseFloat(o.totalAmount || "0"), 0);
+
+    res.json({
+      total: filteredOrders.length,
+      revenue: totalRevenue,
+      statusBreakdown: statusCounts,
+      orders: filteredOrders.slice(0, 100) // أحدث 100 طلب
+    });
+  } catch (error) {
+    console.error("خطأ في تقارير الطلبات:", error);
+    res.status(500).json({ error: "خطأ في الخادم" });
+  }
+});
+
+// تقارير المنتجات
+router.get("/reports/products", async (req, res) => {
+  try {
+    const orders = await storage.getOrders();
+    const deliveredOrders = orders.filter(o => o.status === 'delivered');
+    
+    const productSales: any = {};
+    
+    deliveredOrders.forEach(order => {
+      try {
+        const items = typeof order.items === 'string' ? JSON.parse(order.items) : order.items;
+        if (Array.isArray(items)) {
+          items.forEach((item: any) => {
+            const id = item.id || item.menuItemId;
+            if (!id) return;
+            if (!productSales[id]) {
+              productSales[id] = {
+                id,
+                name: item.name || 'منتج غير معروف',
+                quantity: 0,
+                revenue: 0
+              };
+            }
+            productSales[id].quantity += item.quantity || 1;
+            productSales[id].revenue += (item.price || 0) * (item.quantity || 1);
+          });
+        }
+      } catch (e) {
+        console.error("Error parsing order items for report:", e);
+      }
+    });
+
+    const sortedProducts = Object.values(productSales)
+      .sort((a: any, b: any) => b.quantity - a.quantity)
+      .slice(0, 50);
+
+    res.json(sortedProducts);
+  } catch (error) {
+    console.error("خطأ في تقارير المنتجات:", error);
+    res.status(500).json({ error: "خطأ في الخادم" });
+  }
+});
+
+// تقارير المستخدمين
+router.get("/reports/users", async (req, res) => {
+  try {
+    const [users, orders] = await Promise.all([
+      storage.getUsers(),
+      storage.getOrders()
+    ]);
+
+    const deliveredOrders = orders.filter(o => o.status === 'delivered');
+    
+    const userStats = users.map(user => {
+      const userOrders = deliveredOrders.filter(o => o.customerId === user.id);
+      const totalSpent = userOrders.reduce((sum, o) => sum + parseFloat(o.totalAmount || "0"), 0);
+      
+      return {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        orderCount: userOrders.length,
+        totalSpent,
+        createdAt: user.createdAt
+      };
+    });
+
+    const topUsers = [...userStats].sort((a, b) => b.totalSpent - a.totalSpent).slice(0, 50);
+    const newUsersCount = users.filter(u => {
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      return new Date(u.createdAt) >= thirtyDaysAgo;
+    }).length;
+
+    res.json({
+      totalUsers: users.length,
+      newUsersLast30Days: newUsersCount,
+      topUsers
+    });
+  } catch (error) {
+    console.error("خطأ في تقارير المستخدمين:", error);
+    res.status(500).json({ error: "خطأ في الخادم" });
+  }
+});
+
+// ملخص السائقين للتقارير المتقدمة
+router.get("/drivers-summary", async (req, res) => {
+  try {
+    const driversList = await storage.getDrivers();
+    const allOrders = await storage.getOrders();
+
+    const summary = await Promise.all(
+      driversList.map(async (driver) => {
+        const driverOrders = allOrders.filter(o => o.driverId === driver.id && o.status === 'delivered');
+        const totalEarnings = driverOrders.reduce((sum, o) => sum + parseFloat(o.deliveryFee || "0"), 0);
+        const balance = await storage.getDriverBalance(driver.id).catch(() => null);
+        return {
+          id: driver.id,
+          name: driver.name,
+          phone: driver.phone,
+          isAvailable: driver.isAvailable,
+          stats: {
+            totalOrders: driverOrders.length,
+            totalEarnings: balance ? parseFloat(balance.totalBalance || "0") : totalEarnings,
+            averageRating: parseFloat(driver.rating || "0"),
+            availableBalance: balance ? parseFloat(balance.availableBalance || "0") : 0
+          }
+        };
+      })
+    );
+
+    res.json(summary);
+  } catch (error) {
+    console.error("خطأ في ملخص السائقين:", error);
+    res.status(500).json({ error: "خطأ في الخادم" });
+  }
+});
+
+// ملخص المطاعم للتقارير المتقدمة
+router.get("/restaurants-summary", async (req, res) => {
+  try {
+    const allRestaurants = await storage.getRestaurants({});
+    const allOrders = await storage.getOrders();
+
+    const summary = allRestaurants.map(restaurant => {
+      const restaurantOrders = allOrders.filter(o => o.restaurantId === restaurant.id && o.status === 'delivered');
+      const totalRevenue = restaurantOrders.reduce((sum, o) => sum + parseFloat(o.totalAmount || o.total || "0"), 0);
+      const commissionRate = 0.15;
+      const totalCommission = totalRevenue * commissionRate;
+
+      return {
+        id: restaurant.id,
+        name: restaurant.name,
+        phone: restaurant.phone,
+        isOpen: restaurant.isOpen,
+        stats: {
+          totalOrders: restaurantOrders.length,
+          totalRevenue,
+          totalCommission,
+          netEarnings: totalRevenue - totalCommission,
+          avgOrderValue: restaurantOrders.length > 0 ? totalRevenue / restaurantOrders.length : 0
+        }
+      };
+    });
+
+    res.json(summary);
+  } catch (error) {
+    console.error("خطأ في ملخص المطاعم:", error);
+    res.status(500).json({ error: "خطأ في الخادم" });
+  }
+});
+
+router.get("/reports/restaurants/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const restaurant = await storage.getRestaurant(id);
+    if (!restaurant) return res.status(404).json({ error: "Restaurant not found" });
+    
+    const allOrders = await storage.getOrders();
+    const restaurantOrders = allOrders.filter(order => order.restaurantId === id);
+    const deliveredOrders = restaurantOrders.filter(order => order.status === 'delivered');
+    
+    const totalSales = deliveredOrders.reduce((sum, order) => sum + parseFloat(order.totalAmount || order.total || "0"), 0);
+    const commissionRate = 0.15;
+    const totalCommission = totalSales * commissionRate;
+    
+    // تحليل المبيعات (يومي، أسبوعي، شهري)
+    const now = new Date();
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const weekStart = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const monthStart = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+    
+    const salesToday = deliveredOrders.filter(o => new Date(o.createdAt) >= todayStart).reduce((s, o) => s + parseFloat(o.totalAmount || o.total || "0"), 0);
+    const salesWeek = deliveredOrders.filter(o => new Date(o.createdAt) >= weekStart).reduce((s, o) => s + parseFloat(o.totalAmount || o.total || "0"), 0);
+    const salesMonth = deliveredOrders.filter(o => new Date(o.createdAt) >= monthStart).reduce((s, o) => s + parseFloat(o.totalAmount || o.total || "0"), 0);
+    
+    const cancelledCount = restaurantOrders.filter(o => o.status === 'cancelled').length;
+    const cancellationRate = restaurantOrders.length > 0 ? (cancelledCount / restaurantOrders.length) * 100 : 0;
+    
+    res.json({
+      restaurant,
+      financials: {
+        totalSales,
+        totalCommission,
+        netAmount: totalSales - totalCommission,
+        salesToday,
+        salesWeek,
+        salesMonth,
+        deliveryFees: deliveredOrders.reduce((s, o) => s + parseFloat(o.deliveryFee || "0"), 0),
+      },
+      analytics: {
+        totalOrders: restaurantOrders.length,
+        deliveredOrders: deliveredOrders.length,
+        cancellationRate,
+        avgDeliveryTime: restaurant.deliveryTime
+      },
+      transactions: deliveredOrders.map(o => ({
+        id: o.id,
+        orderNumber: o.orderNumber,
+        date: o.createdAt,
+        total: parseFloat(o.totalAmount || o.total || "0"),
+        commission: parseFloat(o.totalAmount || o.total || "0") * commissionRate,
+        net: parseFloat(o.totalAmount || o.total || "0") * (1 - commissionRate),
+        status: 'paid'
+      }))
+    });
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
+  }
+}); // <-- قوس الإغلاق الصحيح
+
+// إدارة الموظفين والموارد البشرية
+router.get("/employees", async (req, res) => {
+  try {
+    const employees = await storage.getEmployees();
+    res.json(employees);
+  } catch (error) {
+    console.error("Error fetching employees:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.post("/employees", async (req, res) => {
+  try {
+    const coercedData = coerceRequestData(req.body);
+    const validatedData = insertEmployeeSchema.parse(coercedData);
+    const newEmployee = await storage.createEmployee(validatedData);
+    res.status(201).json(newEmployee);
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({ error: "Invalid data", details: error.errors });
+    }
+    console.error("Error creating employee:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.put("/employees/:id", async (req, res) => {
+  try {
+    const coercedData = coerceRequestData(req.body);
+    const validatedData = insertEmployeeSchema.partial().parse(coercedData);
+    const updated = await storage.updateEmployee(req.params.id, validatedData);
+    if (!updated) return res.status(404).json({ error: "Employee not found" });
+    res.json(updated);
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({ error: "Invalid data", details: error.errors });
+    }
+    console.error("Error updating employee:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.delete("/employees/:id", async (req, res) => {
+  try {
+    const success = await storage.deleteEmployee(req.params.id);
+    if (!success) return res.status(404).json({ error: "Employee not found" });
+    res.json({ success: true });
+  } catch (error) {
+    console.error("Error deleting employee:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// إدارة الحضور
+router.get("/attendance", async (req, res) => {
+  try {
+    const { employeeId, date } = req.query;
+    const attendance = await storage.getAttendance(
+      employeeId as string,
+      date ? new Date(date as string) : undefined
+    );
+    res.json(attendance);
+  } catch (error) {
+    console.error("Error fetching attendance:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.post("/attendance", async (req, res) => {
+  try {
+    const coercedData = coerceRequestData(req.body);
+    const validatedData = insertAttendanceSchema.parse(coercedData);
+    const newAttendance = await storage.createAttendance(validatedData);
+    res.status(201).json(newAttendance);
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({ error: "Invalid data", details: error.errors });
+    }
+    console.error("Error creating attendance:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// طلبات الإجازة
+router.get("/leave-requests", async (req, res) => {
+  try {
+    const { employeeId } = req.query;
+    const requests = await storage.getLeaveRequests(employeeId as string);
+    res.json(requests);
+  } catch (error) {
+    console.error("Error fetching leave requests:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.post("/leave-requests", async (req, res) => {
+  try {
+    const coercedData = coerceRequestData(req.body);
+    const validatedData = insertLeaveRequestSchema.parse(coercedData);
+    const newRequest = await storage.createLeaveRequest(validatedData);
+    res.status(201).json(newRequest);
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({ error: "Invalid data", details: error.errors });
+    }
+    console.error("Error creating leave request:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.put("/leave-requests/:id", async (req, res) => {
+  try {
+    const coercedData = coerceRequestData(req.body);
+    const validatedData = insertLeaveRequestSchema.partial().parse(coercedData);
+    const updated = await storage.updateLeaveRequest(req.params.id, validatedData);
+    if (!updated) return res.status(404).json({ error: "Leave request not found" });
+    res.json(updated);
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({ error: "Invalid data", details: error.errors });
+    }
+    console.error("Error updating leave request:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 router.get("/drivers", async (req, res) => {
   try {
-    const drivers = await dbStorage.getDrivers();
-    
-    // ترتيب السائقين حسب تاريخ الإنشاء (الأحدث أولاً)
-    const sortedDrivers = drivers.sort((a, b) => 
-      b.createdAt.getTime() - a.createdAt.getTime()
-    );
-    
-    res.json(sortedDrivers);
+    const drivers = await storage.getDrivers();
+    res.json(drivers);
   } catch (error) {
-    console.error("خطأ في جلب السائقين:", error);
-    res.status(500).json({ error: "خطأ في الخادم" });
+    console.error("Error fetching drivers:", error);
+    res.status(500).json({ error: "فشل في جلب بيانات السائقين" });
+  }
+});
+
+router.get("/drivers/:id/stats", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const driver = await storage.getDriver(id);
+    if (!driver) return res.status(404).json({ error: "السائق غير موجود" });
+    const orders = await storage.getOrders();
+    const driverOrders = orders.filter((o: any) => o.driverId === id);
+    const completedOrders = driverOrders.filter((o: any) => o.status === 'delivered');
+    const totalEarnings = completedOrders.reduce((sum: number, o: any) => sum + parseFloat(o.deliveryFee || '0'), 0);
+    res.json({
+      totalOrders: driverOrders.length,
+      completedOrders: completedOrders.length,
+      totalEarnings: totalEarnings.toFixed(2),
+      rating: driver.rating || 0,
+    });
+  } catch (error) {
+    console.error("Error fetching driver stats:", error);
+    res.status(500).json({ error: "فشل في جلب إحصائيات السائق" });
+  }
+});
+
+router.get("/stats", async (req, res) => {
+  try {
+    const orders = await storage.getOrders();
+    const drivers = await storage.getDrivers();
+    const categories = await storage.getCategories();
+    const restaurants = await storage.getRestaurants();
+    const users = await storage.getUsers();
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    const todayOrders = orders.filter((o: any) => new Date(o.createdAt) >= today);
+    const totalRevenue = orders.filter((o: any) => o.status === 'delivered')
+      .reduce((sum: number, o: any) => sum + parseFloat(o.totalAmount || '0'), 0);
+    res.json({
+      totalOrders: orders.length,
+      todayOrders: todayOrders.length,
+      totalDrivers: drivers.length,
+      activeDrivers: drivers.filter((d: any) => d.isAvailable).length,
+      totalCategories: categories.length,
+      totalRestaurants: restaurants.length,
+      totalUsers: users.length,
+      totalRevenue: totalRevenue.toFixed(2),
+    });
+  } catch (error) {
+    console.error("Error fetching stats:", error);
+    res.status(500).json({ error: "فشل في جلب الإحصائيات" });
   }
 });
 
@@ -651,8 +1190,11 @@ router.post("/drivers", async (req, res) => {
   try {
     console.log("Driver creation request data:", req.body);
     
+    // تنظيف وتحويل البيانات باستخدام helper function
+    const coercedData = coerceRequestData(req.body);
+    
     // التحقق من البيانات المطلوبة
-    if (!req.body.name || !req.body.phone || !req.body.password) {
+    if (!coercedData.name || !coercedData.phone || !coercedData.password) {
       return res.status(400).json({ 
         error: "البيانات المطلوبة ناقصة", 
         details: "الاسم ورقم الهاتف وكلمة المرور مطلوبة"
@@ -661,13 +1203,13 @@ router.post("/drivers", async (req, res) => {
     
     // التحقق من صحة البيانات مع الحقول المطلوبة
     const driverData = {
-      ...req.body,
+      ...coercedData,
       // التأكد من وجود الحقول الافتراضية
-      isAvailable: req.body.isAvailable !== undefined ? req.body.isAvailable : true,
-      isActive: req.body.isActive !== undefined ? req.body.isActive : true,
-      earnings: req.body.earnings || "0",
+      isAvailable: coercedData.isAvailable !== undefined ? coercedData.isAvailable : true,
+      isActive: coercedData.isActive !== undefined ? coercedData.isActive : true,
+      earnings: coercedData.earnings || "0",
       userType: "driver",
-      currentLocation: req.body.currentLocation || null
+      currentLocation: coercedData.currentLocation || null
     };
     
     console.log("Processed driver data:", driverData);
@@ -693,8 +1235,11 @@ router.put("/drivers/:id", async (req, res) => {
   try {
     const { id } = req.params;
     
+    // تنظيف وتحويل البيانات باستخدام helper function
+    const coercedData = coerceRequestData(req.body);
+    
     // التحقق من صحة البيانات المحدثة (جزئي)
-    const validatedData = insertDriverSchema.partial().parse(req.body);
+    const validatedData = insertDriverSchema.partial().parse(coercedData);
     
     const updatedDriver = await dbStorage.updateDriver(id, validatedData);
     
@@ -778,6 +1323,315 @@ router.get("/drivers/:id/stats", async (req, res) => {
   }
 });
 
+// ==================== إدارة مالية السائقين ====================
+
+// جلب الملخص المالي لجميع السائقين
+router.get("/drivers/finances", async (req, res) => {
+  try {
+    const driversList = await storage.getDrivers();
+    const financialSummaries = await Promise.all(
+      driversList.map(async (driver) => {
+        const balance = await storage.getDriverBalance(driver.id);
+        return {
+          id: driver.id,
+          name: driver.name,
+          phone: driver.phone,
+          balance: balance || {
+            totalBalance: "0",
+            availableBalance: "0",
+            withdrawnAmount: "0",
+            pendingAmount: "0"
+          }
+        };
+      })
+    );
+    res.json(financialSummaries);
+  } catch (error) {
+    console.error("خطأ في جلب البيانات المالية للسائقين:", error);
+    res.status(500).json({ error: "خطأ في الخادم" });
+  }
+});
+
+// جلب التفاصيل المالية لسائق محدد
+router.get("/drivers/:id/finances", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const [balance, transactions, commissions, withdrawals] = await Promise.all([
+      storage.getDriverBalance(id),
+      storage.getDriverTransactions(id),
+      storage.getDriverCommissions(id),
+      storage.getDriverWithdrawals(id)
+    ]);
+
+    res.json({
+      balance: balance || {
+        totalBalance: "0",
+        availableBalance: "0",
+        withdrawnAmount: "0",
+        pendingAmount: "0"
+      },
+      transactions: transactions || [],
+      commissions: commissions || [],
+      withdrawals: withdrawals || []
+    });
+  } catch (error) {
+    console.error("خطأ في جلب التفاصيل المالية للسائق:", error);
+    res.status(500).json({ error: "خطأ في الخادم" });
+  }
+});
+
+// إضافة معاملة يدوية (مكافأة أو خصم)
+router.post("/drivers/:id/transactions", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { amount, type, description } = req.body;
+
+    if (!amount || !type) {
+      return res.status(400).json({ error: "المبلغ والنوع مطلوبان" });
+    }
+
+    const transaction = await storage.createDriverTransaction({
+      driverId: id,
+      amount: amount.toString(),
+      type,
+      description: description || "تسوية يدوية من الإدارة",
+      referenceId: "admin_manual"
+    });
+
+    res.status(201).json(transaction);
+  } catch (error) {
+    console.error("خطأ في إنشاء المعاملة:", error);
+    res.status(500).json({ error: "خطأ في الخادم" });
+  }
+});
+
+// جلب طلبات السحب المعلقة
+router.get("/withdrawals/pending", async (req, res) => {
+  try {
+    const driversList = await storage.getDrivers();
+    const allWithdrawals = await Promise.all(
+      driversList.map(driver => storage.getDriverWithdrawals(driver.id))
+    );
+    
+    const pendingWithdrawals = allWithdrawals
+      .flat()
+      .filter(w => w.status === 'pending')
+      .map(w => {
+        const driver = driversList.find(d => d.id === w.driverId);
+        return {
+          ...w,
+          userName: driver?.name || 'سائق غير معروف',
+          userType: 'driver'
+        };
+      });
+
+    res.json(pendingWithdrawals);
+  } catch (error) {
+    console.error("خطأ في جلب طلبات السحب المعلقة:", error);
+    res.status(500).json({ error: "خطأ في الخادم" });
+  }
+});
+
+// تحديث حالة طلب سحب
+router.put("/withdrawals/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status, adminNotes } = req.body;
+
+    if (!status) {
+      return res.status(400).json({ error: "الحالة مطلوبة" });
+    }
+
+    const updated = await storage.updateWithdrawal(id, {
+      status,
+      adminNotes,
+      processedAt: status === 'completed' ? new Date() : undefined
+    });
+
+    if (!updated) {
+      return res.status(404).json({ error: "طلب السحب غير موجود" });
+    }
+
+    res.json(updated);
+  } catch (error) {
+    console.error("خطأ في تحديث طلب السحب:", error);
+    res.status(500).json({ error: "خطأ في الخادم" });
+  }
+});
+
+// الموافقة على طلب سحب
+router.post("/withdrawals/:id/approve", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updated = await storage.updateWithdrawal(id, {
+      status: 'completed',
+      processedAt: new Date()
+    });
+
+    if (!updated) {
+      return res.status(404).json({ error: "طلب السحب غير موجود" });
+    }
+
+    res.json(updated);
+  } catch (error) {
+    console.error("خطأ في الموافقة على طلب السحب:", error);
+    res.status(500).json({ error: "خطأ في الخادم" });
+  }
+});
+
+// رفض طلب سحب
+router.post("/withdrawals/:id/reject", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { reason } = req.body;
+    const updated = await storage.updateWithdrawal(id, {
+      status: 'rejected',
+      adminNotes: reason
+    });
+
+    if (!updated) {
+      return res.status(404).json({ error: "طلب السحب غير موجود" });
+    }
+
+    res.json(updated);
+  } catch (error) {
+    console.error("خطأ في رفض طلب السحب:", error);
+    res.status(500).json({ error: "خطأ في الخادم" });
+  }
+});
+
+// تحديث حالة عمولة
+router.put("/commissions/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    if (!status) {
+      return res.status(400).json({ error: "الحالة مطلوبة" });
+    }
+
+    const updated = await storage.updateDriverCommission(id, { status });
+
+    if (!updated) {
+      return res.status(404).json({ error: "العمولة غير موجودة" });
+    }
+
+    res.json(updated);
+  } catch (error) {
+    console.error("خطأ في تحديث العمولة:", error);
+    res.status(500).json({ error: "خطأ في الخادم" });
+  }
+});
+
+// جلب المعاملات المالية الشاملة
+router.get("/transactions", async (req, res) => {
+  try {
+    const { from, to } = req.query;
+    const fromDate = from ? new Date(from as string) : new Date(new Date().setDate(new Date().getDate() - 30));
+    const toDate = to ? new Date(to as string) : new Date();
+    
+    // جلب جميع السائقين أولاً لربط الأسماء
+    const driversList = await storage.getDrivers();
+    
+    // جلب معاملات جميع السائقين
+    const allTransactions = await Promise.all(
+      driversList.map(async (driver) => {
+        const txs = await storage.getDriverTransactions(driver.id);
+        return txs.map(tx => ({
+          ...tx,
+          userName: driver.name,
+          userType: 'driver',
+          fromUser: tx.type === 'withdrawal' ? driver.name : 'المنصة',
+          toUser: tx.type === 'withdrawal' ? 'البنك / محفظة السائق' : driver.name,
+          amount: parseFloat(tx.amount.toString()),
+          status: 'completed' // في نظامنا الحالي المعاملات المسجلة هي مكتملة
+        }));
+      })
+    );
+    
+    let flatTransactions = allTransactions.flat();
+    
+    // تصفية حسب التاريخ
+    flatTransactions = flatTransactions.filter(tx => {
+      const txDate = new Date(tx.createdAt);
+      return txDate >= fromDate && txDate <= toDate;
+    });
+    
+    // ترتيب تنازلي حسب التاريخ
+    flatTransactions.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    
+    res.json(flatTransactions);
+  } catch (error) {
+    console.error("خطأ في جلب المعاملات:", error);
+    res.status(500).json({ error: "خطأ في الخادم" });
+  }
+});
+
+// جلب التقارير المالية
+router.get("/financial-reports", async (req, res) => {
+  try {
+    const { from, to, type } = req.query;
+    const fromDate = from ? new Date(from as string) : new Date(new Date().setDate(new Date().getDate() - 30));
+    const toDate = to ? new Date(to as string) : new Date();
+
+    const ordersList = await storage.getOrders();
+    const filteredOrders = ordersList.filter(o => {
+      const orderDate = new Date(o.createdAt);
+      return orderDate >= fromDate && orderDate <= toDate;
+    });
+    
+    const deliveredOrders = filteredOrders.filter(o => o.status === 'delivered');
+    
+    // حساب الإحصائيات الأساسية
+    const totalRevenue = deliveredOrders.reduce((sum, o) => sum + parseFloat(o.totalAmount || "0"), 0);
+    const deliveryFees = deliveredOrders.reduce((sum, o) => sum + parseFloat(o.deliveryFee || "0"), 0);
+    const platformFees = deliveredOrders.reduce((sum, o) => sum + parseFloat(o.companyEarnings || "0"), 0);
+    const restaurantPayments = deliveredOrders.reduce((sum, o) => sum + parseFloat(o.restaurantEarnings || "0"), 0);
+    
+    // جلب بيانات السائقين والسحوبات
+    const driversList = await storage.getDrivers();
+    const allWithdrawals = (await Promise.all(driversList.map(d => storage.getDriverWithdrawals(d.id)))).flat();
+    
+    const filteredWithdrawals = allWithdrawals.filter(w => {
+      const wDate = new Date(w.createdAt);
+      return wDate >= fromDate && wDate <= toDate;
+    });
+
+    const pendingWithdrawals = filteredWithdrawals.filter(w => w.status === 'pending');
+    const completedWithdrawals = filteredWithdrawals.filter(w => w.status === 'completed');
+    const driverPayments = completedWithdrawals.reduce((sum, w) => sum + parseFloat(w.amount.toString()), 0);
+    
+    // إنشاء التقرير
+    const report = {
+      id: "rep_" + Date.now(),
+      period: type === 'monthly' ? fromDate.toLocaleDateString('ar-YE', { month: 'long', year: 'numeric' }) : "الفترة المختارة",
+      totalRevenue,
+      totalExpenses: driverPayments + restaurantPayments,
+      netProfit: platformFees,
+      commissionEarned: platformFees,
+      deliveryFees,
+      platformFees,
+      restaurantPayments,
+      driverPayments,
+      withdrawalRequests: filteredWithdrawals.length,
+      pendingWithdrawals: pendingWithdrawals.length,
+      completedWithdrawals: completedWithdrawals.length,
+      taxAmount: totalRevenue * 0.05, // افتراضي 5%
+      transactionCount: deliveredOrders.length,
+      averageOrderValue: deliveredOrders.length > 0 ? totalRevenue / deliveredOrders.length : 0,
+      growthRate: 15.5, // قيمة افتراضية للنمو
+      status: "published",
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+
+    res.json([report]);
+  } catch (error) {
+    console.error("خطأ في جلب التقارير المالية:", error);
+    res.status(500).json({ error: "خطأ في الخادم" });
+  }
+});
+
 // إدارة العروض الخاصة
 router.get("/special-offers", async (req, res) => {
   try {
@@ -820,15 +1674,48 @@ router.post("/special-offers", async (req, res) => {
       // حالة العرض (الآن مع تحويل صحيح للبوليان)
       isActive: coercedData.isActive !== undefined ? coercedData.isActive : true,
       
+      restaurantId: coercedData.restaurantId,
+      menuItemId: coercedData.menuItemId,
+      categoryId: coercedData.categoryId,
+      
       // حقول التوقيت
       createdAt: new Date()
     };
     
     console.log("Processed special offer data:", offerData);
     
+    // ضمان وجود تصنيف "العروض" وربط العرض به تلقائياً
+    try {
+      const allCategories = await storage.getCategories();
+      let offersCategory = allCategories.find(c => c.name === 'العروض' || c.name === 'Offers');
+      
+      if (!offersCategory) {
+        offersCategory = await storage.createCategory({
+          name: 'العروض',
+          icon: 'fas fa-tags',
+          image: 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?q=80&w=400',
+          isActive: true,
+          sortOrder: -1, // جعلها تظهر في البداية
+          type: 'primary'
+        });
+      }
+      
+      if (!offerData.categoryId) {
+        offerData.categoryId = offersCategory.id;
+      }
+    } catch (catError) {
+      console.error('Error ensuring Offers category exists:', catError);
+    }
+
     const validatedData = insertSpecialOfferSchema.parse(offerData);
     
     const newOffer = await storage.createSpecialOffer(validatedData);
+
+    // إذا تم ربط العرض بمنتج، قم بتحديث المنتج ليكون عرضاً خاصاً
+    if (newOffer.menuItemId) {
+      await storage.updateMenuItem(newOffer.menuItemId, { isSpecialOffer: true });
+    }
+    
     res.status(201).json(newOffer);
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -894,16 +1781,40 @@ router.post("/notifications", async (req: any, res) => {
   try {
     const notificationData = {
       ...req.body,
-      createdBy: req.admin.id
+      createdBy: req.admin?.id || null
     };
     
     const [newNotification] = await db.insert(schema.notifications)
       .values(notificationData)
       .returning();
     
+    // بث الإشعار عبر WebSocket لجميع المتصلين
+    broadcastEvent('new_notification', {
+      notification: newNotification,
+      recipientType: notificationData.recipientType,
+      recipientId: notificationData.recipientId,
+      timestamp: new Date().toISOString()
+    });
+    
     res.json(newNotification);
   } catch (error) {
     console.error("خطأ في إنشاء الإشعار:", error);
+    res.status(500).json({ error: "خطأ في الخادم" });
+  }
+});
+
+// جلب جميع الإشعارات
+router.get("/notifications", async (req: any, res) => {
+  try {
+    const { recipientType, recipientId, limit: limitParam } = req.query;
+    const limitNum = parseInt(limitParam as string) || 50;
+    
+    let query = db.select().from(schema.notifications).orderBy(desc(schema.notifications.createdAt)).limit(limitNum);
+    const notifs = await query;
+    
+    res.json(notifs);
+  } catch (error) {
+    console.error("خطأ في جلب الإشعارات:", error);
     res.status(500).json({ error: "خطأ في الخادم" });
   }
 });
@@ -931,24 +1842,10 @@ router.put("/settings/:key", async (req, res) => {
       .where(eq(schema.systemSettings.key, key))
       .returning();
     
-    res.json(updatedSetting);
-  } catch (error) {
-    res.status(500).json({ error: "خطأ في الخادم" });
-  }
-});
+    // بث التحديث عبر WebSocket
+    broadcastSettingsChanged(key);
 
-// إعدادات واجهة المستخدم (متاحة للعامة)
-router.get("/ui-settings", async (req, res) => {
-  try {
-    // TEMPORARY FIX: Return sample UI settings
-    console.log('TEMPORARY FIX: Returning sample UI settings from admin.ts');
-    const settings = [
-      { id: '1', key: 'app_name', value: 'تطبيق السريع ون', category: 'general', isActive: true },
-      { id: '2', key: 'delivery_fee', value: '5.00', category: 'pricing', isActive: true },
-      { id: '3', key: 'minimum_order', value: '20.00', category: 'pricing', isActive: true }
-    ];
-    
-    res.json(settings);
+    res.json(updatedSetting);
   } catch (error) {
     res.status(500).json({ error: "خطأ في الخادم" });
   }
@@ -986,6 +1883,9 @@ router.put("/business-hours", async (req, res) => {
     }
     
     await Promise.all(updates);
+    
+    // بث التحديث عبر WebSocket لمزامنة جميع الأجهزة
+    broadcastSettingsChanged('business_hours');
     
     res.json({ success: true, message: "تم تحديث أوقات العمل بنجاح" });
   } catch (error) {
@@ -1171,8 +2071,8 @@ router.delete("/users/:id", async (req, res) => {
       .limit(1);
     
     if (customerResult.length > 0) {
-      // حذف العميل
-      await db.delete(schema.customers).where(eq(schema.customers.id, id));
+      // حذف العميل باستخدام التخزين لمعالجة التبعيات
+      await storage.deleteUser(id);
       res.json({ success: true, message: "تم حذف العميل بنجاح" });
       return;
     }
@@ -1191,9 +2091,9 @@ router.delete("/users/:id", async (req, res) => {
         return res.status(403).json({ error: "لا يمكن حذف المدير الرئيسي" });
       }
       
-      // حذف السائق أو المدير
-      await db.delete(schema.adminUsers).where(eq(schema.adminUsers.id, id));
-      res.json({ success: true, message: `تم حذف ${user.userType === 'driver' ? 'السائق' : 'المدير'} بنجاح` });
+      // حذف المستخدم من جدول المديرين/السائقين
+      await storage.deleteAdminUser(id);
+      res.json({ success: true, message: "تم حذف المستخدم بنجاح" });
       return;
     }
     
@@ -1205,187 +2105,12 @@ router.delete("/users/:id", async (req, res) => {
   }
 });
 
-// إدارة الملف الشخصي للمدير
-router.get("/profile", async (req, res) => {
-  try {
-    // جلب المدير الافتراضي من قاعدة البيانات
-    const admins = await db.select().from(schema.adminUsers).where(
-      eq(schema.adminUsers.email, 'admin@alsarie-one.com')
-    );
-    
-    if (admins.length === 0) {
-      return res.status(404).json({ error: "المدير غير موجود" });
-    }
-    
-    const admin = admins[0];
-    
-    // إرجاع بيانات المدير (بدون كلمة المرور)
-    const adminProfile = {
-      id: admin.id,
-      name: admin.name,
-      email: admin.email,
-      username: admin.username,
-      phone: admin.phone,
-      userType: admin.userType,
-      isActive: admin.isActive,
-      createdAt: admin.createdAt
-    };
-    
-    res.json(adminProfile);
-  } catch (error) {
-    console.error("خطأ في جلب الملف الشخصي:", error);
-    res.status(500).json({ error: "خطأ في الخادم" });
-  }
-});
-
-// تحديث الملف الشخصي للمدير
-router.put("/profile", async (req, res) => {
-  try {
-    const { name, email, username, phone } = req.body;
-    
-    // جلب المدير الافتراضي
-    const admins = await db.select().from(schema.adminUsers).where(
-      eq(schema.adminUsers.email, 'admin@alsarie-one.com')
-    );
-    
-    if (admins.length === 0) {
-      return res.status(404).json({ error: "المدير غير موجود" });
-    }
-    
-    const adminId = admins[0].id;
-
-    if (!name || !email) {
-      return res.status(400).json({ error: "الاسم والبريد الإلكتروني مطلوبان" });
-    }
-
-    // التحقق من عدم تكرار البريد الإلكتروني
-    const existingAdmin = await db.select().from(schema.adminUsers).where(
-      and(
-        eq(schema.adminUsers.email, email),
-        sql`${schema.adminUsers.id} != ${adminId}`
-      )
-    );
-
-    if (existingAdmin.length > 0) {
-      return res.status(400).json({ error: "البريد الإلكتروني مستخدم بالفعل" });
-    }
-
-    // تحديث البيانات
-    const [updatedAdmin] = await db.update(schema.adminUsers)
-      .set({
-        name,
-        email,
-        username: username || null,
-        phone: phone || null
-      })
-      .where(eq(schema.adminUsers.id, adminId))
-      .returning();
-
-    if (!updatedAdmin) {
-      return res.status(404).json({ error: "المدير غير موجود" });
-    }
-
-    // إرجاع البيانات المحدثة (بدون كلمة المرور)
-    const adminProfile = {
-      id: updatedAdmin.id,
-      name: updatedAdmin.name,
-      email: updatedAdmin.email,
-      username: updatedAdmin.username,
-      phone: updatedAdmin.phone,
-      userType: updatedAdmin.userType,
-      isActive: updatedAdmin.isActive,
-      createdAt: updatedAdmin.createdAt
-    };
-
-    res.json(adminProfile);
-  } catch (error) {
-    console.error("خطأ في تحديث الملف الشخصي:", error);
-    res.status(500).json({ error: "خطأ في الخادم" });
-  }
-});
-
-// تغيير كلمة المرور
-router.put("/change-password", async (req, res) => {
-  try {
-    const { currentPassword, newPassword } = req.body;
-    
-    if (!currentPassword || !newPassword) {
-      return res.status(400).json({ error: "كلمة المرور الحالية والجديدة مطلوبتان" });
-    }
-    
-    // جلب المدير الافتراضي
-    const admins = await db.select().from(schema.adminUsers).where(
-      eq(schema.adminUsers.email, 'admin@alsarie-one.com')
-    );
-    
-    if (admins.length === 0) {
-      return res.status(404).json({ error: "المدير غير موجود" });
-    }
-    
-    const admin = admins[0];
-    
-    // التحقق من كلمة المرور الحالية
-    if (admin.password !== currentPassword) {
-      return res.status(400).json({ error: "كلمة المرور الحالية غير صحيحة" });
-    }
-    
-    // تحديث كلمة المرور
-    await db.update(schema.adminUsers)
-      .set({ password: newPassword })
-      .where(eq(schema.adminUsers.id, admin.id));
-    
-    res.json({ success: true, message: "تم تغيير كلمة المرور بنجاح" });
-  } catch (error) {
-    console.error("خطأ في تغيير كلمة المرور:", error);
-    res.status(500).json({ error: "خطأ في الخادم" });
-  }
-});
+// تم دمج مسارات الملف الشخصي في القسم الموجود أسفل (Admin Profile Routes)
 
 // UI Settings Routes
 router.get("/ui-settings", async (req, res) => {
   try {
-    let settings = await dbStorage.getUiSettings();
-    
-    // إضافة الإعدادات الافتراضية إذا لم تكن موجودة
-    const defaultSettings = [
-      { key: 'show_categories', value: 'true', description: 'عرض تصنيفات المطاعم' },
-      { key: 'show_search_bar', value: 'true', description: 'عرض شريط البحث' },
-      { key: 'show_special_offers', value: 'true', description: 'عرض العروض الخاصة' },
-      { key: 'show_orders_page', value: 'true', description: 'عرض صفحة الطلبات' },
-      { key: 'show_track_orders_page', value: 'true', description: 'عرض صفحة تتبع الطلبات' },
-      { key: 'show_admin_panel', value: 'false', description: 'عرض لوحة التحكم' },
-      { key: 'show_delivery_app', value: 'false', description: 'عرض تطبيق التوصيل' },
-      { key: 'show_ratings', value: 'true', description: 'عرض التقييمات' },
-      { key: 'show_delivery_time', value: 'true', description: 'عرض وقت التوصيل' },
-      { key: 'show_minimum_order', value: 'true', description: 'عرض الحد الأدنى للطلب' },
-      { key: 'show_restaurant_description', value: 'true', description: 'عرض وصف المطعم' },
-      { key: 'enable_location_services', value: 'true', description: 'تفعيل خدمات الموقع' },
-      { key: 'app_name', value: 'السريع ون', description: 'اسم التطبيق' },
-      { key: 'delivery_fee_default', value: '5', description: 'رسوم التوصيل الافتراضية' },
-      { key: 'opening_time', value: '08:00', description: 'وقت الفتح' },
-      { key: 'closing_time', value: '23:00', description: 'وقت الإغلاق' },
-      { key: 'store_status', value: 'مفتوح', description: 'حالة المتجر' }
-    ];
-    
-    // إضافة الإعدادات المفقودة
-    for (const defaultSetting of defaultSettings) {
-      const exists = settings.find(s => s.key === defaultSetting.key);
-      if (!exists) {
-        try {
-          const newSetting = await dbStorage.createUiSetting({
-            key: defaultSetting.key,
-            value: defaultSetting.value,
-            category: 'ui',
-            description: defaultSetting.description,
-            isActive: true
-          });
-          settings.push(newSetting);
-        } catch (error) {
-          console.error(`خطأ في إنشاء الإعداد ${defaultSetting.key}:`, error);
-        }
-      }
-    }
-    
+    const settings = await dbStorage.getUiSettings();
     res.json(settings);
   } catch (error) {
     console.error('خطأ في جلب إعدادات الواجهة:', error);
@@ -1419,6 +2144,9 @@ router.put("/ui-settings/:key", async (req, res) => {
       return res.status(404).json({ error: "فشل في تحديث الإعداد" });
     }
 
+    // بث التحديث عبر WebSocket لمزامنة جميع الأجهزة فوراً
+    broadcastSettingsChanged(key);
+
     res.json(setting);
   } catch (error) {
     console.error("خطأ في تحديث إعداد الواجهة:", error);
@@ -1426,4 +2154,503 @@ router.put("/ui-settings/:key", async (req, res) => {
   }
 });
 
+// Coupon Routes
+router.get("/coupons", async (req, res) => {
+  try {
+    const coupons = await storage.getCoupons();
+    res.json(coupons);
+  } catch (error) {
+    console.error("خطأ في جلب الكوبونات:", error);
+    res.status(500).json({ error: "خطأ في الخادم" });
+  }
+});
+
+router.post("/coupons", async (req, res) => {
+  try {
+    const coupon = await storage.createCoupon(req.body);
+    res.status(201).json(coupon);
+  } catch (error: any) {
+    console.error("خطأ في إضافة الكوبون:", error);
+    if (error?.code === '23505') {
+      return res.status(400).json({ error: "كود الكوبون مستخدم بالفعل، يرجى اختيار كود آخر" });
+    }
+    res.status(500).json({ error: "خطأ في الخادم: " + (error?.message || '') });
+  }
+});
+
+router.put("/coupons/:id", async (req, res) => {
+  try {
+    const coupon = await storage.updateCoupon(req.params.id, req.body);
+    if (!coupon) return res.status(404).json({ error: "الكوبون غير موجود" });
+    res.json(coupon);
+  } catch (error) {
+    console.error("خطأ في تحديث الكوبون:", error);
+    res.status(500).json({ error: "خطأ في الخادم" });
+  }
+});
+
+router.delete("/coupons/:id", async (req, res) => {
+  try {
+    const success = await storage.deleteCoupon(req.params.id);
+    if (!success) return res.status(404).json({ error: "الكوبون غير موجود" });
+    res.json({ success: true });
+  } catch (error) {
+    console.error("خطأ في حذف الكوبون:", error);
+    res.status(500).json({ error: "خطأ في الخادم" });
+  }
+});
+
+// Detailed Reports Routes
+router.get("/reports/detailed", async (req, res) => {
+  try {
+    const filters = {
+      type: req.query.type,
+      startDate: req.query.startDate,
+      endDate: req.query.endDate
+    };
+    const report = await storage.getDetailedReport(filters);
+    res.json(report);
+  } catch (error) {
+    console.error("خطأ في جلب التقرير التفصيلي:", error);
+    res.status(500).json({ error: "خطأ في الخادم" });
+  }
+});
+
+// Payment Methods Routes
+router.get("/payment-methods", async (req, res) => {
+  try {
+    const methods = await storage.getPaymentMethods();
+    const methodsWithDocs = await Promise.all(methods.map(async (m: any) => {
+      const docs = await storage.getPaymentMethodDocuments(m.id);
+      return { ...m, documents: docs };
+    }));
+    res.json(methodsWithDocs);
+  } catch (error) {
+    console.error("خطأ في جلب طرق الدفع:", error);
+    res.status(500).json({ error: "خطأ في الخادم" });
+  }
+});
+
+router.post("/payment-methods", async (req, res) => {
+  try {
+    const method = await storage.createPaymentMethod(req.body);
+    res.status(201).json(method);
+  } catch (error) {
+    console.error("خطأ في إضافة طريقة الدفع:", error);
+    res.status(500).json({ error: "خطأ في الخادم" });
+  }
+});
+
+router.put("/payment-methods/:id", async (req, res) => {
+  try {
+    const method = await storage.updatePaymentMethod(req.params.id, req.body);
+    if (!method) return res.status(404).json({ error: "طريقة الدفع غير موجودة" });
+    res.json(method);
+  } catch (error) {
+    console.error("خطأ في تحديث طريقة الدفع:", error);
+    res.status(500).json({ error: "خطأ في الخادم" });
+  }
+});
+
+router.delete("/payment-methods/:id", async (req, res) => {
+  try {
+    const success = await storage.deletePaymentMethod(req.params.id);
+    if (!success) return res.status(404).json({ error: "طريقة الدفع غير موجودة" });
+    res.json({ success: true });
+  } catch (error) {
+    console.error("خطأ في حذف طريقة الدفع:", error);
+    res.status(500).json({ error: "خطأ في الخادم" });
+  }
+});
+
+router.get("/payment-methods/:id/documents", async (req, res) => {
+  try {
+    const docs = await storage.getPaymentMethodDocuments(req.params.id);
+    res.json(docs);
+  } catch (error) {
+    console.error("خطأ في جلب وثائق طريقة الدفع:", error);
+    res.status(500).json({ error: "خطأ في الخادم" });
+  }
+});
+
+router.post("/payment-methods/:id/documents", async (req, res) => {
+  try {
+    const doc = await storage.createPaymentMethodDocument({ ...req.body, paymentMethodId: req.params.id });
+    res.status(201).json(doc);
+  } catch (error) {
+    console.error("خطأ في إضافة وثيقة:", error);
+    res.status(500).json({ error: "خطأ في الخادم" });
+  }
+});
+
+router.put("/payment-methods/:id/documents/:docId", async (req, res) => {
+  try {
+    const doc = await storage.updatePaymentMethodDocument(req.params.docId, req.body);
+    if (!doc) return res.status(404).json({ error: "الوثيقة غير موجودة" });
+    res.json(doc);
+  } catch (error) {
+    console.error("خطأ في تحديث الوثيقة:", error);
+    res.status(500).json({ error: "خطأ في الخادم" });
+  }
+});
+
+router.delete("/payment-methods/:id/documents/:docId", async (req, res) => {
+  try {
+    const success = await storage.deletePaymentMethodDocument(req.params.docId);
+    if (!success) return res.status(404).json({ error: "الوثيقة غير موجودة" });
+    res.json({ success: true });
+  } catch (error) {
+    console.error("خطأ في حذف الوثيقة:", error);
+    res.status(500).json({ error: "خطأ في الخادم" });
+  }
+});
+
+
+router.post("/orders/reset-numbers", async (req, res) => {
+  try {
+    const allOrders = await storage.getOrders();
+    const sorted = [...allOrders].sort(
+      (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+    );
+    const prefix = req.body.prefix || '';
+    for (let i = 0; i < sorted.length; i++) {
+      const newNumber = `${prefix}${String(i + 1).padStart(4, '0')}`;
+      await db.update(orders)
+        .set({ orderNumber: newNumber })
+        .where(eq(orders.id, sorted[i].id));
+    }
+    res.json({ success: true, message: `تم إعادة تسلسل ${sorted.length} طلب بنجاح` });
+  } catch (error) {
+    console.error("خطأ في إعادة تسلسل أرقام الطلبات:", error);
+    res.status(500).json({ error: "خطأ في الخادم" });
+  }
+});
+
+router.get("/backup", async (req, res) => {
+  try {
+    const [
+      allOrders, allDrivers, allRestaurants, allCategories,
+      allMenuItems, allSpecialOffers, allUsers
+    ] = await Promise.all([
+      storage.getOrders(),
+      storage.getDrivers(),
+      storage.getRestaurants(),
+      storage.getCategories(),
+      storage.getAllMenuItems(),
+      storage.getSpecialOffers(),
+      storage.getUsers ? storage.getUsers() : [],
+    ]);
+
+    const backup = {
+      version: '1.0',
+      exportedAt: new Date().toISOString(),
+      data: {
+        orders: allOrders,
+        drivers: allDrivers,
+        restaurants: allRestaurants,
+        categories: allCategories,
+        menuItems: allMenuItems,
+        specialOffers: allSpecialOffers,
+        users: allUsers,
+      },
+      counts: {
+        orders: allOrders.length,
+        drivers: allDrivers.length,
+        restaurants: allRestaurants.length,
+        categories: allCategories.length,
+        menuItems: allMenuItems.length,
+        specialOffers: allSpecialOffers.length,
+        users: allUsers.length,
+      }
+    };
+
+    const filename = `tamtom-backup-${new Date().toISOString().split('T')[0]}.json`;
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.json(backup);
+  } catch (error) {
+    console.error("خطأ في إنشاء النسخة الاحتياطية:", error);
+    res.status(500).json({ error: "خطأ في الخادم" });
+  }
+});
+
+router.get("/backup/stats", async (req, res) => {
+  try {
+    const [
+      allOrders, allDrivers, allRestaurants, allCategories,
+      allMenuItems, allSpecialOffers
+    ] = await Promise.all([
+      storage.getOrders(),
+      storage.getDrivers(),
+      storage.getRestaurants(),
+      storage.getCategories(),
+      storage.getAllMenuItems(),
+      storage.getSpecialOffers(),
+    ]);
+
+    res.json({
+      counts: {
+        orders: allOrders.length,
+        drivers: allDrivers.length,
+        restaurants: allRestaurants.length,
+        categories: allCategories.length,
+        menuItems: allMenuItems.length,
+        specialOffers: allSpecialOffers.length,
+      },
+      lastBackup: null,
+    });
+  } catch (error) {
+    res.status(500).json({ error: "خطأ في الخادم" });
+  }
+});
+
+// Admin Profile Routes
+router.get("/profile", async (req: any, res) => {
+  try {
+    let admin: any = null;
+    if (req.admin) {
+      admin = req.admin;
+    } else {
+      const [found] = await db.select().from(adminUsers).where(eq(adminUsers.userType, 'admin')).limit(1);
+      admin = found;
+    }
+    if (!admin) return res.status(404).json({ error: "لم يتم العثور على ملف المدير" });
+    const { password: _, ...safeAdmin } = admin as any;
+    res.json(safeAdmin);
+  } catch (error) {
+    res.status(500).json({ error: "خطأ في الخادم" });
+  }
+});
+
+router.put("/profile", async (req: any, res) => {
+  try {
+    const { name, email, username, phone } = req.body;
+    if (!name || !email) {
+      return res.status(400).json({ error: "الاسم والبريد الإلكتروني مطلوبان" });
+    }
+    let adminId: string;
+    if (req.admin) {
+      adminId = req.admin.id;
+    } else {
+      const [found] = await db.select().from(adminUsers).where(eq(adminUsers.userType, 'admin')).limit(1);
+      if (!found) return res.status(404).json({ error: "لم يتم العثور على ملف المدير" });
+      adminId = found.id;
+    }
+    const updatePayload: any = {
+      name,
+      email,
+      username: username && username.trim() ? username.trim() : null,
+      phone: phone && phone.trim() ? phone.trim() : null,
+    };
+    const [updated] = await db.update(adminUsers).set(updatePayload).where(eq(adminUsers.id, adminId)).returning();
+    if (!updated) return res.status(404).json({ error: "لم يتم العثور على ملف المدير" });
+    const { password: _, ...safeAdmin } = updated as any;
+    res.json(safeAdmin);
+  } catch (error: any) {
+    console.error('❌ خطأ في تحديث ملف المدير:', error);
+    if (error?.code === '23505') {
+      return res.status(400).json({ error: "البريد الإلكتروني أو اسم المستخدم مستخدم بالفعل" });
+    }
+    res.status(500).json({ error: "خطأ في الخادم: " + (error?.message || '') });
+  }
+});
+
+router.put("/change-password", async (req: any, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    let admin: any = null;
+    if (req.admin) {
+      const [found] = await db.select().from(adminUsers).where(eq(adminUsers.id, req.admin.id)).limit(1);
+      admin = found;
+    } else {
+      const [found] = await db.select().from(adminUsers).where(eq(adminUsers.userType, 'admin')).limit(1);
+      admin = found;
+    }
+    if (!admin) return res.status(404).json({ error: "لم يتم العثور على المدير" });
+    const isValid = await bcrypt.compare(currentPassword, admin.password || '');
+    if (!isValid) {
+      return res.status(400).json({ error: "كلمة المرور الحالية غير صحيحة" });
+    }
+    const hashed = await bcrypt.hash(newPassword, 10);
+    await db.update(adminUsers).set({ password: hashed } as any).where(eq(adminUsers.id, admin.id));
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: "خطأ في الخادم" });
+  }
+});
+
+// Sub-admins Management - للمدير الرئيسي فقط
+router.get("/sub-admins", requirePermission('manage_admins'), async (req, res) => {
+  try {
+    const subAdmins = await db.select().from(adminUsers).where(eq(adminUsers.userType, 'sub_admin'));
+    const safe = subAdmins.map((u: any) => { const { password: _, ...rest } = u; return rest; });
+    res.json(safe);
+  } catch (error) {
+    res.status(500).json({ error: "خطأ في الخادم" });
+  }
+});
+
+router.post("/sub-admins", requirePermission('manage_admins'), async (req, res) => {
+  try {
+    const { name, phone, password, permissions, isActive } = req.body;
+    let { email, username } = req.body;
+    if (!name || !name.trim()) return res.status(400).json({ error: "الاسم مطلوب" });
+    if (!phone || !phone.trim()) return res.status(400).json({ error: "رقم الهاتف مطلوب" });
+    if (!password) return res.status(400).json({ error: "كلمة المرور مطلوبة" });
+    // توليد بريد إلكتروني افتراضي إذا لم يُقدَّم
+    if (!email || !email.trim()) {
+      email = `${phone.replace(/\D/g, '')}@subadmin.local`;
+    }
+    const hashed = await bcrypt.hash(password, 10);
+    const [newSubAdmin] = await db.insert(adminUsers).values({
+      name, email, username: username || null, phone,
+      password: hashed,
+      userType: 'sub_admin',
+      permissions: typeof permissions === 'string' ? permissions : JSON.stringify(permissions || []),
+      isActive: isActive !== false,
+    } as any).returning();
+    const { password: _, ...safe } = newSubAdmin as any;
+    res.status(201).json(safe);
+  } catch (error: any) {
+    if (error?.code === '23505') {
+      return res.status(409).json({ error: "رقم الهاتف أو البريد الإلكتروني مستخدم بالفعل" });
+    }
+    res.status(500).json({ error: "خطأ في الخادم" });
+  }
+});
+
+router.put("/sub-admins/:id", requirePermission('manage_admins'), async (req, res) => {
+  try {
+    const { name, phone, password, permissions, isActive } = req.body;
+    let { email, username } = req.body;
+    const updateData: any = { name, phone, isActive };
+    if (email !== undefined) updateData.email = email;
+    if (username !== undefined) updateData.username = username || null;
+    if (password) {
+      updateData.password = await bcrypt.hash(password, 10);
+    }
+    if (permissions !== undefined) {
+      updateData.permissions = typeof permissions === 'string' ? permissions : JSON.stringify(permissions);
+    }
+    const [updated] = await db.update(adminUsers).set(updateData).where(eq(adminUsers.id, req.params.id)).returning();
+    if (!updated) return res.status(404).json({ error: "المشرف غير موجود" });
+    const { password: _, ...safe } = updated as any;
+    res.json(safe);
+  } catch (error) {
+    res.status(500).json({ error: "خطأ في الخادم" });
+  }
+});
+
+router.delete("/sub-admins/:id", requirePermission('manage_admins'), async (req, res) => {
+  try {
+    await db.delete(adminUsers).where(eq(adminUsers.id, req.params.id));
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: "خطأ في الخادم" });
+  }
+});
+
+// ===== Security Logging Routes =====
+
+router.get("/security/settings", async (req, res) => {
+  try {
+    res.json({
+      twoFactorEnabled: false,
+      sessionTimeout: 60,
+      passwordComplexity: 'medium',
+      ipWhitelist: [],
+      lastAudit: new Date().toISOString(),
+    });
+  } catch (error) {
+    res.status(500).json({ error: "خطأ في الخادم" });
+  }
+});
+
+router.get("/security/logs", async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit as string) || 50;
+    const logs = await db
+      .select({
+        id: auditLogs.id,
+        adminId: auditLogs.adminId,
+        action: auditLogs.action,
+        entityType: auditLogs.entityType,
+        entityId: auditLogs.entityId,
+        ipAddress: auditLogs.ipAddress,
+        createdAt: auditLogs.createdAt,
+        oldData: auditLogs.oldData,
+        newData: auditLogs.newData,
+      })
+      .from(auditLogs)
+      .where(sql`${auditLogs.entityType} = 'auth'`)
+      .orderBy(desc(auditLogs.createdAt))
+      .limit(limit);
+
+    const adminIds = [...new Set(logs.map(l => l.adminId))];
+    let adminMap: Record<string, string> = {};
+    if (adminIds.length > 0) {
+      const admins = await db.select({ id: adminUsers.id, name: adminUsers.name }).from(adminUsers).where(inArray(adminUsers.id, adminIds));
+      admins.forEach(a => { adminMap[a.id] = a.name; });
+    }
+
+    const formatted = logs.map(log => ({
+      id: log.id,
+      userId: log.adminId,
+      userName: adminMap[log.adminId] || 'مستخدم',
+      action: log.action === 'login' ? 'تسجيل الدخول' : log.action === 'logout' ? 'تسجيل الخروج' : log.action,
+      ipAddress: log.ipAddress || 'غير معروف',
+      device: log.oldData ? (() => { try { return JSON.parse(log.oldData)?.device || 'غير معروف'; } catch { return 'غير معروف'; } })() : 'غير معروف',
+      location: 'اليمن',
+      createdAt: log.createdAt,
+      status: (log.newData ? (() => { try { return JSON.parse(log.newData)?.status || 'success'; } catch { return 'success'; } })() : 'success') as 'success' | 'failure' | 'warning',
+    }));
+
+    res.json(formatted);
+  } catch (error) {
+    res.status(500).json({ error: "خطأ في الخادم" });
+  }
+});
+
+router.post("/security/log-login", async (req, res) => {
+  try {
+    const { adminId, ipAddress, device } = req.body;
+    if (!adminId) return res.status(400).json({ error: "معرف المدير مطلوب" });
+    await db.insert(auditLogs).values({
+      adminId,
+      action: 'login',
+      entityType: 'auth',
+      entityId: adminId,
+      ipAddress: ipAddress || req.ip || 'unknown',
+      oldData: JSON.stringify({ device: device || req.headers['user-agent'] || 'غير معروف' }),
+      newData: JSON.stringify({ status: 'success' }),
+    });
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: "خطأ في الخادم" });
+  }
+});
+
+router.post("/security/log-logout", async (req, res) => {
+  try {
+    const { userId, userName } = req.body;
+    if (!userId) return res.status(400).json({ error: "معرف المستخدم مطلوب" });
+    // التحقق من وجود المدير أولاً
+    const [admin] = await db.select({ id: adminUsers.id }).from(adminUsers).where(eq(adminUsers.id, userId)).limit(1);
+    if (!admin) return res.json({ success: true }); // تجاهل إذا لم يوجد
+    await db.insert(auditLogs).values({
+      adminId: userId,
+      action: 'logout',
+      entityType: 'auth',
+      entityId: userId,
+      ipAddress: req.ip || 'unknown',
+      oldData: JSON.stringify({ device: req.headers['user-agent'] || 'غير معروف', name: userName }),
+      newData: JSON.stringify({ status: 'success' }),
+    });
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: "خطأ في الخادم" });
+  }
+});
+
 export { router as adminRoutes };
+

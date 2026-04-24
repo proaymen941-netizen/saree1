@@ -1,6 +1,6 @@
 import type { Config } from "tailwindcss";
 
-const config: Config = {
+export default {
   darkMode: ["class"],
   content: ["./client/index.html", "./client/src/**/*.{js,jsx,ts,tsx}"],
   theme: {
@@ -103,20 +103,5 @@ const config: Config = {
       },
     },
   },
-  plugins: [
-    require("tailwindcss-animate"),
-    // تحميل @tailwindcss/typography بشكل آمن
-    ...(process.env.NODE_ENV === 'production' ? 
-      [require("@tailwindcss/typography")] : 
-      [(() => {
-        try {
-          return require("@tailwindcss/typography");
-        } catch {
-          return null;
-        }
-      })()].filter(Boolean)
-    ),
-  ],
+  plugins: [require("tailwindcss-animate"), require("@tailwindcss/typography")],
 } satisfies Config;
-
-export default config;

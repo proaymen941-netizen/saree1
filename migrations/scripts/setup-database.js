@@ -211,7 +211,7 @@ async function setupInitialData() {
     // Create UI settings
     console.log("⚙️ Creating UI settings...");
     const uiSettingsData = [
-      { key: "app_name", value: "السريع ون للتوصيل", description: "اسم التطبيق" },
+      { key: "app_name", value: "واصل للتوصيل", description: "اسم التطبيق" },
       { key: "app_logo", value: "/logo.png", description: "شعار التطبيق" },
       { key: "primary_color", value: "#f6863bff", description: "اللون الأساسي" },
       { key: "secondary_color", value: "#10B981", description: "اللون الثانوي" },

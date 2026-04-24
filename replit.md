@@ -1,206 +1,87 @@
-# تطبيق السريع ون - نظام توصيل الطلبات الشامل
+# واصل - Wasel Food Delivery System
 
-## نظرة عامة
+## Project Overview
+A comprehensive food delivery system supporting three user roles: Customers, Drivers, and Administrators. Built as a full-stack TypeScript application with a React frontend and Express backend.
 
-تطبيق السريع ون هو منصة توصيل طلبات شاملة تهدف إلى ربط المطاعم والمتاجر بالعملاء عبر نظام توصيل فعال. يتكون النظام من ثلاث تطبيقات رئيسية تعمل بتناغم لتوفير تجربة متكاملة.
+## Architecture
+- **Frontend**: React 18 + Vite, Tailwind CSS, Radix UI, TanStack Query, Wouter routing
+- **Backend**: Node.js + Express, Drizzle ORM, PostgreSQL, WebSockets (ws), Passport.js auth
+- **Database**: PostgreSQL (Replit managed), Drizzle ORM schema in `/shared/schema.ts`
+- **Package Manager**: npm
+- **Build Tool**: Vite (frontend) + esbuild (backend)
 
-## التطبيقات الثلاثة
+## Project Structure
+- `/client` - React frontend application
+  - `/src/pages` - Pages organized by role: admin, driver, customer
+  - `/src/components` - Reusable UI components (Shadcn UI based)
+  - `/src/context` - React Context providers (Auth, Cart, Location, Theme)
+- `/server` - Express backend
+  - `index.ts` - Entry point
+  - `db.ts` - DatabaseStorage class (Drizzle ORM)
+  - `storage.ts` - IStorage interface + MemStorage fallback
+  - `routes/` - Modular API routes (admin, driver, orders, etc.)
+  - `viteServer.ts` - Vite dev server integration
+  - `seed.ts` - Default data seeding
+- `/shared` - Shared code (Drizzle schema, types)
+- `/drizzle` - Migration files
 
-### 1. تطبيق العملاء (/)
-التطبيق الرئيسي للعملاء النهائيين لطلب الطعام والمنتجات.
+## Recent Fixes Applied
+- Fixed `eq import` error in `server/index.ts` scheduled orders timer
+- Fixed admin/driver login routing in `AuthContext.tsx` and `LoginPage.tsx`
 
-**الصفحات والميزات:**
-- **الصفحة الرئيسية (/)**: عرض المطاعم والتصنيفات مع إمكانية البحث
-- **صفحة المطعم (/restaurant/:id)**: عرض قائمة الطعام والعروض الخاصة
-- **السلة (/cart)**: إدارة الطلبات مع تفاصيل التوصيل وطرق الدفع
-- **الملف الشخصي (/profile)**: إدارة المعلومات الشخصية والإحصائيات
-- **العناوين المحفوظة (/addresses)**: إدارة عناوين التوصيل مع إمكانية الحفظ
-- **تتبع الطلب (/orders/:id)**: متابعة حالة الطلب في الوقت الفعلي
-- **الإعدادات (/settings)**: تخصيص إعدادات التطبيق والإشعارات
-- **سياسة الخصوصية (/privacy)**: معلومات مفصلة حول حماية البيانات
+## Driver Earnings Bug Fix (Critical)
+**Bug**: Driver wallet balance was being doubled on order completion (e.g., 3000 earned → 6000 added).
+**Root Cause**: In `server/db.ts` `completeOrder()`, both `updateDriverBalance()` AND `createDriverCommission()` (which internally calls `createDriverTransaction()` which calls `updateDriverBalance()` again) were called for the same amount.
+**Fix Applied**:
+1. `completeOrder()` (db.ts): Removed direct `updateDriverBalance()` call - now only `createDriverCommission()` handles the balance update chain
+2. `add-balance` route (advanced.ts): Removed extra `updateDriverBalance()` call - now only `createDriverTransaction()` updates the balance  
+3. Withdrawal approval route (advanced.ts): Same fix - removed duplicate `updateDriverBalance()` call
 
-**المميزات الرئيسية:**
-- واجهة عربية بالكامل مع دعم الكتابة من اليمين إلى اليسار (RTL)
-- نظام سلة تسوق مع حفظ محلي
-- عرض العروض الخاصة والتخفيضات
-- تتبع الطلبات في الوقت الفعلي
-- إدارة متعددة لعناوين التوصيل
-- نظام إشعارات متقدم
-- دعم الوضع الليلي/النهاري
+## Restaurant Financial Statement
+- **API**: `GET /api/restaurant-accounts/:restaurantId/statement?from=&to=` - returns detailed order-by-order breakdown with commission, net earnings, and withdrawal history
+- **UI Page**: `client/src/pages/admin/RestaurantStatementPage.tsx` - full-featured statement with period filter, summary cards, detailed order table, withdrawal history, print, and PDF download (jsPDF + autoTable)
+- **Navigation**: Added "تقرير PDF" button in `AdminRestaurantAccounts.tsx` next to each restaurant
+- **Route**: `/admin/restaurant-accounts/:restaurantId/statement`
 
-### 2. لوحة التحكم الإدارية (/admin)
-نظام إدارة شامل لأصحاب المطاعم والمديرين.
+## Real-time Dashboard Updates
+- Admin Dashboard (`AdminDashboard.tsx`): Added WebSocket listener for instant invalidation on order/notification events, reduced polling to 15 seconds
+- Driver Dashboard: Already had WebSocket + added wasalni query invalidation
+- Customer Notifications Panel: Added WebSocket for real-time notification refresh
+- Added GPS location auto-fill (Nominatim reverse geocoding) to WasalniPage steps 1 & 2
+- Added conditional coupon field in CartPage based on `coupon_min_order_value` setting
+- Added `coupon_min_order_value` to seed.ts and AdminUiSettings admin panel
+- Removed hard location requirement from cart checkout button (order can be placed without GPS)
+- Fixed React invalid hook call and setState-in-render warning in App.tsx
 
-**الوظائف الإدارية:**
-- **إدارة المطاعم**: إضافة وتعديل وحذف المطاعم
-- **إدارة التصنيفات**: تنظيم تصنيفات المطاعم والمنتجات
-- **إدارة المنتجات**: إضافة وتعديل عناصر القوائم
-- **إدارة الطلبات**: متابعة وتحديث حالة الطلبات
-- **إدارة السائقين**: إضافة وإدارة سائقي التوصيل
-- **إدارة العروض**: إنشاء وإدارة العروض الخاصة
-- **التقارير والإحصائيات**: عرض بيانات المبيعات والأداء
+## Development
+- **Dev command**: `npm run dev` (runs Express + Vite middleware on port 5000)
+- **Build command**: `npm run build`
+- **DB push**: `npm run db:push`
 
-**لوحة المعلومات:**
-- إحصائيات يومية للطلبات والإيرادات
-- عدد المطاعم النشطة
-- عدد السائقين المتاحين
-- رسوم بيانية للأداء
+## Key Features
+- Customer app: Browse restaurants/categories, place orders, order tracking
+- Driver app: Manage deliveries, earnings, wallet
+- Admin panel: Orders management, drivers, financial reports, system settings
+- Real-time updates via WebSockets
+- PWA support with service worker
+- Scheduled orders with auto-activation timer
+- Hidden 4-click admin access (tap logo)
+- **AppClosedOverlay**: Interactive popup when store is closed, allows scheduling orders with date/time picker
+- **Wasalni Service (وصل لي)**: Full delivery-from-anywhere service
+  - Customer page: `/wasalni` with from/to address, order type, scheduled time, notes, invoice view
+  - Admin page: `/admin/wasalni` with request management, status updates, fee setting
+  - DB table: `wasalni_requests` (schema in `/shared/schema.ts`)
+  - API: `/api/wasalni` (CRUD in `server/routes/wasalni.ts`)
+  - Toggle: `show_wasalni_service` UI setting in admin panel
+- **Notifications fix**: Customer notifications now correctly fetched from server
+- **Scheduled orders bypass closure**: Scheduled orders allowed even when store is closed
 
-### 3. تطبيق السائقين (/delivery)
-تطبيق مخصص لسائقي التوصيل لإدارة المهام.
+## Environment Variables
+- `DATABASE_URL` - PostgreSQL connection (managed by Replit)
+- `SESSION_SECRET` - Session encryption key (managed by Replit)
+- `NODE_ENV` - Set to "development" for dev mode
 
-**المميزات للسائقين:**
-- **حالة التوفر**: تفعيل/إلغاء تفعيل استقبال الطلبات
-- **الطلبات المتاحة**: عرض الطلبات الجديدة مع تفاصيل العمولة
-- **الطلبات الحالية**: إدارة الطلبات قيد التوصيل
-- **التنقل المباشر**: ربط مع خرائط جوجل للتوجيه
-- **الاتصال بالعملاء**: إمكانية الاتصال المباشر
-- **تتبع الأرباح**: عرض الأرباح اليومية والشهرية
-- **إحصائيات الأداء**: متوسط الطلبات والتقييمات
-
-## البنية التقنية
-
-### الواجهة الأمامية (Frontend)
-- **إطار العمل**: React 18 مع TypeScript
-- **أداة البناء**: Vite للتطوير السريع
-- **التصميم**: Tailwind CSS مع مكتبة shadcn/ui
-- **إدارة الحالة**: React Context API للسلة والثيم
-- **استعلام البيانات**: TanStack Query (React Query)
-- **التوجيه**: Wouter للتنقل خفيف الوزن
-- **مكونات واجهة المستخدم**: Radix UI مع تخصيصات
-
-### الواجهة الخلفية (Backend)
-- **إطار العمل**: Express.js مع TypeScript
-- **قاعدة البيانات**: PostgreSQL مع Neon Database
-- **ORM**: Drizzle ORM للعمليات الآمنة
-- **تصميم API**: RESTful endpoints مع رموز HTTP صحيحة
-- **بنية الملفات**: معالجات مسارات منفصلة مع طبقة تخزين
-- **التطوير**: إعادة تحميل ساخنة مع تكامل Vite
-
-### قاعدة البيانات
-**الجداول الرئيسية:**
-- **المستخدمون (users)**: بيانات المستخدمين والمصادقة
-- **عناوين المستخدمين (user_addresses)**: عناوين التوصيل المحفوظة
-- **التصنيفات (categories)**: تصنيفات المطاعم
-- **المطاعم (restaurants)**: معلومات المطاعم والحالة
-- **عناصر القائمة (menu_items)**: المنتجات والأسعار
-- **الطلبات (orders)**: تفاصيل الطلبات وحالة التتبع
-- **السائقون (drivers)**: معلومات سائقي التوصيل
-- **العروض الخاصة (special_offers)**: العروض والتخفيضات
-
-## الميزات الرئيسية للنظام
-
-### للعملاء
-1. **تصفح سهل**: واجهة بديهية لتصفح المطاعم والمنتجات
-2. **بحث متقدم**: البحث عن المطاعم والوجبات
-3. **سلة ذكية**: إدارة الطلبات مع حفظ تلقائي
-4. **تتبع مباشر**: متابعة حالة الطلب خطوة بخطوة
-5. **عناوين متعددة**: حفظ وإدارة عناوين التوصيل
-6. **دفع متنوع**: دعم طرق دفع متعددة
-7. **إشعارات فورية**: تحديثات حالة الطلب
-
-### للمطاعم والإدارة
-1. **إدارة شاملة**: تحكم كامل في المطعم والقوائم
-2. **تتبع الطلبات**: إدارة ومتابعة جميع الطلبات
-3. **إحصائيات مفصلة**: تقارير المبيعات والأداء
-4. **إدارة العروض**: إنشاء عروض جذابة
-5. **إدارة السائقين**: تنسيق عمليات التوصيل
-6. **تحديثات فورية**: تحديث حالة الطلبات في الوقت الفعلي
-
-### للسائقين
-1. **إدارة مرنة**: تحكم في حالة التوفر
-2. **اختيار الطلبات**: قبول الطلبات المناسبة
-3. **تنقل محسن**: توجيه GPS مباشر
-4. **تواصل سهل**: اتصال مباشر بالعملاء
-5. **تتبع الأرباح**: مراقبة الدخل والإحصائيات
-6. **واجهة بسيطة**: تصميم مخصص للاستخدام أثناء القيادة
-
-## إعداد وتشغيل النظام
-
-### متطلبات النظام
-- Node.js 20+
-- PostgreSQL database
-- متصفح حديث يدعم ES6+
-
-### خطوات التشغيل
-
-1. **تثبيت التبعيات**:
-```bash
-npm install
-```
-
-2. **إعداد قاعدة البيانات**:
-   - إنشاء قاعدة بيانات PostgreSQL
-   - تحديث متغيرات البيئة
-   - تشغيل migrations
-
-3. **تشغيل التطبيق**:
-```bash
-npm run dev
-```
-
-### الوصول للتطبيقات
-- **تطبيق العملاء**: `http://localhost:5000/`
-- **لوحة التحكم**: `http://localhost:5000/admin`
-- **تطبيق السائقين**: `http://localhost:5000/delivery`
-
-## الأمان والخصوصية
-
-- **تشفير البيانات**: جميع البيانات الحساسة مشفرة
-- **مصادقة آمنة**: نظام مصادقة قوي للمستخدمين
-- **حماية API**: تحقق من الصلاحيات لجميع العمليات
-- **خصوصية البيانات**: امتثال لمعايير حماية البيانات
-- **نسخ احتياطي**: نسخ احتياطي منتظم لقاعدة البيانات
-
-## التحديثات الأخيرة
-
-### إصلاحات حرجة في إدارة الوجبات (AdminMenuItems) - سبتمبر 2025
-
-**المشاكل التي تم إصلاحها:**
-1. **خطأ في validation البيانات**: حل مشكلة parseFloat() التي تُرجع NaN عند إرسال قيم فارغة
-2. **معالجة أخطاء محسنة**: إضافة رسائل خطأ واضحة ومفهومة للمستخدمين
-3. **تحويل البيانات الآمن**: تحسين تحويل البيانات الرقمية من/إلى string و decimal
-4. **validation شامل**: إضافة تحقق كامل من الحقول المطلوبة قبل إرسال البيانات
-
-**التحسينات التقنية:**
-- تحقق من وجود القيم المطلوبة (name, price, image, category, restaurantId)
-- validation رقمي آمن للأسعار مع منع القيم السالبة أو الصفر
-- تحويل صحيح للبيانات الرقمية في handleEdit function
-- رسائل خطأ مفصلة وواضحة بالعربية
-- معالجة صحيحة للـ originalPrice الاختياري
-
-**تأثير الإصلاحات:**
-- منع أخطاء إضافة/تعديل الوجبات في لوحة التحكم
-- تحسين تجربة المستخدم مع رسائل خطأ واضحة
-- ضمان سلامة البيانات في قاعدة البيانات
-- عدم إرسال قيم NaN التي تسبب فشل validation في الخادم
-
-## التحديثات المستقبلية
-
-- **دفع إلكتروني**: ربط مع بوابات دفع محلية ودولية
-- **إشعارات الدفع**: رسائل SMS وإشعارات فورية
-- **تطبيق موبايل**: نسخ Android و iOS
-- **ذكاء اصطناعي**: توصيات شخصية للعملاء
-- **تحليلات متقدمة**: رؤى أعمق لسلوك العملاء
-
-## الدعم والصيانة
-
-- **مراقبة 24/7**: مراقبة مستمرة لأداء النظام
-- **تحديثات أمنية**: تحديثات دورية للحماية
-- **دعم فني**: فريق دعم متخصص
-- **تدريب المستخدمين**: دورات تدريبية للمطاعم والسائقين
-
-## معلومات الاتصال
-
-- **الموقع الإلكتروني**: [alsarie-one.com]
-- **البريد الإلكتروني**: support@alsarie-one.com
-- **الهاتف**: +967-1-234567
-- **العنوان**: صنعاء، اليمن
-
-## الخلاصة
-
-تطبيق السريع ون يوفر حلاً متكاملاً لصناعة توصيل الطعام في اليمن، مع التركيز على الجودة والسرعة وسهولة الاستخدام. النظام مصمم ليكون قابلاً للتوسع ويدعم النمو المستقبلي للأعمال.
-
----
-
-*تم تطوير هذا النظام باستخدام أحدث التقنيات لضمان الأداء الأمثل والأمان الكامل.*
+## Deployment
+- Target: autoscale
+- Build: `npm run build`
+- Run: `node dist/index.js`

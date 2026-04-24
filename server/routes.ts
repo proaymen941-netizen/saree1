@@ -1,14 +1,27 @@
 import type { Express } from "express";
+import express from "express";
 import { createServer, type Server } from "http";
+import path from "path";
+import { fileURLToPath } from "url";
 import { storage } from "./storage";
 import { dbStorage } from "./db";
-import { log } from "./vite";
+import { log } from "./viteServer";
+import { broadcastSettingsChanged } from "./broadcast";
 import authRoutes from "./routes/auth";
 import { customerRoutes } from "./routes/customer";
 import driverRoutes from "./routes/driver";
 import ordersRoutes from "./routes/orders";
+import deliveryFeeRoutes from "./routes/delivery-fees";
 import { adminRoutes } from "./routes/admin";
-import imageUploadRoutes from "./imageUpload";
+import { registerAdvancedRoutes } from "./routes/advanced";
+import { publicRoutes } from "./routes/public";
+import restaurantAccountsRouter from "./routes/restaurant-accounts";
+import flutterRouter from "./routes/flutter";
+import wasalniRouter from "./routes/wasalni";
+import imageUploadRouter from "./imageUpload";
+import { ensureUploadsDir, UPLOADS_DIR } from "./localStorage";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 import { 
   insertRestaurantSchema, 
   insertMenuItemSchema, 
@@ -32,19 +45,35 @@ import {
 import { randomUUID } from "crypto";
 import { eq, and, gte, lte, desc, isNull } from "drizzle-orm";
 import { z } from "zod";
-import express from "express";
-import path from "path";
 
 export async function registerRoutes(app: Express): Promise<Server> {
 
-  // إعداد خدمة الملفات الثابتة للصور المرفوعة
-  app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+  // Ensure uploads directory exists
+  ensureUploadsDir();
 
-  // تسجيل مسارات رفع الصور
-  app.use("/api/images", imageUploadRoutes);
+  // Serve uploaded images as static files
+  app.use('/uploads', express.static(UPLOADS_DIR));
 
-  // تم حذف مسارات المصادقة - تم إزالة نظام المصادقة بالكامل
+  // ✅ Serve TWA Digital Asset Links (.well-known) so the Android wrapper
+  // verifies ownership and hides the browser top URL bar.
+  app.get('/.well-known/assetlinks.json', (_req, res) => {
+    try {
+      const filePath = path.resolve(import.meta.dirname, '..', 'client', 'public', 'well-known', 'assetlinks.json');
+      res.type('application/json').sendFile(filePath);
+    } catch (err) {
+      res.status(404).json({ error: 'assetlinks.json not found' });
+    }
+  });
 
+  // Image upload routes (local disk storage)
+  app.use('/api/images', imageUploadRouter);
+
+  // Auth Routes
+  app.use("/api/auth", authRoutes);
+
+  // Admin and Advanced Routes
+  app.use("/api/admin", adminRoutes);
+  registerAdvancedRoutes(app);
 
   // Users
   app.get("/api/users/:id", async (req, res) => {
@@ -160,11 +189,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Restaurant write operations are only available through /api/admin/restaurants
 
   // Menu Items
+  app.get("/api/products", async (req, res) => {
+    try {
+      const products = await storage.getAllMenuItems();
+      res.json(products);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch products" });
+    }
+  });
+
+  app.get("/api/products/featured", async (req, res) => {
+    try {
+      const products = await storage.getAllMenuItems();
+      const featured = products.filter(p => p.isFeatured);
+      res.json(featured.length > 0 ? featured : products.slice(0, 12));
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch featured products" });
+    }
+  });
+
+  app.get("/api/products/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const item = await storage.getMenuItem(id);
+      if (!item) {
+        return res.status(404).json({ message: "المنتج غير موجود" });
+      }
+      res.json(item);
+    } catch (error) {
+      res.status(500).json({ message: "فشل في جلب بيانات المنتج" });
+    }
+  });
+
   app.get("/api/restaurants/:restaurantId/menu", async (req, res) => {
     try {
       const { restaurantId } = req.params;
-      const menuItems = await storage.getMenuItems(restaurantId);
-      res.json(menuItems);
+      const allItems = await storage.getMenuItems(restaurantId);
+      res.json({ allItems });
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch menu items" });
     }
@@ -172,121 +233,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Menu item write operations are only available through /api/admin/menu-items
 
-  // Orders
-  app.get("/api/orders", async (req, res) => {
-    try {
-      const { restaurantId } = req.query;
-      let orders;
-      
-      if (restaurantId) {
-        orders = await storage.getOrdersByRestaurant(restaurantId as string);
-      } else {
-        orders = await storage.getOrders();
-      }
-      
-      res.json(orders);
-    } catch (error) {
-      res.status(500).json({ message: "Failed to fetch orders" });
-    }
-  });
-
-  app.get("/api/orders/:id", async (req, res) => {
-    try {
-      const { id } = req.params;
-      const order = await storage.getOrder(id);
-      if (!order) {
-        return res.status(404).json({ message: "Order not found" });
-      }
-      res.json(order);
-    } catch (error) {
-      res.status(500).json({ message: "Failed to fetch order" });
-    }
-  });
-
-  // Orders routes are now handled by the dedicated orders router
-  // app.post("/api/orders", ...) - moved to routes/orders.ts
-
-  app.put("/api/orders/:id", async (req, res) => {
-    try {
-      const { id } = req.params;
-      const validatedData = insertOrderSchema.partial().parse(req.body);
-      const order = await storage.updateOrder(id, validatedData);
-      if (!order) {
-        return res.status(404).json({ message: "Order not found" });
-      }
-      res.json(order);
-    } catch (error) {
-      res.status(400).json({ message: "Invalid order data" });
-    }
-  });
-
-  // Drivers
-  app.get("/api/drivers", async (req, res) => {
-    try {
-      const { available } = req.query;
-      let drivers;
-      
-      if (available === 'true') {
-        drivers = await storage.getAvailableDrivers();
-      } else {
-        drivers = await storage.getDrivers();
-      }
-      
-      res.json(drivers);
-    } catch (error) {
-      res.status(500).json({ message: "Failed to fetch drivers" });
-    }
-  });
-
-  app.get("/api/drivers/:id", async (req, res) => {
-    try {
-      const { id } = req.params;
-      const driver = await storage.getDriver(id);
-      if (!driver) {
-        return res.status(404).json({ message: "Driver not found" });
-      }
-      res.json(driver);
-    } catch (error) {
-      res.status(500).json({ message: "Failed to fetch driver" });
-    }
-  });
-
-  app.post("/api/drivers", async (req, res) => {
-    try {
-      const validatedData = insertDriverSchema.parse(req.body);
-      const driver = await storage.createDriver(validatedData);
-      res.status(201).json(driver);
-    } catch (error) {
-      res.status(400).json({ message: "Invalid driver data" });
-    }
-  });
-
-  app.put("/api/drivers/:id", async (req, res) => {
-    try {
-      const { id } = req.params;
-      const validatedData = insertDriverSchema.partial().parse(req.body);
-      const driver = await storage.updateDriver(id, validatedData);
-      if (!driver) {
-        return res.status(404).json({ message: "Driver not found" });
-      }
-      res.json(driver);
-    } catch (error) {
-      res.status(400).json({ message: "Invalid driver data" });
-    }
-  });
-
-  app.delete("/api/drivers/:id", async (req, res) => {
-    try {
-      const { id } = req.params;
-      const success = await storage.deleteDriver(id);
-      if (!success) {
-        return res.status(404).json({ message: "Driver not found" });
-      }
-      res.status(204).send();
-    } catch (error) {
-      res.status(500).json({ message: "Failed to delete driver" });
-    }
-  });
+  // Orders routes are now handled by the dedicated orders router in routes/orders.ts at the bottom
+  // Drivers routes are now handled by the dedicated driver router in routes/driver.ts at the bottom
 
   // Special Offers
   app.get("/api/special-offers", async (req, res) => {
@@ -316,6 +264,162 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Special offer write operations are only available through /api/admin/special-offers
+
+  // Favorites Routes
+  app.get("/api/favorites/restaurants/:userId", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const favorites = await storage.getFavoriteRestaurants(userId);
+      res.json(favorites);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch favorite restaurants" });
+    }
+  });
+
+  app.get("/api/favorites/products/:userId", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const favorites = await storage.getFavoriteProducts(userId);
+      res.json(favorites);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch favorite products" });
+    }
+  });
+
+  app.post("/api/favorites", async (req, res) => {
+    try {
+      const validatedData = insertFavoritesSchema.parse(req.body);
+      const favorite = await storage.addToFavorites(validatedData);
+      res.status(201).json(favorite);
+    } catch (error) {
+      res.status(400).json({ message: "Invalid favorite data" });
+    }
+  });
+
+  app.delete("/api/favorites", async (req, res) => {
+    try {
+      const { userId, restaurantId, menuItemId } = req.query;
+      if (!userId) {
+        return res.status(400).json({ message: "User ID is required" });
+      }
+      const success = await storage.removeFromFavorites(userId as string, restaurantId as string, menuItemId as string);
+      if (success) {
+        res.status(204).send();
+      } else {
+        res.status(404).json({ message: "Favorite not found" });
+      }
+    } catch (error) {
+      res.status(500).json({ message: "Failed to remove favorite" });
+    }
+  });
+
+  app.get("/api/favorites/check", async (req, res) => {
+    try {
+      const { userId, restaurantId, menuItemId } = req.query;
+      if (!userId) {
+        return res.status(400).json({ message: "User ID is required" });
+      }
+      
+      let isFavorite = false;
+      if (restaurantId) {
+        isFavorite = await storage.isRestaurantFavorite(userId as string, restaurantId as string);
+      } else if (menuItemId) {
+        isFavorite = await storage.isProductFavorite(userId as string, menuItemId as string);
+      }
+      
+      res.json({ isFavorite });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to check favorite" });
+    }
+  });
+
+  // ===========================================
+  // Bootstrap endpoint - يُجمّع كل البيانات الأولية للتطبيق في طلب واحد
+  // يُستهلك من شاشة السبلاش لتحضير الكاش قبل دخول المستخدم للتطبيق
+  // ===========================================
+  app.get("/api/bootstrap", async (req, res) => {
+    try {
+      const { phone, customerId } = req.query as { phone?: string; customerId?: string };
+
+      // تشغيل كل الاستعلامات بالتوازي لخفض زمن الاستجابة
+      const [
+        uiSettings,
+        categories,
+        restaurants,
+        specialOffers,
+        paymentMethodsRaw,
+      ] = await Promise.all([
+        storage.getUiSettings().catch(() => []),
+        storage.getCategories().catch(() => []),
+        storage.getRestaurants({}).catch(() => []),
+        storage.getActiveSpecialOffers().catch(() => []),
+        (storage as any).getActivePaymentMethods?.().catch(() => []) ?? Promise.resolve([]),
+      ]);
+
+      // إثراء طرق الدفع بالمستندات (نفس سلوك /api/payment-methods)
+      const paymentMethods = await Promise.all(
+        (paymentMethodsRaw || []).map(async (m: any) => {
+          try {
+            const docs = await (storage as any).getPaymentMethodDocuments?.(m.id) ?? [];
+            return { ...m, documents: docs };
+          } catch {
+            return { ...m, documents: [] };
+          }
+        })
+      );
+
+      // بيانات خاصة بالعميل (اختيارية حسب المعرّف المُمرَّر)
+      let customerData: {
+        addresses: any[];
+        orders: any[];
+        notifications: any[];
+        unreadCount: number;
+      } | null = null;
+
+      if (phone || customerId) {
+        const [addresses, orders, allNotifs] = await Promise.all([
+          customerId
+            ? (storage as any).getUserAddresses?.(customerId).catch(() => []) ?? Promise.resolve([])
+            : Promise.resolve([]),
+          phone
+            ? storage.getOrdersByCustomer(phone).catch(() => [])
+            : Promise.resolve([]),
+          (storage as any).getNotifications?.('customer').catch(() => []) ?? Promise.resolve([]),
+        ]);
+
+        const myNotifications = (allNotifs || []).filter((n: any) => {
+          if (!n.recipientId || n.recipientId === 'all') return true;
+          if (customerId && n.recipientId === customerId) return true;
+          if (phone && n.recipientId === phone) return true;
+          return false;
+        });
+        myNotifications.sort((a: any, b: any) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+
+        customerData = {
+          addresses: addresses || [],
+          orders: orders || [],
+          notifications: myNotifications.slice(0, 30),
+          unreadCount: myNotifications.filter((n: any) => !n.isRead).length,
+        };
+      }
+
+      res.set('Cache-Control', 'no-store');
+      res.json({
+        uiSettings,
+        categories,
+        restaurants,
+        specialOffers,
+        paymentMethods,
+        customer: customerData,
+        serverTime: Date.now(),
+      });
+    } catch (error) {
+      console.error('Error in /api/bootstrap:', error);
+      res.status(500).json({ message: 'Failed to load bootstrap data' });
+    }
+  });
 
   // UI Settings Routes
   app.get("/api/ui-settings", async (req, res) => {
@@ -356,6 +460,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "الإعداد غير موجود" });
       }
       
+      // بث التحديث عبر WebSocket
+      broadcastSettingsChanged(key);
+
       res.json(updated);
     } catch (error) {
       console.error('خطأ في تحديث إعداد الواجهة:', error);
@@ -367,80 +474,117 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/orders/:id/track", async (req, res) => {
     try {
       const { id } = req.params;
-      const order = await storage.getOrder(id);
+      let orderData = await storage.getOrder(id);
+      let isWaselLi = false;
+
+      // If not found in regular orders, check wasalni requests
+      if (!orderData) {
+        const wasalniOrder = await storage.getWasalniRequest(id);
+        if (wasalniOrder) {
+          isWaselLi = true;
+          // Map wasalni structure to order structure for tracking page
+          orderData = {
+            ...wasalniOrder,
+            orderNumber: wasalniOrder.requestNumber,
+            deliveryAddress: wasalniOrder.toAddress,
+            customerLocationLat: wasalniOrder.toLat,
+            customerLocationLng: wasalniOrder.toLng,
+            total: wasalniOrder.estimatedFee,
+            items: [], // Wasalni has no items list usually
+            isWaselLi: true,
+            pickupAddress: wasalniOrder.fromAddress,
+            pickupLocationLat: wasalniOrder.fromLat,
+            pickupLocationLng: wasalniOrder.fromLng,
+            waselLiItemType: wasalniOrder.orderType,
+            restaurantName: "وصل لي"
+          };
+        }
+      }
       
-      if (!order) {
+      if (!orderData) {
         return res.status(404).json({ error: "الطلب غير موجود" });
       }
 
-      // Create tracking data based on order status
-      const tracking = [];
-      const baseTime = new Date(order.createdAt);
+      // Fetch actual tracking from database
+      const trackingEntries = await storage.getOrderTracking(id);
       
-      if (order.status === 'pending' || order.status === 'confirmed' || order.status === 'preparing' || 
-          order.status === 'on_way' || order.status === 'delivered') {
-        tracking.push({
-          id: '1',
-          status: 'pending',
-          message: 'تم استلام الطلب',
-          timestamp: baseTime,
-          createdByType: 'system'
-        });
-      }
-      
-      if (order.status === 'confirmed' || order.status === 'preparing' || order.status === 'on_way' || order.status === 'delivered') {
-        tracking.push({
-          id: '2',
-          status: 'confirmed',
-          message: 'تم تأكيد الطلب من المطعم',
-          timestamp: new Date(baseTime.getTime() + 5 * 60000),
-          createdByType: 'restaurant'
-        });
-      }
-      
-      if (order.status === 'preparing' || order.status === 'on_way' || order.status === 'delivered') {
-        tracking.push({
-          id: '3',
-          status: 'preparing',
-          message: 'جاري تحضير الطلب',
-          timestamp: new Date(baseTime.getTime() + 10 * 60000),
-          createdByType: 'restaurant'
-        });
-      }
-      
-      if (order.status === 'on_way' || order.status === 'delivered') {
-        tracking.push({
-          id: '4',
-          status: 'on_way',
-          message: 'الطلب في الطريق إليك',
-          timestamp: new Date(baseTime.getTime() + 20 * 60000),
-          createdByType: 'driver'
-        });
-      }
-      
-      if (order.status === 'delivered') {
-        tracking.push({
-          id: '5',
-          status: 'delivered',
-          message: 'تم تسليم الطلب بنجاح',
-          timestamp: new Date(baseTime.getTime() + 35 * 60000),
-          createdByType: 'driver'
-        });
+      // If no tracking entries exist, create a fallback based on status
+      let tracking = trackingEntries.map((t, index) => ({
+        id: t.id || String(index + 1),
+        status: t.status,
+        message: t.message,
+        timestamp: t.createdAt,
+        createdByType: t.createdByType
+      }));
+
+      if (tracking.length === 0) {
+        const baseTime = new Date(orderData.createdAt);
+        
+        if (orderData.status === 'pending' || orderData.status === 'confirmed' || orderData.status === 'preparing' || 
+            orderData.status === 'on_way' || orderData.status === 'delivered') {
+          tracking.push({
+            id: '1',
+            status: 'pending',
+            message: isWaselLi ? 'تم استلام طلب وصل لي' : 'تم استلام الطلب',
+            timestamp: baseTime,
+            createdByType: 'system'
+          });
+        }
+        
+        if (orderData.status === 'confirmed' || orderData.status === 'preparing' || orderData.status === 'on_way' || orderData.status === 'delivered') {
+          tracking.push({
+            id: '2',
+            status: 'confirmed',
+            message: isWaselLi ? 'تم قبول طلبك وجاري تعيين سائق' : 'تم تأكيد الطلب من المطعم',
+            timestamp: new Date(baseTime.getTime() + 5 * 60000),
+            createdByType: isWaselLi ? 'system' : 'restaurant'
+          });
+        }
+        
+        if (orderData.status === 'preparing' || orderData.status === 'on_way' || orderData.status === 'delivered') {
+          tracking.push({
+            id: '3',
+            status: 'preparing',
+            message: isWaselLi ? 'السائق في الطريق لنقطة الاستلام' : 'جاري تحضير الطلب',
+            timestamp: new Date(baseTime.getTime() + 10 * 60000),
+            createdByType: isWaselLi ? 'driver' : 'restaurant'
+          });
+        }
+        
+        if (orderData.status === 'on_way' || orderData.status === 'delivered') {
+          tracking.push({
+            id: '4',
+            status: 'on_way',
+            message: isWaselLi ? 'السائق استلم الغرض وهو في الطريق إليك' : 'الطلب في الطريق إليك',
+            timestamp: new Date(baseTime.getTime() + 20 * 60000),
+            createdByType: 'driver'
+          });
+        }
+        
+        if (orderData.status === 'delivered') {
+          tracking.push({
+            id: '5',
+            status: 'delivered',
+            message: isWaselLi ? 'تم توصيل طلب وصل لي بنجاح' : 'تم تسليم الطلب بنجاح',
+            timestamp: new Date(baseTime.getTime() + 35 * 60000),
+            createdByType: 'driver'
+          });
+        }
       }
       
       // Parse items if they're stored as JSON string
       let parsedItems = [];
       try {
-        parsedItems = typeof order.items === 'string' ? JSON.parse(order.items) : order.items;
+        parsedItems = typeof orderData.items === 'string' ? JSON.parse(orderData.items) : orderData.items;
       } catch (e) {
         parsedItems = [];
       }
 
       res.json({
         order: {
-          ...order,
+          ...orderData,
           items: parsedItems,
-          total: parseFloat(order.total || '0')
+          total: parseFloat(orderData.total || '0')
         },
         tracking
       });
@@ -450,65 +594,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Driver-specific endpoints
-  // Get driver available orders
-  app.get("/api/drivers/:id/available-orders", async (req, res) => {
-    try {
-      const orders = await storage.getOrders();
-      const availableOrders = orders.filter(order => 
-        (order.status === 'confirmed' && !order.driverId) ||
-        (order.status === 'pending' && !order.driverId)
-      );
-      res.json(availableOrders);
-    } catch (error) {
-      console.error('Error fetching available orders:', error);
-      res.status(500).json({ error: "Internal server error" });
-    }
-  });
-
-  // Get orders by driverId
-  app.get("/api/orders", async (req, res) => {
-    try {
-      const { driverId } = req.query;
-      const orders = await storage.getOrders();
-      
-      if (driverId) {
-        const driverOrders = orders.filter(order => order.driverId === driverId);
-        return res.json(driverOrders);
-      }
-      
-      res.json(orders);
-    } catch (error) {
-      console.error('Error fetching orders:', error);
-      res.status(500).json({ error: "Internal server error" });
-    }
-  });
-
-  // Assign order to driver
-  app.put("/api/orders/:id/assign-driver", async (req, res) => {
-    try {
-      const { id } = req.params;
-      const { driverId } = req.body;
-      
-      if (!driverId) {
-        return res.status(400).json({ error: "Driver ID is required" });
-      }
-
-      const updatedOrder = await storage.updateOrder(id, {
-        driverId,
-        status: 'preparing'
-      });
-      
-      if (!updatedOrder) {
-        return res.status(404).json({ error: "Order not found" });
-      }
-      
-      res.json({ success: true, order: updatedOrder });
-    } catch (error) {
-      console.error('Error assigning driver:', error);
-      res.status(500).json({ error: "Internal server error" });
-    }
-  });
+  // Driver-specific order endpoints are handled in routes/orders.ts
 
   app.get("/api/drivers/:id/orders", async (req, res) => {
     try {
@@ -552,52 +638,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/drivers/:id/accept-order", async (req, res) => {
-    try {
-      const { id: driverId } = req.params;
-      const { orderId } = req.body;
-      
-      // Update order status and assign driver
-      const updatedOrder = await storage.updateOrder(orderId, {
-        driverId: driverId,
-        status: 'accepted',
-      });
-      
-      if (!updatedOrder) {
-        return res.status(404).json({ message: "Order not found" });
-      }
-      
-      // Update driver availability
-      await storage.updateDriver(driverId, { isAvailable: false });
-      
-      res.json(updatedOrder);
-    } catch (error) {
-      res.status(400).json({ message: "Failed to accept order" });
-    }
-  });
-
-  app.post("/api/drivers/:id/complete-order", async (req, res) => {
-    try {
-      const { id: driverId } = req.params;
-      const { orderId } = req.body;
-      
-      // Update order status
-      const updatedOrder = await storage.updateOrder(orderId, {
-        status: 'delivered',
-      });
-      
-      if (!updatedOrder) {
-        return res.status(404).json({ message: "Order not found" });
-      }
-      
-      // Update driver availability
-      await storage.updateDriver(driverId, { isAvailable: true });
-      
-      res.json(updatedOrder);
-    } catch (error) {
-      res.status(400).json({ message: "Failed to complete order" });
-    }
-  });
+  // Driver dashboard routes
 
   app.get("/api/drivers/:id/stats", async (req, res) => {
     try {
@@ -677,54 +718,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/drivers/:id/available-orders", async (req, res) => {
+  // Available orders for drivers are handled in routes/orders.ts
+
+  // ================= RESTAURANT SECTIONS API =================
+  app.get("/api/restaurants/:restaurantId/sections", async (req, res) => {
     try {
-      const { id } = req.params;
-      
-      // Get orders that are pending and without assigned driver
-      const allOrders = await storage.getOrders();
-      const availableOrders = allOrders
-        .filter(order => order.status === 'pending' && !order.driverId)
-        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-        .slice(0, 10)
-        .map(order => ({
-          id: order.id,
-          totalAmount: order.totalAmount,
-          status: order.status,
-          createdAt: order.createdAt,
-          deliveryAddress: order.deliveryAddress,
-          restaurantId: order.restaurantId,
-          customerName: order.customerName,
-        }));
-      
-      res.json(availableOrders);
+      const { restaurantId } = req.params;
+      const sections = await storage.getRestaurantSections(restaurantId);
+      res.json(sections);
     } catch (error) {
-      res.status(500).json({ message: "Failed to fetch available orders" });
+      res.status(500).json({ message: "Failed to fetch sections" });
     }
   });
-
-  // ================= RESTAURANT SECTIONS API - DISABLED =================
-  // Restaurant sections functionality temporarily disabled - would require additional database methods
 
   // ================= RATINGS & REVIEWS API - DISABLED =================
   // Ratings functionality temporarily disabled - would require additional database methods
 
   // ================= NOTIFICATIONS API =================
-/*
-app.get("/api/notifications", async (req, res) => {
-  try {
-    const { recipientType, recipientId, unread } = req.query;
-    const notifications = await storage.getNotifications(
-      recipientType as string, 
-      recipientId as string, 
-      unread === 'true'
-    );
-    res.json(notifications);
-  } catch (error) {
-    res.status(500).json({ message: "Failed to fetch notifications" });
-  }
-});
-*/
+  app.get("/api/notifications", async (req, res) => {
+    try {
+      const { recipientType, recipientId, unread } = req.query;
+      const notifications = await storage.getNotifications(
+        recipientType as string, 
+        recipientId as string, 
+        unread === 'true'
+      );
+      res.json(notifications);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch notifications" });
+    }
+  });
 
   app.post("/api/notifications", async (req, res) => {
     try {
@@ -736,8 +759,6 @@ app.get("/api/notifications", async (req, res) => {
     }
   });
 
-  // Mark notification as read endpoint temporarily disabled - requires additional database method
-  /*
   app.put("/api/notifications/:id/read", async (req, res) => {
     try {
       const { id } = req.params;
@@ -750,7 +771,6 @@ app.get("/api/notifications", async (req, res) => {
       res.status(400).json({ message: "Failed to update notification" });
     }
   });
-  */
 
   // ================= WALLET & PAYMENTS API - DISABLED =================
   // Wallet functionality temporarily disabled - would require additional database methods
@@ -765,38 +785,6 @@ app.get("/api/notifications", async (req, res) => {
   // Analytics functionality temporarily disabled - would require additional database methods
 
   // ================= ADVANCED ORDER MANAGEMENT =================
-  app.put("/api/orders/:id/assign-driver", async (req, res) => {
-    try {
-      const { id } = req.params;
-      const { driverId } = req.body;
-      
-      // Update order with driver
-      const order = await storage.updateOrder(id, { 
-        driverId,
-        status: 'assigned',
-        updatedAt: new Date()
-      });
-      
-      if (!order) {
-        return res.status(404).json({ message: "Order not found" });
-      }
-      
-      // Create notification for driver
-      await storage.createNotification({
-        type: 'order',
-        title: 'طلب جديد',
-        message: `تم تكليفك بطلب جديد رقم ${id.slice(0, 8)}`,
-        recipientType: 'driver',
-        recipientId: driverId,
-        orderId: id
-      });
-      
-      res.json(order);
-    } catch (error) {
-      res.status(400).json({ message: "Failed to assign driver" });
-    }
-  });
-
   app.get("/api/orders/track/:id", async (req, res) => {
     try {
       const { id } = req.params;
@@ -856,17 +844,7 @@ app.get("/api/notifications", async (req, res) => {
           userLongitude: userLocation?.lon,
           radius: radius ? parseFloat(radius as string) : undefined
         };
-        // TEMPORARY FIX: Return sample data for search
-        console.log('TEMPORARY FIX: Returning sample restaurants for search');
-        results.restaurants = [
-          {
-            id: '1',
-            name: 'مطعم الأصالة',
-            description: 'مطعم يقدم أشهى الأطباق العربية الأصيلة',
-            image: '/images/restaurant1.jpg',
-            rating: '4.5'
-          }
-        ];
+        results.restaurants = await storage.getRestaurants(filters);
       }
       
       if (!type || type === 'categories') {
@@ -1022,11 +1000,26 @@ app.get("/api/notifications", async (req, res) => {
   // Register customer routes
   app.use("/api/customer", customerRoutes);
   
-  // Register driver routes
-  app.use("/api/driver", driverRoutes);
+  // Register driver routes (plural for consistency)
+  app.use("/api/drivers", driverRoutes);
   
   // Register orders routes
   app.use("/api/orders", ordersRoutes);
+
+  // Register delivery fee routes
+  app.use("/api/delivery-fees", deliveryFeeRoutes);
+
+  // Register restaurant accounts routes
+  app.use("/api/restaurant-accounts", restaurantAccountsRouter);
+
+  // Register Flutter API routes
+  app.use("/api/flutter", flutterRouter);
+
+  // Register Wasalni (وصل لي) routes
+  app.use("/api/wasalni", wasalniRouter);
+
+  // Register public routes (including Flutter API)
+  app.use("/api", publicRoutes);
 
   // Enhanced notifications endpoint
   app.get("/api/notifications", async (req, res) => {
@@ -1044,34 +1037,116 @@ app.get("/api/notifications", async (req, res) => {
     }
   });
 
+  // Customer notifications endpoint - by phone or customerId
+  app.get("/api/notifications/customer", async (req, res) => {
+    try {
+      const { phone, customerId } = req.query;
+      if (!phone && !customerId) {
+        return res.status(400).json({ message: "phone or customerId required" });
+      }
+      // Get ALL customer notifications (both read and unread) - no unread filter
+      const allNotifs = await storage.getNotifications('customer');
+      const filtered = allNotifs.filter((n: any) => {
+        // إذا كان الإشعار موجه لجميع العملاء (recipientId هو null)
+        if (!n.recipientId || n.recipientId === 'all') return true;
+        
+        // إذا كان الإشعار موجه لعميل محدد
+        if (customerId && n.recipientId === customerId) return true;
+        if (phone && n.recipientId === phone) return true;
+        
+        return false;
+      });
+      filtered.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      res.json(filtered);
+    } catch (error) {
+      console.error('Error fetching customer notifications:', error);
+      res.status(500).json({ message: "Failed to fetch notifications" });
+    }
+  });
+
+  // Mark all customer notifications as read
+  app.put("/api/notifications/customer/mark-all-read", async (req, res) => {
+    try {
+      const { phone, customerId } = req.body;
+      if (!phone && !customerId) {
+        return res.status(400).json({ message: "phone or customerId required" });
+      }
+      const allNotifs = await storage.getNotifications('customer');
+      const unread = allNotifs.filter((n: any) => {
+        if (n.isRead) return false;
+        if (!n.recipientId || n.recipientId === 'all') return true;
+        if (customerId && n.recipientId === customerId) return true;
+        if (phone && n.recipientId === phone) return true;
+        return false;
+      });
+      await Promise.all(unread.map((n: any) => (storage as any).markNotificationAsRead(n.id)));
+
+      // بث حدث المزامنة لجميع أجهزة العميل لتحديث الشارة فوراً
+      if (global.WS_MANAGER) {
+        const payload = { allRead: true, count: unread.length };
+        if (customerId) global.WS_MANAGER.sendToUser(customerId, 'notifications_updated', payload);
+        if (phone) global.WS_MANAGER.sendToUser(phone, 'notifications_updated', payload);
+      }
+
+      res.json({ success: true, markedCount: unread.length });
+    } catch (error) {
+      console.error('Error marking customer notifications as read:', error);
+      res.status(500).json({ message: "Failed to mark notifications as read" });
+    }
+  });
+
   // Mark notification as read
   app.put("/api/notifications/:id/read", async (req, res) => {
     try {
       const { id } = req.params;
-      
-      // For MemStorage, we need to implement this method
-      if (storage.constructor.name === 'MemStorage') {
-        // Simple implementation for memory storage
-        const notifications = await storage.getNotifications();
-        const notification = notifications.find(n => n.id === id);
-        if (notification) {
-          // Update in memory (this is a simplified approach)
-          (notification as any).isRead = true;
-          res.json(notification);
-        } else {
-          res.status(404).json({ message: "Notification not found" });
-        }
-      } else {
-        // For database storage
-        const notification = await (storage as any).markNotificationAsRead(id);
-        if (!notification) {
-          return res.status(404).json({ message: "Notification not found" });
-        }
-        res.json(notification);
+      const notification = await (storage as any).markNotificationAsRead(id);
+      if (!notification) {
+        return res.status(404).json({ message: "Notification not found" });
       }
+
+      // بث المزامنة للمستلم لتحديث الشارة على بقية الأجهزة/التبويبات
+      if (global.WS_MANAGER && notification.recipientId) {
+        const payload = { id: notification.id, isRead: true };
+        if (notification.recipientType === 'driver') {
+          global.WS_MANAGER.sendToDriver(notification.recipientId, 'notifications_updated', payload);
+        } else {
+          global.WS_MANAGER.sendToUser(notification.recipientId, 'notifications_updated', payload);
+        }
+      }
+
+      res.json(notification);
     } catch (error) {
       console.error('Error marking notification as read:', error);
       res.status(500).json({ message: "Failed to update notification" });
+    }
+  });
+
+  // Public Payment Methods Route
+  app.get("/api/payment-methods", async (req, res) => {
+    try {
+      const methods = await (storage as any).getActivePaymentMethods();
+      const methodsWithDocs = await Promise.all(methods.map(async (m: any) => {
+        const docs = await (storage as any).getPaymentMethodDocuments(m.id);
+        return { ...m, documents: docs };
+      }));
+      res.json(methodsWithDocs);
+    } catch (error) {
+      console.error("خطأ في جلب طرق الدفع:", error);
+      res.status(500).json({ error: "خطأ في الخادم" });
+    }
+  });
+
+  // Coupon Validation Route
+  app.post("/api/coupons/validate", async (req, res) => {
+    try {
+      const { code, orderValue, userId, userPhone } = req.body;
+      if (!code) return res.status(400).json({ error: "كود الكوبون مطلوب" });
+      if (!orderValue) return res.status(400).json({ error: "قيمة الطلب مطلوبة" });
+      const result = await (storage as any).validateCoupon(code, parseFloat(orderValue), userId, userPhone);
+      res.json(result);
+    } catch (error) {
+      console.error("خطأ في التحقق من الكوبون:", error);
+      res.status(500).json({ error: "خطأ في الخادم" });
     }
   });
 
