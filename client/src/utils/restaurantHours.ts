@@ -6,7 +6,16 @@ export interface RestaurantStatus {
   statusColor: 'green' | 'red' | 'yellow';
 }
 
-export function getRestaurantStatus(restaurant: any): RestaurantStatus {
+export function getRestaurantStatus(restaurant: any, appIsOpen?: boolean): RestaurantStatus {
+  // If the global app is closed, force all restaurants to show as closed
+  if (appIsOpen === false) {
+    return {
+      isOpen: false,
+      message: 'التطبيق مغلق حالياً',
+      statusColor: 'red',
+    };
+  }
+
   const now = new Date();
   const currentDay = now.getDay(); // 0 = Sunday, 6 = Saturday
   const currentTime = now.toTimeString().slice(0, 5); // HH:MM format
@@ -137,20 +146,87 @@ function getDayName(day: number): string {
   return days[day] || '';
 }
 
-export function canOrderFromRestaurant(restaurant: any): { canOrder: boolean; message?: string } {
-  // If restaurant is manually set to open, allow ordering regardless of hours (for demo)
-  if (restaurant.isOpen && !restaurant.isTemporarilyClosed) {
-    return { canOrder: true };
+export function canOrderFromRestaurant(restaurant: any, appIsOpen?: boolean): { canOrder: boolean; message?: string } {
+  if (appIsOpen === false) {
+    return {
+      canOrder: false,
+      message: 'التطبيق مغلق حالياً، يرجى المحاولة لاحقاً'
+    };
   }
-  
+
   const status = getRestaurantStatus(restaurant);
   
   if (!status.isOpen) {
+    const openMsg = status.nextOpenTime 
+      ? `سيفتح ${status.nextOpenTime}` 
+      : '';
     return {
       canOrder: false,
-      message: `عذراً، لا يمكن الطلب الآن. ${status.message}`
+      message: `عذراً، المتجر مغلق حالياً. ${openMsg}`
     };
   }
   
   return { canOrder: true };
+}
+
+export interface AppStatus {
+  isOpen: boolean;
+  message: string;
+  openingTime: string;
+  closingTime: string;
+}
+
+export function getAppStatus(openingTime: string, closingTime: string, storeStatus?: string): AppStatus {
+  if (storeStatus === 'closed') {
+    return {
+      isOpen: false,
+      message: 'التطبيق مغلق حالياً من قِبل الإدارة',
+      openingTime,
+      closingTime,
+    };
+  }
+
+  // إذا كان المتجر مفتوحاً يدوياً، نتجاوز فحص الوقت تماماً
+  if (storeStatus === 'open') {
+    return {
+      isOpen: true,
+      message: 'مفتوح',
+      openingTime,
+      closingTime,
+    };
+  }
+
+  const now = new Date();
+  const currentTime = now.toTimeString().slice(0, 5);
+  const currentMinutes = timeToMinutes(currentTime);
+  const openMinutes = timeToMinutes(openingTime);
+  const closeMinutes = timeToMinutes(closingTime);
+
+  let isOpen = false;
+  if (closeMinutes > openMinutes) {
+    isOpen = currentMinutes >= openMinutes && currentMinutes < closeMinutes;
+  } else {
+    isOpen = currentMinutes >= openMinutes || currentMinutes < closeMinutes;
+  }
+
+  if (isOpen) {
+    return {
+      isOpen: true,
+      message: `مفتوح حتى ${closingTime}`,
+      openingTime,
+      closingTime,
+    };
+  }
+
+  const isBeforeOpen = currentMinutes < openMinutes;
+  const openMsg = isBeforeOpen
+    ? `يفتح اليوم الساعة ${openingTime}`
+    : `يفتح غداً الساعة ${openingTime}`;
+
+  return {
+    isOpen: false,
+    message: `التطبيق مغلق حالياً. ${openMsg}`,
+    openingTime,
+    closingTime,
+  };
 }

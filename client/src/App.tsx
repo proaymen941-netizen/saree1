@@ -1,27 +1,30 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, useLocation as useWouterLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { CartProvider } from "./contexts/CartContext";
+import { CartProvider } from "./context/CartContext";
 import { ThemeProvider } from "./context/ThemeContext";
-import { AuthProvider } from "./context/AuthContext";
-import { LocationProvider, useLocation } from "./context/LocationContext";
+import { AuthProvider, useAuth } from "./context/AuthContext";
+import { LocationProvider, useUserLocation } from "./context/LocationContext";
 import { UiSettingsProvider, useUiSettings } from "./context/UiSettingsContext";
 import { NotificationProvider } from "./context/NotificationContext";
 import { LocationPermissionModal } from "./components/LocationPermissionModal";
 import Layout from "./components/Layout";
+import FloatingCartNotification from "./components/FloatingCartNotification";
 import AdminLoginPage from "./pages/admin/AdminLoginPage";
 import DriverLoginPage from "./pages/driver/DriverLoginPage";
 import AdminApp from "./pages/AdminApp";
-import { DriverDashboard } from "./pages/DriverDashboard";
-import { useState } from "react";
-import Home from "./pages/Home";
-import Restaurant from "./pages/Restaurant";
+import DriverAppPage from "./pages/driver/DriverApp";
+import { useState, useEffect } from "react";
+import { useSettingsSync } from "./hooks/useSettingsSync";
+import { prefetchBootstrap } from "./lib/bootstrap";
+import HomePage from "./pages/HomePage";
+import RestaurantPage from "./pages/RestaurantPage";
 import Cart from "./pages/Cart";
 import Profile from "./pages/Profile";
 import Location from "./pages/Location";
-import OrderTracking from "./pages/OrderTracking";
+import OrderTrackingPage from "./pages/OrderTrackingPage";
 import OrdersPage from "./pages/OrdersPage";
 import TrackOrdersPage from "./pages/TrackOrdersPage";
 import Settings from "./pages/Settings";
@@ -30,61 +33,78 @@ import SearchPage from "./pages/SearchPage";
 // Admin pages removed - now handled separately
 import NotFound from "@/pages/not-found";
 
-function MainApp() {
-  // const { userType, loading } = useAuth(); // تم إزالة نظام المصادقة
-  const { location } = useLocation();
-  const [showLocationModal, setShowLocationModal] = useState(true);
+import SplashScreen from "./components/SplashScreen";
 
-  // تم إزالة loading state ومراجع المصادقة
+function MainApp() {
+  useSettingsSync();
+  const { location: userLocation } = useUserLocation();
+  const [currentLocation, setLocation] = useWouterLocation();
+  const [showLocationModal, setShowLocationModal] = useState(true);
+  const [showSplash, setShowSplash] = useState(() => {
+    return !sessionStorage.getItem('splash_seen');
+  });
+  const [isGuest, setIsGuest] = useState(() => {
+    return localStorage.getItem('is_guest') === 'true';
+  });
+
+  const { isAuthenticated, user } = useAuth();
+
+  // Pre-warm caches on cold start (covers users who already saw splash this session)
+  useEffect(() => {
+    if (!showSplash) {
+      const phone = user?.phone || localStorage.getItem('customer_phone') || '';
+      const customerId = user?.id || '';
+      prefetchBootstrap({ phone, customerId });
+    }
+  }, [showSplash, user?.id, user?.phone]);
+
+  // Handle splash finish
+  const handleSplashFinish = () => {
+    sessionStorage.setItem('splash_seen', 'true');
+    setShowSplash(false);
+  };
+
+  // If not authenticated and not guest, redirect to auth (unless already on auth or login pages)
+  const isAuthPage = currentLocation === '/auth' || 
+                     currentLocation === '/admin-login' || 
+                     currentLocation === '/driver-login';
+
+  const isAdminRoute = currentLocation.startsWith('/admin');
+  const isDriverRoute = currentLocation.startsWith('/driver');
+  const needsRedirectToAuth = !isAuthenticated && !isGuest && !isAuthPage && !isAdminRoute && !isDriverRoute;
+
+  useEffect(() => {
+    if (needsRedirectToAuth) {
+      setLocation('/auth');
+    }
+  }, [needsRedirectToAuth]);
+
+  if (showSplash && !isAdminRoute && !isDriverRoute && !isAuthPage) {
+    return <SplashScreen onFinish={handleSplashFinish} />;
+  }
+
+  if (needsRedirectToAuth) {
+    return null;
+  }
 
   // Handle login pages first (without layout)
-  if (window.location.pathname === '/admin-login') {
+  if (currentLocation === '/admin-login') {
     return <AdminLoginPage />;
   }
   
-  if (window.location.pathname === '/driver-login') {
+  if (currentLocation === '/driver-login') {
     return <DriverLoginPage />;
   }
 
-  // Handle admin routes (direct access without authentication)
-  if (window.location.pathname.startsWith('/admin')) {
-    // التحقق من تسجيل الدخول للمدير
-    const adminToken = localStorage.getItem('admin_token');
-    const adminUser = localStorage.getItem('admin_user');
-    
-    if (!adminToken || !adminUser) {
-      // إعادة توجيه إلى صفحة تسجيل الدخول
-      window.location.href = '/admin-login';
-      return null;
-    }
-    
-    return <AdminApp onLogout={() => {
-      localStorage.removeItem('admin_token');
-      localStorage.removeItem('admin_user');
-      window.location.href = '/admin-login';
-    }} />;
+  // Handle admin routes - AdminApp handles its own AdminLayout internally
+  if (currentLocation.startsWith('/admin')) {
+    return <AdminApp />;
   }
 
-  // Handle driver routes (direct access without authentication)  
-  if (window.location.pathname.startsWith('/driver')) {
-    // التحقق من تسجيل الدخول للسائق
-    const driverToken = localStorage.getItem('driver_token');
-    const driverUser = localStorage.getItem('driver_user');
-    
-    if (!driverToken || !driverUser) {
-      // إعادة توجيه إلى صفحة تسجيل الدخول
-      window.location.href = '/driver-login';
-      return null;
-    }
-    
-    return <DriverDashboard onLogout={() => {
-      localStorage.removeItem('driver_token');
-      localStorage.removeItem('driver_user');
-      window.location.href = '/';
-    }} />;
+  // Handle driver routes
+  if (currentLocation.startsWith('/driver')) {
+    return <DriverAppPage />;
   }
-
-  // Remove admin/driver routes from customer app routing
 
   // Default customer app
   return (
@@ -92,8 +112,9 @@ function MainApp() {
       <Layout>
         <Router />
       </Layout>
+      <FloatingCartNotification />
       
-      {showLocationModal && !location.hasPermission && (
+      {showLocationModal && !userLocation.hasPermission && (
         <LocationPermissionModal
           onPermissionGranted={(position) => {
             console.log('تم منح الإذن للموقع:', position);
@@ -109,6 +130,13 @@ function MainApp() {
   );
 }
 
+import CategoryPage from "./pages/CategoryPage";
+import ProductDetails from "./pages/ProductDetails";
+import CustomerAuthPage from "./pages/CustomerAuthPage";
+import Favorites from "./pages/Favorites";
+import CustomerAddresses from "./pages/CustomerAddresses";
+import WasalniPage from "./pages/WasalniPage";
+
 function Router() {
   // Check UiSettings for page visibility
   const { isFeatureEnabled } = useUiSettings();
@@ -117,17 +145,23 @@ function Router() {
 
   return (
     <Switch>
-      <Route path="/" component={Home} />
+      <Route path="/" component={HomePage} />
       <Route path="/search" component={SearchPage} />
-      <Route path="/restaurant/:id" component={Restaurant} />
+      <Route path="/category/:slug" component={CategoryPage} />
+      <Route path="/product/:id" component={ProductDetails} />
+      <Route path="/restaurant/:id" component={RestaurantPage} />
       <Route path="/cart" component={Cart} />
       <Route path="/profile" component={Profile} />
+      <Route path="/auth" component={CustomerAuthPage} />
+      <Route path="/favorites" component={Favorites} />
       <Route path="/addresses" component={Location} />
-      {showOrdersPage && <Route path="/orders" component={OrdersPage} />}
-      <Route path="/orders/:orderId" component={OrderTracking} />
+      <Route path="/orders" component={OrdersPage} />
+      <Route path="/orders/:orderId" component={OrderTrackingPage} />
       {showTrackOrdersPage && <Route path="/track-orders" component={TrackOrdersPage} />}
+      <Route path="/my-addresses" component={CustomerAddresses} />
       <Route path="/settings" component={Settings} />
       <Route path="/privacy" component={Privacy} />
+      <Route path="/wasalni" component={WasalniPage} />
       
       {/* Authentication Routes */}
       <Route path="/admin-login" component={AdminLoginPage} />
@@ -138,23 +172,27 @@ function Router() {
   );
 }
 
+import { LanguageProvider } from "./context/LanguageContext";
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <ThemeProvider>
-          <AuthProvider>
-            <UiSettingsProvider>
-              <LocationProvider>
-                <CartProvider>
-                  <NotificationProvider>
-                    <Toaster />
-                    <MainApp />
-                  </NotificationProvider>
-                </CartProvider>
-              </LocationProvider>
-            </UiSettingsProvider>
-          </AuthProvider>
+          <LanguageProvider>
+            <AuthProvider>
+              <UiSettingsProvider>
+                <LocationProvider>
+                  <CartProvider>
+                    <NotificationProvider>
+                      <Toaster />
+                      <MainApp />
+                    </NotificationProvider>
+                  </CartProvider>
+                </LocationProvider>
+              </UiSettingsProvider>
+            </AuthProvider>
+          </LanguageProvider>
         </ThemeProvider>
       </TooltipProvider>
     </QueryClientProvider>

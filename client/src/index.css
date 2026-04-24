@@ -1,5 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@100..900&display=swap');
+@import "leaflet/dist/leaflet.css";
 
 @tailwind base;
 @tailwind components;
@@ -12,44 +11,44 @@
   --card-foreground: hsl(222.2 84% 4.9%);
   --popover: hsl(0 0% 100%);
   --popover-foreground: hsl(222.2 84% 4.9%);
-  --primary: hsl(16 100% 55%);
+  --primary: hsl(14 92% 52%); /* Red-Orange */
   --primary-foreground: hsl(0 0% 100%);
-  --secondary: hsl(16 15% 95%);
-  --secondary-foreground: hsl(222.2 84% 4.9%);
-  --muted: hsl(16 10% 96%);
-  --muted-foreground: hsl(215.4 16.3% 46.9%);
-  --accent: hsl(16 100% 55%);
+  --secondary: hsl(14 80% 42%); /* Darker Red-Orange */
+  --secondary-foreground: hsl(0 0% 100%);
+  --muted: hsl(14 12% 96%);
+  --muted-foreground: hsl(14 5% 46.9%);
+  --accent: hsl(14 80% 42%);
   --accent-foreground: hsl(0 0% 100%);
   --destructive: hsl(0 84.2% 60.2%);
   --destructive-foreground: hsl(210 40% 98%);
   --border: hsl(214.3 31.8% 91.4%);
   --input: hsl(214.3 31.8% 91.4%);
-  --ring: hsl(16 100% 55%);
-  --chart-1: hsl(16 100% 55%);
-  --chart-2: hsl(159.7826 100% 36.0784%);
+  --ring: hsl(14 92% 52%);
+  --chart-1: hsl(14 92% 52%);
+  --chart-2: hsl(14 80% 42%);
   --chart-3: hsl(42.0290 92.8251% 56.2745%);
-  --chart-4: hsl(147.1429 78.5047% 41.9608%);
-  --chart-5: hsl(341.4894 75.2000% 50.9804%);
-  --sidebar: hsl(180 6.6667% 97.0588%);
+  --chart-4: hsl(14 60% 60%);
+  --chart-5: hsl(20 75% 50%);
+  --sidebar: hsl(14 6% 97%);
   --sidebar-foreground: hsl(210 25% 7.8431%);
-  --sidebar-primary: hsl(16 100% 55%);
+  --sidebar-primary: hsl(14 92% 52%);
   --sidebar-primary-foreground: hsl(0 0% 100%);
   --sidebar-accent: hsl(210 40% 96%);
-  --sidebar-accent-foreground: hsl(16 100% 55%);
+  --sidebar-accent-foreground: hsl(14 92% 52%);
   --sidebar-border: hsl(205.0000 25.0000% 90.5882%);
-  --sidebar-ring: hsl(16 100% 55%);
+  --sidebar-ring: hsl(14 92% 52%);
   --font-sans: 'Inter', 'Noto Sans Arabic', sans-serif;
   --font-serif: Georgia, serif;
   --font-mono: Menlo, monospace;
   --radius: 0.75rem;
-  --shadow-2xs: 0px 2px 0px 0px hsl(15 98% 56% / 0.00);
-  --shadow-xs: 0px 2px 0px 0px hsl(15 98% 56% / 0.00);
-  --shadow-sm: 0px 2px 0px 0px hsl(15 98% 56% / 0.00), 0px 1px 2px -1px hsl(15 98% 56% / 0.00);
-  --shadow: 0px 2px 0px 0px hsl(15 98% 56% / 0.00), 0px 1px 2px -1px hsl(15 98% 56% / 0.00);
-  --shadow-md: 0px 2px 0px 0px hsl(15 98% 56% / 0.00), 0px 2px 4px -1px hsl(15 98% 56% / 0.00);
-  --shadow-lg: 0px 2px 0px 0px hsl(15 98% 56% / 0.00), 0px 4px 6px -1px hsl(15 98% 56% / 0.00);
-  --shadow-xl: 0px 2px 0px 0px hsl(15 98% 56% / 0.00), 0px 8px 10px -1px hsl(15 98% 56% / 0.00);
-  --shadow-2xl: 0px 2px 0px 0px hsl(15 98% 56% / 0.00);
+  --shadow-2xs: 0px 2px 0px 0px hsl(14 92% 52% / 0.00);
+  --shadow-xs: 0px 2px 0px 0px hsl(14 92% 52% / 0.00);
+  --shadow-sm: 0px 2px 0px 0px hsl(14 92% 52% / 0.00), 0px 1px 2px -1px hsl(14 92% 52% / 0.00);
+  --shadow: 0px 2px 0px 0px hsl(14 92% 52% / 0.00), 0px 1px 2px -1px hsl(14 92% 52% / 0.00);
+  --shadow-md: 0px 2px 0px 0px hsl(14 92% 52% / 0.00), 0px 2px 4px -1px hsl(14 92% 52% / 0.00);
+  --shadow-lg: 0px 2px 0px 0px hsl(14 92% 52% / 0.00), 0px 4px 6px -1px hsl(14 92% 52% / 0.00);
+  --shadow-xl: 0px 2px 0px 0px hsl(14 92% 52% / 0.00), 0px 8px 10px -1px hsl(14 92% 52% / 0.00);
+  --shadow-2xl: 0px 2px 0px 0px hsl(14 92% 52% / 0.00);
   --tracking-normal: 0em;
   --spacing: 0.25rem;
 }
@@ -61,8 +60,8 @@
   --card-foreground: hsl(210 40% 98%);
   --popover: hsl(222.2 84% 4.9%);
   --popover-foreground: hsl(210 40% 98%);
-  --primary: hsl(16 100% 55%);
-  --primary-foreground: hsl(222.2 84% 4.9%);
+  --primary: hsl(14 92% 52%);
+  --primary-foreground: hsl(0 0% 100%);
   --secondary: hsl(217.2 32.6% 17.5%);
   --secondary-foreground: hsl(210 40% 98%);
   --muted: hsl(217.2 32.6% 17.5%);
@@ -73,20 +72,20 @@
   --destructive-foreground: hsl(210 40% 98%);
   --border: hsl(217.2 32.6% 17.5%);
   --input: hsl(217.2 32.6% 17.5%);
-  --ring: hsl(16 100% 55%);
-  --chart-1: hsl(16 100% 55%);
-  --chart-2: hsl(159.7826 100% 36.0784%);
+  --ring: hsl(14 92% 52%);
+  --chart-1: hsl(14 92% 52%);
+  --chart-2: hsl(14 80% 42%);
   --chart-3: hsl(42.0290 92.8251% 56.2745%);
-  --chart-4: hsl(147.1429 78.5047% 41.9608%);
-  --chart-5: hsl(341.4894 75.2000% 50.9804%);
+  --chart-4: hsl(14 60% 60%);
+  --chart-5: hsl(20 75% 50%);
   --sidebar: hsl(222.2 84% 4.9%);
   --sidebar-foreground: hsl(210 40% 98%);
-  --sidebar-primary: hsl(16 100% 55%);
-  --sidebar-primary-foreground: hsl(222.2 84% 4.9%);
+  --sidebar-primary: hsl(14 92% 52%);
+  --sidebar-primary-foreground: hsl(0 0% 100%);
   --sidebar-accent: hsl(217.2 32.6% 17.5%);
-  --sidebar-accent-foreground: hsl(16 100% 55%);
+  --sidebar-accent-foreground: hsl(14 92% 52%);
   --sidebar-border: hsl(217.2 32.6% 17.5%);
-  --sidebar-ring: hsl(16 100% 55%);
+  --sidebar-ring: hsl(14 92% 52%);
 }
 
 @layer base {
@@ -96,37 +95,67 @@
 
   body {
     @apply font-sans antialiased bg-background text-foreground;
-    direction: rtl;
   }
 
   html {
-    direction: rtl;
   }
 }
 
 @layer components {
   .hero-banner {
-    background: linear-gradient(135deg, hsl(16 100% 55%) 0%, hsl(16 100% 45%) 100%);
+    background: linear-gradient(135deg, #F97316 0%, #EA580C 50%, #0E1729 100%);
   }
 
   .gradient-header {
-    background: linear-gradient(135deg, hsl(16 100% 55%) 0%, hsl(16 100% 45%) 100%);
+    background: linear-gradient(135deg, #0E1729 0%, #152033 100%);
+  }
+
+  .logo-wasel {
+    display: flex;
+    align-items: center;
+    font-weight: 900;
+  }
+
+  .logo-wasel .primary {
+    color: #F97316;
   }
 
   .orange-gradient {
-    background: linear-gradient(135deg, hsl(16 100% 55%) 0%, hsl(16 100% 45%) 100%);
+    background: linear-gradient(135deg, #F97316 0%, #EA580C 100%);
   }
 
   .red-gradient {
-    background: linear-gradient(135deg, hsl(355 85% 55%) 0%, hsl(355 85% 45%) 100%);
+    background: linear-gradient(135deg, #F97316 0%, #C2410C 100%);
   }
 
+  /* الشريط العلوي للجوال: تدرج برتقالي بلمسة كحلية لمطابقة الشعار */
   .header-gradient {
-    background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%);
+    background: linear-gradient(135deg, #F97316 0%, #EA580C 60%, #0E1729 130%);
   }
 
-  .green-gradient {
-    background: linear-gradient(135deg, #388e3c 0%, #2e7d32 100%);
+  .primary-gradient {
+    background: linear-gradient(135deg, #F97316 0%, #EA580C 100%);
+  }
+
+  .navy-gradient {
+    background: linear-gradient(135deg, #0E1729 0%, #152033 50%, #1E293B 100%);
+  }
+
+  /* ── Splash Screen Animations ─────────────────────────────────── */
+  .splash-logo-enter {
+    animation: splashLogoEnter 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+  .splash-text-enter {
+    animation: splashFadeUp 0.8s ease-out 0.4s both;
+  }
+  .splash-button-enter {
+    animation: splashFadeUp 0.7s ease-out 0.7s both;
+  }
+  .splash-float {
+    animation: splashFloat 4s ease-in-out infinite;
+  }
+  .splash-speed-line {
+    animation: splashSpeedLine 1.6s ease-out infinite;
   }
 
   .brown-gradient {
@@ -135,6 +164,14 @@
 
   .fade-in {
     animation: fadeIn 0.3s ease-in;
+  }
+
+  .status-transition {
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .pulse-border {
+    animation: pulseBorder 2s infinite;
   }
 
   .floating-cart {
@@ -153,6 +190,71 @@
   to { 
     opacity: 1; 
     transform: translateY(0); 
+  }
+}
+
+@keyframes pulseBorder {
+  0% {
+    box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(249, 115, 22, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(249, 115, 22, 0);
+  }
+}
+
+/* ── Splash Screen Keyframes ─────────────────────────────────── */
+@keyframes splashLogoEnter {
+  0% {
+    opacity: 0;
+    transform: scale(0.4) translateY(40px);
+    filter: blur(8px);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.05) translateY(-4px);
+    filter: blur(0);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    filter: blur(0);
+  }
+}
+
+@keyframes splashFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes splashFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes splashSpeedLine {
+  0% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-200%);
+    opacity: 0;
   }
 }
 
