@@ -379,8 +379,9 @@ export default function Cart() {
       <div className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-8 border-b pb-4">
           <div className="flex items-center gap-3">
-            <div className="text-3xl font-black tracking-tighter">
-              <span className="text-primary">السريع</span> <span className="text-black">ون</span>
+            <div className="text-3xl font-black tracking-tighter flex items-center gap-2">
+              <span className="text-primary">واصل</span>
+              <span className="text-[10px] font-bold text-primary/70 tracking-[0.3em] border border-primary/30 rounded px-1.5 py-0.5">WASEL</span>
             </div>
             <h1 className="text-3xl font-black uppercase tracking-tighter"> - السلة</h1>
           </div>
