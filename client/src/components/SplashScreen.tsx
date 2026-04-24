@@ -4,7 +4,7 @@ import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, Loader2 } from 'lucide-react';
 import { prefetchBootstrap } from '@/lib/bootstrap';
-import waselLogo from '@assets/ChatGPT_Image_24_أبريل_2026،_07_12_29_ص_1777005957448.png';
+import waselLogo from '@assets/wasel-logo.png';
 
 interface SplashScreenProps {
   onFinish: () => void;

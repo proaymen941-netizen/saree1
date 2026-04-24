@@ -9,22 +9,177 @@ var __export = (target, all) => {
 };
 
 // shared/schema.ts
+var schema_exports = {};
+__export(schema_exports, {
+  adminUsers: () => adminUsers,
+  attendance: () => attendance,
+  auditLogs: () => auditLogs,
+  cart: () => cart,
+  categories: () => categories,
+  commissionSettings: () => commissionSettings,
+  couponUsages: () => couponUsages,
+  coupons: () => coupons,
+  customers: () => customers,
+  deliveryDiscounts: () => deliveryDiscounts,
+  deliveryFeeSettings: () => deliveryFeeSettings,
+  deliveryRules: () => deliveryRules,
+  deliveryZones: () => deliveryZones,
+  deviceTokens: () => deviceTokens,
+  driverBalances: () => driverBalances,
+  driverCommissions: () => driverCommissions,
+  driverEarningsTable: () => driverEarningsTable,
+  driverReviews: () => driverReviews,
+  driverTransactions: () => driverTransactions,
+  driverWallets: () => driverWallets,
+  driverWithdrawals: () => driverWithdrawals,
+  driverWorkSessions: () => driverWorkSessions,
+  drivers: () => drivers,
+  employees: () => employees,
+  favorites: () => favorites,
+  financialReports: () => financialReports,
+  geoZones: () => geoZones,
+  insertAdminUserSchema: () => insertAdminUserSchema,
+  insertAttendanceSchema: () => insertAttendanceSchema,
+  insertAuditLogSchema: () => insertAuditLogSchema,
+  insertCartSchema: () => insertCartSchema,
+  insertCategorySchema: () => insertCategorySchema,
+  insertCommissionSettingsSchema: () => insertCommissionSettingsSchema,
+  insertCouponSchema: () => insertCouponSchema,
+  insertCouponUsageSchema: () => insertCouponUsageSchema,
+  insertDeliveryDiscountSchema: () => insertDeliveryDiscountSchema,
+  insertDeliveryFeeSettingsSchema: () => insertDeliveryFeeSettingsSchema,
+  insertDeliveryRuleSchema: () => insertDeliveryRuleSchema,
+  insertDeliveryZoneSchema: () => insertDeliveryZoneSchema,
+  insertDriverBalanceSchema: () => insertDriverBalanceSchema,
+  insertDriverCommissionSchema: () => insertDriverCommissionSchema,
+  insertDriverEarningsSchema: () => insertDriverEarningsSchema,
+  insertDriverReviewSchema: () => insertDriverReviewSchema,
+  insertDriverSchema: () => insertDriverSchema,
+  insertDriverTransactionSchema: () => insertDriverTransactionSchema,
+  insertDriverWalletSchema: () => insertDriverWalletSchema,
+  insertDriverWithdrawalSchema: () => insertDriverWithdrawalSchema,
+  insertDriverWorkSessionSchema: () => insertDriverWorkSessionSchema,
+  insertEmployeeSchema: () => insertEmployeeSchema,
+  insertFavoritesSchema: () => insertFavoritesSchema,
+  insertFinancialReportSchema: () => insertFinancialReportSchema,
+  insertGeoZoneSchema: () => insertGeoZoneSchema,
+  insertLeaveRequestSchema: () => insertLeaveRequestSchema,
+  insertMenuItemSchema: () => insertMenuItemSchema,
+  insertMessageSchema: () => insertMessageSchema,
+  insertNotificationSchema: () => insertNotificationSchema,
+  insertOrderSchema: () => insertOrderSchema,
+  insertPaymentGatewaySchema: () => insertPaymentGatewaySchema,
+  insertPaymentMethodDocumentSchema: () => insertPaymentMethodDocumentSchema,
+  insertPaymentMethodSchema: () => insertPaymentMethodSchema,
+  insertRatingSchema: () => insertRatingSchema,
+  insertRestaurantEarningsSchema: () => insertRestaurantEarningsSchema,
+  insertRestaurantSchema: () => insertRestaurantSchema,
+  insertRestaurantSectionSchema: () => insertRestaurantSectionSchema,
+  insertRestaurantWalletSchema: () => insertRestaurantWalletSchema,
+  insertSpecialOfferSchema: () => insertSpecialOfferSchema,
+  insertSystemSettingsSchema: () => insertSystemSettingsSchema,
+  insertUiSettingsSchema: () => insertUiSettingsSchema,
+  insertUserAddressSchema: () => insertUserAddressSchema,
+  insertUserSchema: () => insertUserSchema,
+  insertWalletSchema: () => insertWalletSchema,
+  insertWalletTransactionSchema: () => insertWalletTransactionSchema,
+  insertWasalniRequestSchema: () => insertWasalniRequestSchema,
+  insertWithdrawalRequestSchema: () => insertWithdrawalRequestSchema,
+  leaveRequests: () => leaveRequests,
+  loyaltyPoints: () => loyaltyPoints,
+  loyaltyTransactions: () => loyaltyTransactions,
+  menuItems: () => menuItems,
+  messages: () => messages,
+  notifications: () => notifications,
+  orderTracking: () => orderTracking,
+  orders: () => orders,
+  paymentGateways: () => paymentGateways,
+  paymentMethodDocuments: () => paymentMethodDocuments,
+  paymentMethods: () => paymentMethods,
+  ratings: () => ratings,
+  referralCodes: () => referralCodes,
+  referralUsages: () => referralUsages,
+  restaurantEarnings: () => restaurantEarnings,
+  restaurantSections: () => restaurantSections,
+  restaurantUsers: () => restaurantUsers,
+  restaurantWallets: () => restaurantWallets,
+  restaurants: () => restaurants,
+  selectAdminUserSchema: () => selectAdminUserSchema,
+  selectAttendanceSchema: () => selectAttendanceSchema,
+  selectAuditLogSchema: () => selectAuditLogSchema,
+  selectCartSchema: () => selectCartSchema,
+  selectCategorySchema: () => selectCategorySchema,
+  selectCommissionSettingsSchema: () => selectCommissionSettingsSchema,
+  selectCouponSchema: () => selectCouponSchema,
+  selectCouponUsageSchema: () => selectCouponUsageSchema,
+  selectDeliveryDiscountSchema: () => selectDeliveryDiscountSchema,
+  selectDeliveryFeeSettingsSchema: () => selectDeliveryFeeSettingsSchema,
+  selectDeliveryRuleSchema: () => selectDeliveryRuleSchema,
+  selectDeliveryZoneSchema: () => selectDeliveryZoneSchema,
+  selectDriverBalanceSchema: () => selectDriverBalanceSchema,
+  selectDriverCommissionSchema: () => selectDriverCommissionSchema,
+  selectDriverEarningsSchema: () => selectDriverEarningsSchema,
+  selectDriverReviewSchema: () => selectDriverReviewSchema,
+  selectDriverSchema: () => selectDriverSchema,
+  selectDriverTransactionSchema: () => selectDriverTransactionSchema,
+  selectDriverWalletSchema: () => selectDriverWalletSchema,
+  selectDriverWithdrawalSchema: () => selectDriverWithdrawalSchema,
+  selectDriverWorkSessionSchema: () => selectDriverWorkSessionSchema,
+  selectEmployeeSchema: () => selectEmployeeSchema,
+  selectFavoritesSchema: () => selectFavoritesSchema,
+  selectFinancialReportSchema: () => selectFinancialReportSchema,
+  selectGeoZoneSchema: () => selectGeoZoneSchema,
+  selectLeaveRequestSchema: () => selectLeaveRequestSchema,
+  selectMenuItemSchema: () => selectMenuItemSchema,
+  selectMessageSchema: () => selectMessageSchema,
+  selectNotificationSchema: () => selectNotificationSchema,
+  selectOrderSchema: () => selectOrderSchema,
+  selectPaymentGatewaySchema: () => selectPaymentGatewaySchema,
+  selectPaymentMethodDocumentSchema: () => selectPaymentMethodDocumentSchema,
+  selectPaymentMethodSchema: () => selectPaymentMethodSchema,
+  selectRatingSchema: () => selectRatingSchema,
+  selectRestaurantEarningsSchema: () => selectRestaurantEarningsSchema,
+  selectRestaurantSchema: () => selectRestaurantSchema,
+  selectRestaurantSectionSchema: () => selectRestaurantSectionSchema,
+  selectRestaurantWalletSchema: () => selectRestaurantWalletSchema,
+  selectSpecialOfferSchema: () => selectSpecialOfferSchema,
+  selectSystemSettingsSchema: () => selectSystemSettingsSchema,
+  selectUiSettingsSchema: () => selectUiSettingsSchema,
+  selectUserAddressSchema: () => selectUserAddressSchema,
+  selectUserSchema: () => selectUserSchema,
+  selectWalletSchema: () => selectWalletSchema,
+  selectWalletTransactionSchema: () => selectWalletTransactionSchema,
+  selectWasalniRequestSchema: () => selectWasalniRequestSchema,
+  selectWithdrawalRequestSchema: () => selectWithdrawalRequestSchema,
+  specialOffers: () => specialOffers,
+  supportTickets: () => supportTickets,
+  systemSettings: () => systemSettings,
+  systemSettingsTable: () => systemSettingsTable,
+  uiSettings: () => uiSettings,
+  userAddresses: () => userAddresses,
+  users: () => users,
+  walletTransactions: () => walletTransactions,
+  wallets: () => wallets,
+  wasalniRequests: () => wasalniRequests2,
+  withdrawalRequests: () => withdrawalRequests2
+});
 import { pgTable, text, uuid, timestamp, boolean, integer, decimal, varchar } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
-var users, customers, userAddresses, categories, restaurants, menuItems, drivers, orders, specialOffers, adminUsers, systemSettings, uiSettings, restaurantSections, ratings, notifications, orderTracking, wallets, walletTransactions, systemSettingsTable, restaurantEarnings, cart, favorites, driverReviews, driverEarningsTable, driverWallets, driverBalances, driverTransactions, driverCommissions, driverWithdrawals, restaurantWallets, commissionSettings, withdrawalRequests2, driverWorkSessions, employees, attendance, leaveRequests, insertUserSchema, selectUserSchema, insertUserAddressSchema, selectUserAddressSchema, insertCategorySchema, selectCategorySchema, insertRestaurantSchema, selectRestaurantSchema, insertMenuItemSchema, selectMenuItemSchema, insertOrderSchema, selectOrderSchema, insertDriverSchema, selectDriverSchema, insertSpecialOfferSchema, selectSpecialOfferSchema, insertAdminUserSchema, selectAdminUserSchema, insertUiSettingsSchema, selectUiSettingsSchema, insertRestaurantSectionSchema, selectRestaurantSectionSchema, insertRatingSchema, selectRatingSchema, insertNotificationSchema, selectNotificationSchema, insertWalletSchema, selectWalletSchema, insertWalletTransactionSchema, selectWalletTransactionSchema, insertSystemSettingsSchema, selectSystemSettingsSchema, insertRestaurantEarningsSchema, selectRestaurantEarningsSchema, insertCartSchema, selectCartSchema, insertFavoritesSchema, selectFavoritesSchema, insertDriverReviewSchema, selectDriverReviewSchema, insertDriverEarningsSchema, selectDriverEarningsSchema, insertDriverWalletSchema, selectDriverWalletSchema, insertDriverBalanceSchema, selectDriverBalanceSchema, insertDriverTransactionSchema, selectDriverTransactionSchema, insertDriverCommissionSchema, selectDriverCommissionSchema, insertDriverWithdrawalSchema, selectDriverWithdrawalSchema, insertRestaurantWalletSchema, selectRestaurantWalletSchema, insertCommissionSettingsSchema, selectCommissionSettingsSchema, insertWithdrawalRequestSchema, selectWithdrawalRequestSchema, insertDriverWorkSessionSchema, selectDriverWorkSessionSchema, insertEmployeeSchema, selectEmployeeSchema, insertAttendanceSchema, selectAttendanceSchema, insertLeaveRequestSchema, selectLeaveRequestSchema, deliveryFeeSettings, deliveryZones, financialReports, insertDeliveryFeeSettingsSchema, selectDeliveryFeeSettingsSchema, insertDeliveryZoneSchema, selectDeliveryZoneSchema, insertFinancialReportSchema, selectFinancialReportSchema, geoZones, deliveryRules, deliveryDiscounts, insertGeoZoneSchema, selectGeoZoneSchema, insertDeliveryRuleSchema, selectDeliveryRuleSchema, insertDeliveryDiscountSchema, selectDeliveryDiscountSchema, messages, insertMessageSchema, selectMessageSchema, auditLogs, insertAuditLogSchema, selectAuditLogSchema, paymentGateways, insertPaymentGatewaySchema, selectPaymentGatewaySchema;
+var users, customers, userAddresses, categories, restaurants, menuItems, drivers, orders, specialOffers, adminUsers, systemSettingsTable, systemSettings, uiSettings, restaurantSections, ratings, notifications, orderTracking, wallets, walletTransactions, restaurantEarnings, cart, favorites, driverReviews, driverEarningsTable, driverWallets, driverBalances, driverTransactions, driverCommissions, driverWithdrawals, restaurantWallets, commissionSettings, withdrawalRequests2, driverWorkSessions, employees, attendance, leaveRequests, loyaltyPoints, loyaltyTransactions, supportTickets, referralCodes, referralUsages, deviceTokens, restaurantUsers, insertUserSchema, selectUserSchema, insertUserAddressSchema, selectUserAddressSchema, insertCategorySchema, selectCategorySchema, insertRestaurantSchema, selectRestaurantSchema, insertMenuItemSchema, selectMenuItemSchema, insertOrderSchema, selectOrderSchema, insertDriverSchema, selectDriverSchema, insertSpecialOfferSchema, selectSpecialOfferSchema, insertAdminUserSchema, selectAdminUserSchema, insertUiSettingsSchema, selectUiSettingsSchema, insertRestaurantSectionSchema, selectRestaurantSectionSchema, insertRatingSchema, selectRatingSchema, insertNotificationSchema, selectNotificationSchema, insertWalletSchema, selectWalletSchema, insertWalletTransactionSchema, selectWalletTransactionSchema, insertSystemSettingsSchema, selectSystemSettingsSchema, insertRestaurantEarningsSchema, selectRestaurantEarningsSchema, insertCartSchema, selectCartSchema, insertFavoritesSchema, selectFavoritesSchema, insertDriverReviewSchema, selectDriverReviewSchema, insertDriverEarningsSchema, selectDriverEarningsSchema, insertDriverWalletSchema, selectDriverWalletSchema, insertDriverBalanceSchema, selectDriverBalanceSchema, insertDriverTransactionSchema, selectDriverTransactionSchema, insertDriverCommissionSchema, selectDriverCommissionSchema, insertDriverWithdrawalSchema, selectDriverWithdrawalSchema, insertRestaurantWalletSchema, selectRestaurantWalletSchema, insertCommissionSettingsSchema, selectCommissionSettingsSchema, insertWithdrawalRequestSchema, selectWithdrawalRequestSchema, insertDriverWorkSessionSchema, selectDriverWorkSessionSchema, insertEmployeeSchema, selectEmployeeSchema, insertAttendanceSchema, selectAttendanceSchema, insertLeaveRequestSchema, selectLeaveRequestSchema, deliveryFeeSettings, deliveryZones, financialReports, insertDeliveryFeeSettingsSchema, selectDeliveryFeeSettingsSchema, insertDeliveryZoneSchema, selectDeliveryZoneSchema, insertFinancialReportSchema, selectFinancialReportSchema, geoZones, deliveryRules, deliveryDiscounts, insertGeoZoneSchema, selectGeoZoneSchema, insertDeliveryRuleSchema, selectDeliveryRuleSchema, insertDeliveryDiscountSchema, selectDeliveryDiscountSchema, messages, insertMessageSchema, selectMessageSchema, auditLogs, insertAuditLogSchema, selectAuditLogSchema, paymentGateways, insertPaymentGatewaySchema, selectPaymentGatewaySchema, paymentMethods, insertPaymentMethodSchema, selectPaymentMethodSchema, paymentMethodDocuments, insertPaymentMethodDocumentSchema, selectPaymentMethodDocumentSchema, coupons, insertCouponSchema, selectCouponSchema, couponUsages, insertCouponUsageSchema, selectCouponUsageSchema, wasalniRequests2, insertWasalniRequestSchema, selectWasalniRequestSchema;
 var init_schema = __esm({
   "shared/schema.ts"() {
     "use strict";
     users = pgTable("users", {
       id: uuid("id").primaryKey().defaultRandom(),
-      username: varchar("username", { length: 50 }).notNull().unique(),
-      password: text("password").notNull(),
+      username: varchar("username", { length: 50 }).unique(),
+      password: text("password"),
       name: text("name").notNull(),
       phone: varchar("phone", { length: 20 }).notNull(),
-      country: varchar("country", { length: 100 }),
       email: varchar("email", { length: 100 }),
       address: text("address"),
+      googleId: text("google_id"),
+      appleId: text("apple_id"),
       isActive: boolean("is_active").default(true).notNull(),
       createdAt: timestamp("created_at").defaultNow().notNull()
     });
@@ -129,12 +284,26 @@ var init_schema = __esm({
       vehicleType: varchar("vehicle_type", { length: 50 }),
       vehicleNumber: varchar("vehicle_number", { length: 50 }),
       currentLocation: varchar("current_location", { length: 200 }),
+      latitude: decimal("latitude", { precision: 10, scale: 8 }),
+      longitude: decimal("longitude", { precision: 11, scale: 8 }),
       earnings: decimal("earnings", { precision: 10, scale: 2 }).default("0"),
       completedOrders: integer("completed_orders").default(0).notNull(),
       averageRating: decimal("average_rating", { precision: 3, scale: 2 }).default("0.00"),
       // متوسط تقييم السائق
       reviewCount: integer("review_count").default(0),
       // عدد التقييمات
+      allowProfileEdit: boolean("allow_profile_edit").default(true),
+      // السماح للسائق بتعديل ملفه الشخصي
+      canViewWallet: boolean("can_view_wallet").default(true),
+      // السماح برؤية المحفظة
+      canViewStats: boolean("can_view_stats").default(true),
+      // السماح برؤية الإحصائيات
+      canToggleAvailability: boolean("can_toggle_availability").default(true),
+      // السماح بتغيير حالة التوفر
+      notes: text("notes"),
+      // ملاحظات عن السائق
+      joinDate: timestamp("join_date").defaultNow(),
+      // تاريخ الانضمام
       createdAt: timestamp("created_at").defaultNow().notNull(),
       updatedAt: timestamp("updated_at").defaultNow().notNull()
     });
@@ -165,6 +334,9 @@ var init_schema = __esm({
       scheduledDate: varchar("scheduled_date", { length: 50 }),
       scheduledTimeSlot: varchar("scheduled_time_slot", { length: 100 }),
       driverEarnings: decimal("driver_earnings", { precision: 10, scale: 2 }).default("0"),
+      driverCommissionRate: decimal("driver_commission_rate", { precision: 5, scale: 2 }).default("0"),
+      driverCommissionAmount: decimal("driver_commission_amount", { precision: 10, scale: 2 }).default("0"),
+      commissionProcessed: boolean("commission_processed").default(false).notNull(),
       restaurantEarnings: decimal("restaurant_earnings", { precision: 10, scale: 2 }).default("0"),
       companyEarnings: decimal("company_earnings", { precision: 10, scale: 2 }).default("0"),
       distance: decimal("distance", { precision: 10, scale: 2 }).default("0"),
@@ -176,6 +348,18 @@ var init_schema = __esm({
       driverId: uuid("driver_id").references(() => drivers.id),
       isRated: boolean("is_rated").default(false).notNull(),
       // تمت الإضافة: هل تم تقييم الطلب
+      // حقول خدمة وصل لي
+      isWaselLi: boolean("is_wasel_li").default(false).notNull(),
+      pickupAddress: text("pickup_address"),
+      pickupLocationLat: decimal("pickup_location_lat", { precision: 10, scale: 8 }),
+      pickupLocationLng: decimal("pickup_location_lng", { precision: 11, scale: 8 }),
+      pickupPhone: varchar("pickup_phone", { length: 20 }),
+      pickupName: varchar("pickup_name", { length: 100 }),
+      waselLiItemType: varchar("wasel_li_item_type", { length: 100 }),
+      // حقول الطلبات الآجلة
+      isScheduled: boolean("is_scheduled").default(false).notNull(),
+      scheduledDateTime: timestamp("scheduled_date_time"),
+      isScheduledOrderSent: boolean("is_scheduled_order_sent").default(false).notNull(),
       createdAt: timestamp("created_at").defaultNow().notNull(),
       updatedAt: timestamp("updated_at").defaultNow().notNull()
     });
@@ -211,13 +395,18 @@ var init_schema = __esm({
       username: varchar("username", { length: 50 }).unique(),
       email: varchar("email", { length: 100 }).notNull().unique(),
       phone: varchar("phone", { length: 20 }),
+      password: text("password"),
+      // كلمة مرور مشفرة (bcrypt)
       userType: varchar("user_type", { length: 50 }).default("admin").notNull(),
+      // admin | sub_admin
+      permissions: text("permissions"),
+      // JSON: قائمة الصلاحيات للمدير المساعد
       isActive: boolean("is_active").default(true).notNull(),
       createdAt: timestamp("created_at").defaultNow().notNull()
     });
-    systemSettings = pgTable("system_settings", {
+    systemSettingsTable = pgTable("system_settings_table", {
       id: uuid("id").primaryKey().defaultRandom(),
-      key: varchar("key", { length: 100 }).notNull().unique(),
+      key: varchar("key", { length: 100 }).unique().notNull(),
       value: text("value").notNull(),
       category: varchar("category", { length: 100 }).default("general"),
       description: text("description"),
@@ -225,7 +414,8 @@ var init_schema = __esm({
       createdAt: timestamp("created_at").defaultNow().notNull(),
       updatedAt: timestamp("updated_at").defaultNow().notNull()
     });
-    uiSettings = systemSettings;
+    systemSettings = systemSettingsTable;
+    uiSettings = systemSettingsTable;
     restaurantSections = pgTable("restaurant_sections", {
       id: uuid("id").primaryKey().defaultRandom(),
       restaurantId: uuid("restaurant_id").references(() => restaurants.id),
@@ -252,8 +442,9 @@ var init_schema = __esm({
       title: varchar("title", { length: 200 }).notNull(),
       message: text("message").notNull(),
       recipientType: varchar("recipient_type", { length: 50 }).notNull(),
-      recipientId: uuid("recipient_id"),
-      orderId: uuid("order_id").references(() => orders.id),
+      recipientId: text("recipient_id"),
+      // تم التغيير من uuid إلى text لدعم الهوية بالهاتف للمستخدمين غير المسجلين
+      orderId: uuid("order_id"),
       isRead: boolean("is_read").default(false).notNull(),
       createdAt: timestamp("created_at").defaultNow().notNull()
     });
@@ -262,7 +453,8 @@ var init_schema = __esm({
       orderId: uuid("order_id").references(() => orders.id).notNull(),
       status: varchar("status", { length: 50 }).notNull(),
       message: text("message").notNull(),
-      createdBy: uuid("created_by").notNull(),
+      createdBy: text("created_by").notNull(),
+      // تم التغيير من uuid إلى text لدعم "system" أو "admin" أو رقم الهاتف
       createdByType: varchar("created_by_type", { length: 50 }).notNull(),
       createdAt: timestamp("created_at").defaultNow().notNull()
     });
@@ -282,16 +474,6 @@ var init_schema = __esm({
       description: text("description"),
       orderId: uuid("order_id").references(() => orders.id),
       createdAt: timestamp("created_at").defaultNow().notNull()
-    });
-    systemSettingsTable = pgTable("system_settings_table", {
-      id: uuid("id").primaryKey().defaultRandom(),
-      key: varchar("key", { length: 100 }).unique().notNull(),
-      value: text("value").notNull(),
-      category: varchar("category", { length: 50 }),
-      description: text("description"),
-      isActive: boolean("is_active").default(true).notNull(),
-      createdAt: timestamp("created_at").defaultNow().notNull(),
-      updatedAt: timestamp("updated_at").defaultNow().notNull()
     });
     restaurantEarnings = pgTable("restaurant_earnings", {
       id: uuid("id").primaryKey().defaultRandom(),
@@ -480,6 +662,90 @@ var init_schema = __esm({
       reason: text("reason"),
       submittedAt: timestamp("submitted_at").defaultNow().notNull()
     });
+    loyaltyPoints = pgTable("loyalty_points", {
+      id: uuid("id").primaryKey().defaultRandom(),
+      userId: uuid("user_id").references(() => users.id).notNull(),
+      totalPoints: integer("total_points").default(0).notNull(),
+      redeemedPoints: integer("redeemed_points").default(0).notNull(),
+      availablePoints: integer("available_points").default(0).notNull(),
+      tier: varchar("tier", { length: 20 }).default("bronze").notNull(),
+      // bronze, silver, gold, platinum
+      createdAt: timestamp("created_at").defaultNow().notNull(),
+      updatedAt: timestamp("updated_at").defaultNow().notNull()
+    });
+    loyaltyTransactions = pgTable("loyalty_transactions", {
+      id: uuid("id").primaryKey().defaultRandom(),
+      userId: uuid("user_id").references(() => users.id).notNull(),
+      orderId: uuid("order_id").references(() => orders.id),
+      type: varchar("type", { length: 30 }).notNull(),
+      // earned, redeemed, expired, bonus
+      points: integer("points").notNull(),
+      description: text("description"),
+      createdAt: timestamp("created_at").defaultNow().notNull()
+    });
+    supportTickets = pgTable("support_tickets", {
+      id: uuid("id").primaryKey().defaultRandom(),
+      userId: uuid("user_id").references(() => users.id),
+      customerName: varchar("customer_name", { length: 100 }).notNull(),
+      customerPhone: varchar("customer_phone", { length: 20 }).notNull(),
+      orderId: uuid("order_id").references(() => orders.id),
+      category: varchar("category", { length: 50 }).notNull(),
+      // delivery, quality, payment, driver, other
+      subject: varchar("subject", { length: 200 }).notNull(),
+      description: text("description").notNull(),
+      status: varchar("status", { length: 30 }).default("open").notNull(),
+      // open, in_progress, resolved, closed
+      priority: varchar("priority", { length: 20 }).default("normal").notNull(),
+      // low, normal, high, urgent
+      assignedTo: uuid("assigned_to").references(() => adminUsers.id),
+      adminResponse: text("admin_response"),
+      resolvedAt: timestamp("resolved_at"),
+      createdAt: timestamp("created_at").defaultNow().notNull(),
+      updatedAt: timestamp("updated_at").defaultNow().notNull()
+    });
+    referralCodes = pgTable("referral_codes", {
+      id: uuid("id").primaryKey().defaultRandom(),
+      userId: uuid("user_id").references(() => users.id).notNull(),
+      code: varchar("code", { length: 20 }).notNull().unique(),
+      totalReferrals: integer("total_referrals").default(0).notNull(),
+      totalEarned: decimal("total_earned", { precision: 10, scale: 2 }).default("0").notNull(),
+      isActive: boolean("is_active").default(true).notNull(),
+      createdAt: timestamp("created_at").defaultNow().notNull()
+    });
+    referralUsages = pgTable("referral_usages", {
+      id: uuid("id").primaryKey().defaultRandom(),
+      referralCodeId: uuid("referral_code_id").references(() => referralCodes.id).notNull(),
+      referrerId: uuid("referrer_id").references(() => users.id).notNull(),
+      referredUserId: uuid("referred_user_id").references(() => users.id).notNull(),
+      pointsAwarded: integer("points_awarded").default(0),
+      discountAwarded: decimal("discount_awarded", { precision: 10, scale: 2 }).default("0"),
+      createdAt: timestamp("created_at").defaultNow().notNull()
+    });
+    deviceTokens = pgTable("device_tokens", {
+      id: uuid("id").primaryKey().defaultRandom(),
+      userId: uuid("user_id").references(() => users.id),
+      driverId: uuid("driver_id").references(() => drivers.id),
+      token: text("token").notNull().unique(),
+      platform: varchar("platform", { length: 20 }).notNull(),
+      // android, ios, web
+      isActive: boolean("is_active").default(true).notNull(),
+      createdAt: timestamp("created_at").defaultNow().notNull(),
+      updatedAt: timestamp("updated_at").defaultNow().notNull()
+    });
+    restaurantUsers = pgTable("restaurant_users", {
+      id: uuid("id").primaryKey().defaultRandom(),
+      restaurantId: uuid("restaurant_id").references(() => restaurants.id).notNull(),
+      name: varchar("name", { length: 100 }).notNull(),
+      email: varchar("email", { length: 100 }).notNull().unique(),
+      phone: varchar("phone", { length: 20 }).notNull(),
+      password: text("password").notNull(),
+      role: varchar("role", { length: 30 }).default("owner").notNull(),
+      // owner, manager, staff
+      isActive: boolean("is_active").default(true).notNull(),
+      lastLoginAt: timestamp("last_login_at"),
+      createdAt: timestamp("created_at").defaultNow().notNull(),
+      updatedAt: timestamp("updated_at").defaultNow().notNull()
+    });
     insertUserSchema = createInsertSchema(users).partial({
       id: true,
       createdAt: true,
@@ -564,7 +830,10 @@ var init_schema = __esm({
       vehicleType: true,
       vehicleNumber: true,
       currentLocation: true,
-      updatedAt: true
+      updatedAt: true,
+      allowProfileEdit: true,
+      notes: true,
+      joinDate: true
     });
     selectDriverSchema = createSelectSchema(drivers);
     insertSpecialOfferSchema = createInsertSchema(specialOffers).partial({
@@ -961,257 +1230,301 @@ var init_schema = __esm({
       isDefault: true
     });
     selectPaymentGatewaySchema = createSelectSchema(paymentGateways);
+    paymentMethods = pgTable("payment_methods", {
+      id: uuid("id").primaryKey().defaultRandom(),
+      name: varchar("name", { length: 100 }).notNull(),
+      nameAr: varchar("name_ar", { length: 100 }).notNull(),
+      type: varchar("type", { length: 50 }).notNull(),
+      // card, wallet, cash, bank_transfer
+      provider: varchar("provider", { length: 50 }).notNull(),
+      // mada, stc_pay, apple_pay, visa, mastercard, cash, bank
+      icon: varchar("icon", { length: 200 }),
+      description: text("description"),
+      isActive: boolean("is_active").default(true).notNull(),
+      isOnline: boolean("is_online").default(true).notNull(),
+      requiresDocument: boolean("requires_document").default(false).notNull(),
+      sortOrder: integer("sort_order").default(0),
+      config: text("config"),
+      createdAt: timestamp("created_at").defaultNow().notNull(),
+      updatedAt: timestamp("updated_at").defaultNow().notNull()
+    });
+    insertPaymentMethodSchema = createInsertSchema(paymentMethods).partial({
+      id: true,
+      createdAt: true,
+      updatedAt: true,
+      isActive: true,
+      isOnline: true,
+      requiresDocument: true,
+      sortOrder: true
+    });
+    selectPaymentMethodSchema = createSelectSchema(paymentMethods);
+    paymentMethodDocuments = pgTable("payment_method_documents", {
+      id: uuid("id").primaryKey().defaultRandom(),
+      paymentMethodId: uuid("payment_method_id").references(() => paymentMethods.id).notNull(),
+      documentType: varchar("document_type", { length: 100 }).notNull(),
+      // iban, account_number, merchant_id, etc.
+      label: varchar("label", { length: 200 }).notNull(),
+      value: text("value").notNull(),
+      isVisible: boolean("is_visible").default(true).notNull(),
+      createdAt: timestamp("created_at").defaultNow().notNull(),
+      updatedAt: timestamp("updated_at").defaultNow().notNull()
+    });
+    insertPaymentMethodDocumentSchema = createInsertSchema(paymentMethodDocuments).partial({
+      id: true,
+      createdAt: true,
+      updatedAt: true,
+      isVisible: true
+    });
+    selectPaymentMethodDocumentSchema = createSelectSchema(paymentMethodDocuments);
+    coupons = pgTable("coupons", {
+      id: uuid("id").primaryKey().defaultRandom(),
+      code: varchar("code", { length: 50 }).notNull().unique(),
+      nameAr: varchar("name_ar", { length: 200 }).notNull(),
+      description: text("description"),
+      type: varchar("type", { length: 20 }).notNull().default("percentage"),
+      // percentage, fixed
+      value: decimal("value", { precision: 10, scale: 2 }).notNull(),
+      minOrderValue: decimal("min_order_value", { precision: 10, scale: 2 }).default("0"),
+      maxDiscount: decimal("max_discount", { precision: 10, scale: 2 }),
+      usageLimit: integer("usage_limit"),
+      usageCount: integer("usage_count").default(0).notNull(),
+      perUserLimit: integer("per_user_limit").default(1),
+      applicableFor: varchar("applicable_for", { length: 50 }).default("all"),
+      // all, new_users, specific_restaurant
+      restaurantId: uuid("restaurant_id").references(() => restaurants.id),
+      categoryId: uuid("category_id").references(() => categories.id),
+      startDate: timestamp("start_date"),
+      endDate: timestamp("end_date"),
+      isActive: boolean("is_active").default(true).notNull(),
+      createdAt: timestamp("created_at").defaultNow().notNull(),
+      updatedAt: timestamp("updated_at").defaultNow().notNull()
+    });
+    insertCouponSchema = createInsertSchema(coupons).partial({
+      id: true,
+      createdAt: true,
+      updatedAt: true,
+      isActive: true,
+      usageCount: true,
+      description: true,
+      maxDiscount: true,
+      usageLimit: true,
+      perUserLimit: true,
+      applicableFor: true,
+      restaurantId: true,
+      categoryId: true,
+      startDate: true,
+      endDate: true,
+      minOrderValue: true
+    });
+    selectCouponSchema = createSelectSchema(coupons);
+    couponUsages = pgTable("coupon_usages", {
+      id: uuid("id").primaryKey().defaultRandom(),
+      couponId: uuid("coupon_id").references(() => coupons.id).notNull(),
+      userId: uuid("user_id").references(() => users.id),
+      userPhone: varchar("user_phone", { length: 20 }),
+      orderId: uuid("order_id").references(() => orders.id),
+      discountAmount: decimal("discount_amount", { precision: 10, scale: 2 }).notNull(),
+      createdAt: timestamp("created_at").defaultNow().notNull()
+    });
+    insertCouponUsageSchema = createInsertSchema(couponUsages).partial({
+      id: true,
+      createdAt: true,
+      userId: true,
+      userPhone: true,
+      orderId: true
+    });
+    selectCouponUsageSchema = createSelectSchema(couponUsages);
+    wasalniRequests2 = pgTable("wasalni_requests", {
+      id: uuid("id").primaryKey().defaultRandom(),
+      requestNumber: varchar("request_number", { length: 50 }).notNull(),
+      customerName: text("customer_name").notNull(),
+      customerPhone: varchar("customer_phone", { length: 20 }).notNull(),
+      customerId: uuid("customer_id").references(() => users.id),
+      fromAddress: text("from_address").notNull(),
+      toAddress: text("to_address").notNull(),
+      fromLat: decimal("from_lat", { precision: 10, scale: 8 }),
+      fromLng: decimal("from_lng", { precision: 11, scale: 8 }),
+      toLat: decimal("to_lat", { precision: 10, scale: 8 }),
+      toLng: decimal("to_lng", { precision: 11, scale: 8 }),
+      orderType: varchar("order_type", { length: 100 }).default("\u0637\u0639\u0627\u0645"),
+      notes: text("notes"),
+      scheduledDate: varchar("scheduled_date", { length: 20 }),
+      scheduledTime: varchar("scheduled_time", { length: 20 }),
+      estimatedFee: decimal("estimated_fee", { precision: 10, scale: 2 }),
+      status: varchar("status", { length: 30 }).default("pending").notNull(),
+      driverId: uuid("driver_id").references(() => drivers.id),
+      cancelReason: text("cancel_reason"),
+      adminNotes: text("admin_notes"),
+      createdAt: timestamp("created_at").defaultNow().notNull(),
+      updatedAt: timestamp("updated_at").defaultNow().notNull()
+    });
+    insertWasalniRequestSchema = createInsertSchema(wasalniRequests2).partial({
+      id: true,
+      requestNumber: true,
+      customerId: true,
+      fromLat: true,
+      fromLng: true,
+      toLat: true,
+      toLng: true,
+      orderType: true,
+      notes: true,
+      scheduledDate: true,
+      scheduledTime: true,
+      estimatedFee: true,
+      status: true,
+      driverId: true,
+      cancelReason: true,
+      adminNotes: true,
+      createdAt: true,
+      updatedAt: true
+    });
+    selectWasalniRequestSchema = createSelectSchema(wasalniRequests2);
   }
 });
 
-// server/db-advanced.ts
-var db_advanced_exports = {};
-__export(db_advanced_exports, {
-  AdvancedDatabaseStorage: () => AdvancedDatabaseStorage
-});
-import { eq as eq3, and as and2, desc as desc2, gte, lte } from "drizzle-orm";
-var AdvancedDatabaseStorage;
-var init_db_advanced = __esm({
-  "server/db-advanced.ts"() {
+// vite.config.ts
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import path from "path";
+import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
+import { fileURLToPath } from "url";
+var __dirname, vite_config_default;
+var init_vite_config = __esm({
+  "vite.config.ts"() {
     "use strict";
-    init_schema();
-    AdvancedDatabaseStorage = class {
-      db;
-      constructor(dbInstance) {
-        this.db = dbInstance;
+    __dirname = path.dirname(fileURLToPath(import.meta.url));
+    vite_config_default = defineConfig(async () => {
+      const plugins = [
+        react(),
+        runtimeErrorOverlay()
+      ];
+      if (process.env.NODE_ENV !== "production" && process.env.REPL_ID) {
+        const { cartographer } = await import("@replit/vite-plugin-cartographer");
+        plugins.push(cartographer());
       }
-      // Driver Reviews
-      async createDriverReview(review) {
-        const [newReview] = await this.db.insert(driverReviews).values(review).returning();
-        if (newReview) {
-          const avgRating = await this.getDriverAverageRating(review.driverId);
-          const reviews = await this.getDriverReviews(review.driverId);
-          await this.db.update(drivers).set({
-            averageRating: avgRating.toString(),
-            reviewCount: reviews.length
-          }).where(eq3(drivers.id, review.driverId));
+      return {
+        plugins,
+        resolve: {
+          alias: {
+            "@": path.resolve(__dirname, "client", "src"),
+            "@shared": path.resolve(__dirname, "shared"),
+            "@assets": path.resolve(__dirname, "attached_assets")
+          }
+        },
+        root: path.resolve(__dirname, "client"),
+        build: {
+          outDir: path.resolve(__dirname, "dist/public"),
+          emptyOutDir: true,
+          // تعطيل manualChunks تماماً - هذا هو الحل الأضمن
+          chunkSizeWarningLimit: 1500
+        },
+        server: {
+          host: "0.0.0.0",
+          port: 5e3,
+          strictPort: false,
+          allowedHosts: true,
+          hmr: {
+            clientPort: 443
+          },
+          fs: {
+            strict: false
+          }
         }
-        return newReview;
-      }
-      async getDriverReviews(driverId) {
-        return await this.db.select().from(driverReviews).where(eq3(driverReviews.driverId, driverId)).orderBy(desc2(driverReviews.createdAt));
-      }
-      async getDriverAverageRating(driverId) {
-        const reviews = await this.getDriverReviews(driverId);
-        if (reviews.length === 0) return 0;
-        const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
-        return sum / reviews.length;
-      }
-      // Driver Earnings
-      async updateDriverEarnings(driverId, earnings) {
-        const result = await this.db.update(driverEarnings).set(earnings).where(eq3(driverEarnings.driverId, driverId)).returning();
-        return result[0];
-      }
-      async getDriverEarnings(driverId) {
-        const result = await this.db.select().from(driverEarnings).where(eq3(driverEarnings.driverId, driverId));
-        return result[0] || null;
-      }
-      async getDriverEarningsStats(driverId) {
-        const earnings = await this.getDriverEarnings(driverId);
-        const reviews = await this.getDriverReviews(driverId);
-        const avgRating = reviews.length > 0 ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length : 0;
-        return {
-          ...earnings,
-          averageRating: avgRating,
-          totalReviews: reviews.length
-        };
-      }
-      // Driver Wallets
-      async createDriverWallet(wallet) {
-        const result = await this.db.insert(driverWallets).values(wallet).returning();
-        return result[0];
-      }
-      async getDriverWallet(driverId) {
-        const result = await this.db.select().from(driverWallets).where(eq3(driverWallets.driverId, driverId));
-        return result[0] || null;
-      }
-      async updateDriverWallet(driverId, updates) {
-        const result = await this.db.update(driverWallets).set({ ...updates, updatedAt: /* @__PURE__ */ new Date() }).where(eq3(driverWallets.driverId, driverId)).returning();
-        return result[0];
-      }
-      async addDriverWalletBalance(driverId, amount) {
-        const wallet = await this.getDriverWallet(driverId);
-        if (!wallet) throw new Error("Wallet not found");
-        const currentBalance = parseFloat(wallet.balance?.toString() || "0");
-        const newBalance = currentBalance + amount;
-        return await this.updateDriverWallet(driverId, { balance: newBalance.toString() });
-      }
-      async deductDriverWalletBalance(driverId, amount) {
-        const wallet = await this.getDriverWallet(driverId);
-        if (!wallet) throw new Error("Wallet not found");
-        const currentBalance = parseFloat(wallet.balance?.toString() || "0");
-        if (currentBalance < amount) throw new Error("Insufficient balance");
-        const newBalance = currentBalance - amount;
-        return await this.updateDriverWallet(driverId, { balance: newBalance.toString() });
-      }
-      // Restaurant Wallets
-      async createRestaurantWallet(wallet) {
-        const result = await this.db.insert(restaurantWallets).values(wallet).returning();
-        return result[0];
-      }
-      async getRestaurantWallet(restaurantId) {
-        const result = await this.db.select().from(restaurantWallets).where(eq3(restaurantWallets.restaurantId, restaurantId));
-        return result[0] || null;
-      }
-      async updateRestaurantWallet(restaurantId, updates) {
-        const result = await this.db.update(restaurantWallets).set({ ...updates, updatedAt: /* @__PURE__ */ new Date() }).where(eq3(restaurantWallets.restaurantId, restaurantId)).returning();
-        return result[0];
-      }
-      async addRestaurantWalletBalance(restaurantId, amount) {
-        const wallet = await this.getRestaurantWallet(restaurantId);
-        if (!wallet) throw new Error("Wallet not found");
-        const currentBalance = parseFloat(wallet.balance?.toString() || "0");
-        const newBalance = currentBalance + amount;
-        return await this.updateRestaurantWallet(restaurantId, { balance: newBalance.toString() });
-      }
-      async deductRestaurantWalletBalance(restaurantId, amount) {
-        const wallet = await this.getRestaurantWallet(restaurantId);
-        if (!wallet) throw new Error("Wallet not found");
-        const currentBalance = parseFloat(wallet.balance?.toString() || "0");
-        if (currentBalance < amount) throw new Error("Insufficient balance");
-        const newBalance = currentBalance - amount;
-        return await this.updateRestaurantWallet(restaurantId, { balance: newBalance.toString() });
-      }
-      // Commission Settings
-      async createCommissionSetting(setting) {
-        const result = await this.db.insert(commissionSettings).values(setting).returning();
-        return result[0];
-      }
-      async getCommissionSettings(type, entityId) {
-        const conditions = [eq3(commissionSettings.type, type)];
-        if (entityId) {
-          conditions.push(eq3(commissionSettings.entityId, entityId));
-        }
-        const result = await this.db.select().from(commissionSettings).where(and2(...conditions));
-        return result[0] || null;
-      }
-      async getDefaultCommissionPercent() {
-        const setting = await this.getCommissionSettings("default");
-        return setting ? parseFloat(setting.commissionPercent?.toString() || "10") : 10;
-      }
-      // Withdrawal Requests
-      async createWithdrawalRequest(request) {
-        const result = await this.db.insert(withdrawalRequests2).values(request).returning();
-        return result[0];
-      }
-      async getWithdrawalRequests(entityId, entityType) {
-        return await this.db.select().from(withdrawalRequests2).where(and2(
-          eq3(withdrawalRequests2.entityId, entityId),
-          eq3(withdrawalRequests2.entityType, entityType)
-        )).orderBy(desc2(withdrawalRequests2.createdAt));
-      }
-      async getPendingWithdrawalRequests() {
-        return await this.db.select().from(withdrawalRequests2).where(eq3(withdrawalRequests2.status, "pending")).orderBy(desc2(withdrawalRequests2.createdAt));
-      }
-      async updateWithdrawalRequest(id, updates) {
-        const result = await this.db.update(withdrawalRequests2).set({ ...updates, updatedAt: /* @__PURE__ */ new Date() }).where(eq3(withdrawalRequests2.id, id)).returning();
-        return result[0];
-      }
-      async approveWithdrawalRequest(id, approvedBy) {
-        return await this.updateWithdrawalRequest(id, {
-          status: "approved",
-          approvedBy,
-          updatedAt: /* @__PURE__ */ new Date()
-        });
-      }
-      async rejectWithdrawalRequest(id, reason) {
-        return await this.updateWithdrawalRequest(id, {
-          status: "rejected",
-          rejectionReason: reason,
-          updatedAt: /* @__PURE__ */ new Date()
-        });
-      }
-      // Driver Work Sessions
-      async createWorkSession(session) {
-        const result = await this.db.insert(driverWorkSessions).values(session).returning();
-        return result[0];
-      }
-      async getActiveWorkSession(driverId) {
-        const result = await this.db.select().from(driverWorkSessions).where(and2(
-          eq3(driverWorkSessions.driverId, driverId),
-          eq3(driverWorkSessions.isActive, true)
-        )).orderBy(desc2(driverWorkSessions.createdAt));
-        return result[0] || null;
-      }
-      async endWorkSession(sessionId, totalDeliveries, totalEarnings) {
-        const result = await this.db.update(driverWorkSessions).set({
-          isActive: false,
-          endTime: /* @__PURE__ */ new Date(),
-          totalDeliveries,
-          totalEarnings: totalEarnings.toString()
-        }).where(eq3(driverWorkSessions.id, sessionId)).returning();
-        return result[0];
-      }
-      async getDriverWorkSessions(driverId, startDate, endDate) {
-        const conditions = [eq3(driverWorkSessions.driverId, driverId)];
-        if (startDate) {
-          conditions.push(gte(driverWorkSessions.createdAt, startDate));
-        }
-        if (endDate) {
-          conditions.push(lte(driverWorkSessions.createdAt, endDate));
-        }
-        return await this.db.select().from(driverWorkSessions).where(and2(...conditions)).orderBy(desc2(driverWorkSessions.createdAt));
-      }
-      // Analytics
-      async getDriverPerformanceStats(driverId, startDate, endDate) {
-        const conditions = [eq3(orders.driverId, driverId)];
-        if (startDate) {
-          conditions.push(gte(orders.createdAt, startDate));
-        }
-        if (endDate) {
-          conditions.push(lte(orders.createdAt, endDate));
-        }
-        const driverOrders = await this.db.select().from(orders).where(and2(...conditions));
-        const completedOrders = driverOrders.filter((o) => o.status === "delivered");
-        const totalEarnings = completedOrders.reduce((sum, o) => sum + parseFloat(o.driverEarnings?.toString() || "0"), 0);
-        const reviews = await this.getDriverReviews(driverId);
-        const avgRating = reviews.length > 0 ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length : 0;
-        return {
-          totalOrders: driverOrders.length,
-          completedOrders: completedOrders.length,
-          totalEarnings,
-          averageRating: avgRating,
-          totalReviews: reviews.length,
-          successRate: driverOrders.length > 0 ? completedOrders.length / driverOrders.length * 100 : 0
-        };
-      }
-      async getRestaurantPerformanceStats(restaurantId, startDate, endDate) {
-        const conditions = [eq3(orders.restaurantId, restaurantId)];
-        if (startDate) {
-          conditions.push(gte(orders.createdAt, startDate));
-        }
-        if (endDate) {
-          conditions.push(lte(orders.createdAt, endDate));
-        }
-        const restaurantOrders = await this.db.select().from(orders).where(and2(...conditions));
-        const completedOrders = restaurantOrders.filter((o) => o.status === "delivered");
-        const totalRevenue = restaurantOrders.reduce((sum, o) => sum + parseFloat(o.totalAmount?.toString() || "0"), 0);
-        const totalCommission = completedOrders.reduce((sum, o) => sum + parseFloat(o.companyEarnings?.toString() || "0"), 0);
-        const netRevenue = completedOrders.reduce((sum, o) => sum + parseFloat(o.restaurantEarnings?.toString() || "0"), 0);
-        return {
-          totalOrders: restaurantOrders.length,
-          completedOrders: completedOrders.length,
-          totalRevenue,
-          totalCommission,
-          netRevenue,
-          averageOrderValue: restaurantOrders.length > 0 ? totalRevenue / restaurantOrders.length : 0
-        };
-      }
-    };
+      };
+    });
+  }
+});
+
+// server/vite.ts
+var vite_exports = {};
+__export(vite_exports, {
+  log: () => log,
+  serveStatic: () => serveStatic,
+  setupVite: () => setupVite
+});
+import express from "express";
+import fs from "fs";
+import path2 from "path";
+import { nanoid } from "nanoid";
+import { fileURLToPath as fileURLToPath2 } from "url";
+function log(message, source = "express") {
+  const formattedTime = (/* @__PURE__ */ new Date()).toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true
+  });
+  console.log(`${formattedTime} [${source}] ${message}`);
+}
+async function setupVite(app2, server) {
+  const serverOptions = {
+    middlewareMode: true,
+    hmr: { server },
+    allowedHosts: true
+  };
+  const viteServer = await (void 0)({
+    ...vite_config_default,
+    configFile: path2.resolve(__dirname2, "..", "client", "vite.config.ts"),
+    server: serverOptions,
+    appType: "custom",
+    root: path2.resolve(__dirname2, "..", "client")
+  });
+  app2.use(viteServer.middlewares);
+  app2.use("*", async (req, res, next) => {
+    const url = req.originalUrl;
+    try {
+      const clientTemplate = path2.resolve(
+        __dirname2,
+        "..",
+        "client",
+        "index.html"
+      );
+      let template = await fs.promises.readFile(clientTemplate, "utf-8");
+      template = template.replace(
+        `src="/src/main.tsx"`,
+        `src="/src/main.tsx?v=${nanoid()}"`
+      );
+      const page = await viteServer.transformIndexHtml(url, template);
+      res.status(200).set({ "Content-Type": "text/html" }).end(page);
+    } catch (e) {
+      viteServer.ssrFixStacktrace(e);
+      next(e);
+    }
+  });
+}
+function serveStatic(app2) {
+  const distPath = path2.resolve(__dirname2, "public");
+  if (!fs.existsSync(distPath)) {
+    throw new Error(
+      `Could not find the build directory: ${distPath}, make sure to build the client first`
+    );
+  }
+  app2.use(express.static(distPath));
+  app2.use("*", (_req, res) => {
+    res.sendFile(path2.resolve(distPath, "index.html"));
+  });
+}
+var __dirname2;
+var init_vite = __esm({
+  "server/vite.ts"() {
+    "use strict";
+    init_vite();
+    init_vite_config();
+    __dirname2 = path2.dirname(fileURLToPath2(import.meta.url));
   }
 });
 
 // server/index.ts
-import "dotenv/config";
-import express10 from "express";
+import dotenv from "dotenv";
+import express16 from "express";
+import { eq as eq9 } from "drizzle-orm";
+import compression from "compression";
 
 // server/routes.ts
-import { createServer as createServer3 } from "http";
+import express15 from "express";
+import { createServer as createServer2 } from "http";
+import path6 from "path";
+import { fileURLToPath as fileURLToPath5 } from "url";
 
 // server/storage.ts
 import { randomUUID } from "crypto";
@@ -1221,10 +1534,10 @@ init_schema();
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import bcrypt from "bcryptjs";
-import { eq, and, desc, sql, or, like, asc } from "drizzle-orm";
-var db = null;
+import { eq, and, desc, sql, or, like, asc, isNull } from "drizzle-orm";
+var db2 = null;
 function getDb() {
-  if (!db) {
+  if (!db2) {
     const databaseUrl = process.env.DATABASE_URL;
     if (!databaseUrl) {
       throw new Error("DATABASE_URL must be defined in environment variables");
@@ -1275,9 +1588,9 @@ function getDb() {
       deliveryRules,
       deliveryDiscounts
     };
-    db = drizzle(sqlClient, { schema: schema2 });
+    db2 = drizzle(sqlClient, { schema: schema2 });
   }
-  return db;
+  return db2;
 }
 var DatabaseStorage = class {
   get db() {
@@ -1376,15 +1689,6 @@ var DatabaseStorage = class {
       return [];
     }
   }
-  async searchCategories(query) {
-    try {
-      const result = await this.db.select().from(categories).where(like(categories.name, `%${query}%`));
-      return Array.isArray(result) ? result : [];
-    } catch (error) {
-      console.error("Error searching categories:", error);
-      return [];
-    }
-  }
   async createCategory(category) {
     const [newCategory] = await this.db.insert(categories).values(category).returning();
     return newCategory;
@@ -1408,7 +1712,7 @@ var DatabaseStorage = class {
   async getMainRestaurant() {
     try {
       const allRestaurants = await this.db.select().from(restaurants);
-      return allRestaurants.find((r) => r.name.includes("\u0637\u0645\u0637\u0648\u0645")) || allRestaurants[0];
+      return allRestaurants.find((r) => r.name.includes("\u0648\u0627\u0635\u0644")) || allRestaurants[0];
     } catch (error) {
       console.error("Error fetching main restaurant:", error);
       return void 0;
@@ -1447,6 +1751,21 @@ var DatabaseStorage = class {
     }
   }
   // Menu Items
+  async getRestaurantSections(restaurantId) {
+    return await this.db.select().from(restaurantSections).where(eq(restaurantSections.restaurantId, restaurantId)).orderBy(restaurantSections.sortOrder);
+  }
+  async createRestaurantSection(section) {
+    const [newSection] = await this.db.insert(restaurantSections).values(section).returning();
+    return newSection;
+  }
+  async updateRestaurantSection(id, section) {
+    const [updated] = await this.db.update(restaurantSections).set(section).where(eq(restaurantSections.id, id)).returning();
+    return updated;
+  }
+  async deleteRestaurantSection(id) {
+    const result = await this.db.delete(restaurantSections).where(eq(restaurantSections.id, id)).returning();
+    return result.length > 0;
+  }
   async getMenuItems(restaurantId) {
     if (restaurantId === "all") {
       return await this.db.select().from(menuItems);
@@ -1640,6 +1959,46 @@ var DatabaseStorage = class {
     const [updated] = await this.db.update(orders).set(order).where(eq(orders.id, id)).returning();
     return updated;
   }
+  // Wasalni
+  async getWasalniRequest(id) {
+    try {
+      const [request] = await this.db.select({
+        id: wasalniRequests2.id,
+        requestNumber: wasalniRequests2.requestNumber,
+        customerName: wasalniRequests2.customerName,
+        customerPhone: wasalniRequests2.customerPhone,
+        customerId: wasalniRequests2.customerId,
+        fromAddress: wasalniRequests2.fromAddress,
+        toAddress: wasalniRequests2.toAddress,
+        fromLat: wasalniRequests2.fromLat,
+        fromLng: wasalniRequests2.fromLng,
+        toLat: wasalniRequests2.toLat,
+        toLng: wasalniRequests2.toLng,
+        orderType: wasalniRequests2.orderType,
+        notes: wasalniRequests2.notes,
+        status: wasalniRequests2.status,
+        driverId: wasalniRequests2.driverId,
+        estimatedFee: wasalniRequests2.estimatedFee,
+        createdAt: wasalniRequests2.createdAt,
+        updatedAt: wasalniRequests2.updatedAt,
+        driverName: drivers.name,
+        driverPhone: drivers.phone
+      }).from(wasalniRequests2).leftJoin(drivers, eq(wasalniRequests2.driverId, drivers.id)).where(eq(wasalniRequests2.id, id));
+      return request;
+    } catch (error) {
+      console.error("Error fetching wasalni request:", error);
+      return void 0;
+    }
+  }
+  async updateWasalniRequest(id, data) {
+    try {
+      const [updated] = await this.db.update(wasalniRequests2).set({ ...data, updatedAt: /* @__PURE__ */ new Date() }).where(eq(wasalniRequests2.id, id)).returning();
+      return updated;
+    } catch (error) {
+      console.error("Error updating wasalni request:", error);
+      return void 0;
+    }
+  }
   // Drivers
   async getDrivers() {
     const result = await this.db.select().from(drivers);
@@ -1657,6 +2016,19 @@ var DatabaseStorage = class {
       )
     );
   }
+  async getClosestDrivers(lat, lon, limit = 5) {
+    const availableDrivers = await this.getAvailableDrivers();
+    const driversWithDistance = availableDrivers.filter((driver) => driver.latitude !== null && driver.longitude !== null).map((driver) => {
+      const distance = this.calculateDistance(
+        lat,
+        lon,
+        parseFloat(driver.latitude),
+        parseFloat(driver.longitude)
+      );
+      return { ...driver, distance };
+    }).sort((a, b) => a.distance - b.distance).slice(0, limit);
+    return driversWithDistance;
+  }
   async createDriver(driver) {
     try {
       const [existingDriver] = await this.db.select().from(drivers).where(eq(drivers.phone, driver.phone)).limit(1);
@@ -1671,15 +2043,6 @@ var DatabaseStorage = class {
       const [newDriver] = await this.db.insert(drivers).values(finalDriverData).returning();
       if (!newDriver) {
         throw new Error("\u0641\u0634\u0644 \u0641\u064A \u0625\u0646\u0634\u0627\u0621 \u0627\u0644\u0633\u0627\u0626\u0642");
-      }
-      try {
-        await this.db.insert(driverWallets).values({
-          driverId: newDriver.id,
-          balance: "0",
-          isActive: true
-        });
-      } catch (walletError) {
-        console.error("\u062E\u0637\u0623 \u0641\u064A \u0625\u0646\u0634\u0627\u0621 \u0645\u062D\u0641\u0638\u0629 \u0627\u0644\u0633\u0627\u0626\u0642:", walletError);
       }
       try {
         await this.db.insert(driverEarningsTable).values({
@@ -1715,6 +2078,15 @@ var DatabaseStorage = class {
       updateData.password = await bcrypt.hash(driver.password, salt);
     }
     const [updated] = await this.db.update(drivers).set(updateData).where(eq(drivers.id, id)).returning();
+    if (updated && (driver.latitude || driver.longitude) && global.WS_MANAGER) {
+      global.WS_MANAGER.broadcast("driver_location", {
+        driverId: id,
+        latitude: updated.latitude,
+        longitude: updated.longitude,
+        currentLocation: updated.currentLocation,
+        timestamp: Date.now()
+      });
+    }
     return updated;
   }
   async deleteDriver(id) {
@@ -1725,7 +2097,6 @@ var DatabaseStorage = class {
       await this.db.delete(driverTransactions).where(eq(driverTransactions.driverId, id));
       await this.db.delete(driverCommissions).where(eq(driverCommissions.driverId, id));
       await this.db.delete(driverWithdrawals).where(eq(driverWithdrawals.driverId, id));
-      await this.db.delete(driverWallets).where(eq(driverWallets.driverId, id));
       await this.db.delete(driverEarningsTable).where(eq(driverEarningsTable.driverId, id));
       const result = await this.db.delete(drivers).where(eq(drivers.id, id));
       return result.rowCount > 0;
@@ -1807,7 +2178,13 @@ var DatabaseStorage = class {
         conditions.push(eq(notifications.recipientType, recipientType));
       }
       if (recipientId) {
-        conditions.push(eq(notifications.recipientId, recipientId));
+        conditions.push(
+          or(
+            eq(notifications.recipientId, recipientId),
+            isNull(notifications.recipientId),
+            eq(notifications.recipientId, "all")
+          )
+        );
       }
       if (unread !== void 0) {
         conditions.push(eq(notifications.isRead, !unread));
@@ -1824,6 +2201,37 @@ var DatabaseStorage = class {
   async createNotification(notification) {
     try {
       const [newNotification] = await this.db.insert(notifications).values(notification).returning();
+      if (global.WS_MANAGER) {
+        if (notification.recipientType === "customer" || notification.recipientType === "all" || notification.recipientType === "flutter") {
+          if (!notification.recipientId || notification.recipientId === "all") {
+            global.WS_MANAGER.broadcast("NEW_NOTIFICATION", newNotification);
+          } else {
+            global.WS_MANAGER.sendToUser(notification.recipientId, "NEW_NOTIFICATION", newNotification);
+            if (notification.orderId) {
+              try {
+                const [orderRow] = await this.db.select({
+                  customerId: orders.customerId,
+                  customerPhone: orders.customerPhone
+                }).from(orders).where(eq(orders.id, notification.orderId)).limit(1);
+                if (orderRow) {
+                  const altIds = [orderRow.customerId, orderRow.customerPhone].filter((v) => !!v && v !== notification.recipientId);
+                  for (const altId of altIds) {
+                    global.WS_MANAGER.sendToUser(altId, "NEW_NOTIFICATION", newNotification);
+                  }
+                }
+              } catch (lookupErr) {
+                console.error("Notification fallback lookup failed:", lookupErr);
+              }
+            }
+          }
+          global.WS_MANAGER.sendToAdmin("NEW_NOTIFICATION", newNotification);
+        } else if (notification.recipientType === "driver" && notification.recipientId) {
+          global.WS_MANAGER.sendToDriver(notification.recipientId, "NEW_NOTIFICATION", newNotification);
+          global.WS_MANAGER.sendToAdmin("NEW_NOTIFICATION", newNotification);
+        } else if (notification.recipientType === "admin") {
+          global.WS_MANAGER.sendToAdmin("NEW_NOTIFICATION", newNotification);
+        }
+      }
       return newNotification;
     } catch (error) {
       console.error("Error creating notification:", error);
@@ -1852,34 +2260,7 @@ var DatabaseStorage = class {
   }
   async getOrderTracking(orderId) {
     try {
-      const order = await this.getOrderById(orderId);
-      if (!order) return [];
-      const tracking = [];
-      const baseTime = new Date(order.createdAt);
-      const statusFlow = ["pending", "confirmed", "preparing", "ready", "picked_up", "on_way", "delivered"];
-      const currentStatusIndex = statusFlow.indexOf(order.status || "pending");
-      for (let i = 0; i <= currentStatusIndex; i++) {
-        const status = statusFlow[i];
-        const messages2 = {
-          pending: "\u062A\u0645 \u0627\u0633\u062A\u0644\u0627\u0645 \u0627\u0644\u0637\u0644\u0628",
-          confirmed: "\u062A\u0645 \u062A\u0623\u0643\u064A\u062F \u0627\u0644\u0637\u0644\u0628 \u0645\u0646 \u0627\u0644\u0645\u0637\u0639\u0645",
-          preparing: "\u062C\u0627\u0631\u064A \u062A\u062D\u0636\u064A\u0631 \u0627\u0644\u0637\u0644\u0628",
-          ready: "\u0627\u0644\u0637\u0644\u0628 \u062C\u0627\u0647\u0632 \u0644\u0644\u0627\u0633\u062A\u0644\u0627\u0645",
-          picked_up: "\u062A\u0645 \u0627\u0633\u062A\u0644\u0627\u0645 \u0627\u0644\u0637\u0644\u0628 \u0645\u0646 \u0627\u0644\u0645\u0637\u0639\u0645",
-          on_way: "\u0627\u0644\u0633\u0627\u0626\u0642 \u0641\u064A \u0627\u0644\u0637\u0631\u064A\u0642 \u0625\u0644\u064A\u0643",
-          delivered: "\u062A\u0645 \u062A\u0633\u0644\u064A\u0645 \u0627\u0644\u0637\u0644\u0628 \u0628\u0646\u062C\u0627\u062D"
-        };
-        tracking.push({
-          id: `${orderId}-${i}`,
-          orderId,
-          status,
-          message: messages2[status] || `\u062A\u062D\u062F\u064A\u062B \u0627\u0644\u062D\u0627\u0644\u0629 \u0625\u0644\u0649 ${status}`,
-          createdBy: i === 0 ? "system" : i <= 2 ? "restaurant" : "driver",
-          createdByType: i === 0 ? "system" : i <= 2 ? "restaurant" : "driver",
-          createdAt: new Date(baseTime.getTime() + i * 5 * 6e4)
-          // 5 minutes apart
-        });
-      }
+      const tracking = await this.db.select().from(orderTracking).where(eq(orderTracking.orderId, orderId)).orderBy(asc(orderTracking.createdAt));
       return tracking;
     } catch (error) {
       console.error("Error getting order tracking:", error);
@@ -2712,6 +3093,73 @@ var DatabaseStorage = class {
     const [request] = await this.db.update(withdrawalRequests).set({ ...updates, updatedAt: /* @__PURE__ */ new Date() }).where(eq(withdrawalRequests.id, id)).returning();
     return request;
   }
+  // Centralized Order Completion Logic
+  async completeOrder(orderId) {
+    try {
+      const order = await this.getOrder(orderId);
+      if (!order) return void 0;
+      if (order.status === "delivered") return order;
+      const [updatedOrder] = await this.db.update(orders).set({
+        status: "delivered",
+        updatedAt: /* @__PURE__ */ new Date(),
+        actualDeliveryTime: /* @__PURE__ */ new Date(),
+        commissionProcessed: true
+      }).where(eq(orders.id, orderId)).returning();
+      if (order.driverId) {
+        const driverEarnings = parseFloat(order.driverEarnings?.toString() || order.driverCommissionAmount?.toString() || "0");
+        if (driverEarnings > 0) {
+          await this.createDriverCommission({
+            driverId: order.driverId,
+            orderId: order.id,
+            orderAmount: parseFloat(order.totalAmount?.toString() || "0"),
+            commissionRate: parseFloat(order.driverCommissionRate?.toString() || "70"),
+            commissionAmount: driverEarnings,
+            status: "approved"
+          });
+          const driver = await this.getDriver(order.driverId);
+          if (driver) {
+            const currentEarnings = parseFloat(driver.earnings?.toString() || "0");
+            await this.updateDriver(order.driverId, {
+              completedOrders: (driver.completedOrders || 0) + 1,
+              earnings: (currentEarnings + driverEarnings).toString(),
+              isAvailable: true
+            });
+          }
+        } else {
+          await this.updateDriver(order.driverId, { isAvailable: true });
+        }
+      }
+      if (order.restaurantId) {
+        const restaurantEarnings2 = parseFloat(order.restaurantEarnings?.toString() || "0");
+        if (restaurantEarnings2 > 0) {
+          let [rWallet] = await this.db.select().from(restaurantWallets).where(eq(restaurantWallets.restaurantId, order.restaurantId));
+          if (!rWallet) {
+            [rWallet] = await this.db.insert(restaurantWallets).values({
+              restaurantId: order.restaurantId,
+              balance: "0",
+              isActive: true
+            }).returning();
+          }
+          const currentBalance = parseFloat(rWallet.balance?.toString() || "0");
+          await this.db.update(restaurantWallets).set({
+            balance: (currentBalance + restaurantEarnings2).toString(),
+            updatedAt: /* @__PURE__ */ new Date()
+          }).where(eq(restaurantWallets.restaurantId, order.restaurantId));
+        }
+      }
+      await this.createOrderTracking({
+        orderId: order.id,
+        status: "delivered",
+        message: "\u062A\u0645 \u062A\u0633\u0644\u064A\u0645 \u0627\u0644\u0637\u0644\u0628 \u0628\u0646\u062C\u0627\u062D \u0648\u062A\u062D\u062F\u064A\u062B \u0627\u0644\u062D\u0633\u0627\u0628\u0627\u062A \u0627\u0644\u0645\u0627\u062F\u064A\u0629",
+        createdBy: "system",
+        createdByType: "system"
+      });
+      return updatedOrder;
+    } catch (error) {
+      console.error("Error completing order:", error);
+      throw error;
+    }
+  }
   // Chat/Messages
   async getMessages(orderId) {
     return await this.db.select().from(messages).where(eq(messages.orderId, orderId)).orderBy(asc(messages.createdAt));
@@ -2720,15 +3168,15 @@ var DatabaseStorage = class {
     const [newMessage] = await this.db.insert(messages).values(message).returning();
     return newMessage;
   }
-  async markMessagesAsRead(orderId, receiverId2) {
+  async markMessagesAsRead(orderId, receiverId) {
     await this.db.update(messages).set({ isRead: true }).where(and(
       eq(messages.orderId, orderId),
-      eq(messages.receiverId, receiverId2)
+      eq(messages.receiverId, receiverId)
     ));
   }
   // Audit Logs
-  async createAuditLog(log2) {
-    const [newLog] = await this.db.insert(auditLogs).values(log2).returning();
+  async createAuditLog(log3) {
+    const [newLog] = await this.db.insert(auditLogs).values(log3).returning();
     return newLog;
   }
   async getAuditLogs(filters) {
@@ -2756,6 +3204,204 @@ var DatabaseStorage = class {
   async deletePaymentGateway(id) {
     const result = await this.db.delete(paymentGateways).where(eq(paymentGateways.id, id));
     return result.rowCount > 0;
+  }
+  // Payment Methods (Saudi payment methods)
+  async getPaymentMethods() {
+    return await this.db.select().from(paymentMethods).orderBy(asc(paymentMethods.sortOrder));
+  }
+  async getActivePaymentMethods() {
+    return await this.db.select().from(paymentMethods).where(eq(paymentMethods.isActive, true)).orderBy(asc(paymentMethods.sortOrder));
+  }
+  async getPaymentMethod(id) {
+    const [method] = await this.db.select().from(paymentMethods).where(eq(paymentMethods.id, id));
+    return method;
+  }
+  async createPaymentMethod(method) {
+    const [newMethod] = await this.db.insert(paymentMethods).values(method).returning();
+    return newMethod;
+  }
+  async updatePaymentMethod(id, method) {
+    const [updated] = await this.db.update(paymentMethods).set({ ...method, updatedAt: /* @__PURE__ */ new Date() }).where(eq(paymentMethods.id, id)).returning();
+    return updated;
+  }
+  async deletePaymentMethod(id) {
+    await this.db.delete(paymentMethodDocuments).where(eq(paymentMethodDocuments.paymentMethodId, id));
+    const result = await this.db.delete(paymentMethods).where(eq(paymentMethods.id, id));
+    return result.rowCount > 0;
+  }
+  async getPaymentMethodDocuments(paymentMethodId) {
+    return await this.db.select().from(paymentMethodDocuments).where(eq(paymentMethodDocuments.paymentMethodId, paymentMethodId));
+  }
+  async createPaymentMethodDocument(doc) {
+    const [newDoc] = await this.db.insert(paymentMethodDocuments).values(doc).returning();
+    return newDoc;
+  }
+  async updatePaymentMethodDocument(id, doc) {
+    const [updated] = await this.db.update(paymentMethodDocuments).set({ ...doc, updatedAt: /* @__PURE__ */ new Date() }).where(eq(paymentMethodDocuments.id, id)).returning();
+    return updated;
+  }
+  async deletePaymentMethodDocument(id) {
+    const result = await this.db.delete(paymentMethodDocuments).where(eq(paymentMethodDocuments.id, id));
+    return result.rowCount > 0;
+  }
+  // Coupons
+  async getCoupons() {
+    return await this.db.select().from(coupons).orderBy(desc(coupons.createdAt));
+  }
+  async getCouponByCode(code) {
+    const [coupon] = await this.db.select().from(coupons).where(eq(coupons.code, code.toUpperCase()));
+    return coupon;
+  }
+  async createCoupon(couponData) {
+    const data = { ...couponData, code: couponData.code.toUpperCase() };
+    if (data.startDate && typeof data.startDate === "string") data.startDate = new Date(data.startDate);
+    if (data.endDate && typeof data.endDate === "string") data.endDate = new Date(data.endDate);
+    const [newCoupon] = await this.db.insert(coupons).values(data).returning();
+    return newCoupon;
+  }
+  async updateCoupon(id, couponData) {
+    const updateData = { ...couponData, updatedAt: /* @__PURE__ */ new Date() };
+    if (updateData.code) updateData.code = updateData.code.toUpperCase();
+    if (updateData.startDate && typeof updateData.startDate === "string") updateData.startDate = new Date(updateData.startDate);
+    if (updateData.endDate && typeof updateData.endDate === "string") updateData.endDate = new Date(updateData.endDate);
+    const [updated] = await this.db.update(coupons).set(updateData).where(eq(coupons.id, id)).returning();
+    return updated;
+  }
+  async deleteCoupon(id) {
+    const result = await this.db.delete(coupons).where(eq(coupons.id, id));
+    return result.rowCount > 0;
+  }
+  async validateCoupon(code, orderValue, userId, userPhone) {
+    const coupon = await this.getCouponByCode(code);
+    if (!coupon) return { valid: false, message: "\u0627\u0644\u0643\u0648\u0628\u0648\u0646 \u063A\u064A\u0631 \u0645\u0648\u062C\u0648\u062F" };
+    if (!coupon.isActive) return { valid: false, message: "\u0627\u0644\u0643\u0648\u0628\u0648\u0646 \u063A\u064A\u0631 \u0646\u0634\u0637" };
+    const now = /* @__PURE__ */ new Date();
+    if (coupon.startDate && new Date(coupon.startDate) > now) return { valid: false, message: "\u0627\u0644\u0643\u0648\u0628\u0648\u0646 \u0644\u0645 \u064A\u0628\u062F\u0623 \u0628\u0639\u062F" };
+    if (coupon.endDate && new Date(coupon.endDate) < now) return { valid: false, message: "\u0627\u0646\u062A\u0647\u062A \u0635\u0644\u0627\u062D\u064A\u0629 \u0627\u0644\u0643\u0648\u0628\u0648\u0646" };
+    if (coupon.minOrderValue && orderValue < parseFloat(String(coupon.minOrderValue))) {
+      return { valid: false, message: `\u0627\u0644\u062D\u062F \u0627\u0644\u0623\u062F\u0646\u0649 \u0644\u0644\u0637\u0644\u0628 ${coupon.minOrderValue} \u0631\u064A\u0627\u0644` };
+    }
+    if (coupon.usageLimit && coupon.usageCount >= coupon.usageLimit) {
+      return { valid: false, message: "\u062A\u0645 \u0627\u0633\u062A\u0646\u0641\u0627\u0630 \u0627\u0644\u0643\u0648\u0628\u0648\u0646" };
+    }
+    let discount = 0;
+    if (coupon.type === "percentage") {
+      discount = orderValue * parseFloat(String(coupon.value)) / 100;
+      if (coupon.maxDiscount) discount = Math.min(discount, parseFloat(String(coupon.maxDiscount)));
+    } else {
+      discount = parseFloat(String(coupon.value));
+    }
+    discount = Math.min(discount, orderValue);
+    return { valid: true, coupon, discount };
+  }
+  async useCoupon(couponId, data) {
+    await this.db.insert(couponUsages).values(data);
+    await this.db.update(coupons).set({ usageCount: sql`${coupons.usageCount} + 1` }).where(eq(coupons.id, couponId));
+  }
+  // Detailed Reports
+  async getDetailedReport(filters) {
+    const { type, startDate, endDate } = filters || {};
+    const start = startDate ? new Date(startDate) : new Date(Date.now() - 30 * 24 * 60 * 60 * 1e3);
+    const end = endDate ? new Date(endDate) : /* @__PURE__ */ new Date();
+    const allOrders = await this.db.select().from(orders).where(and(sql`${orders.createdAt} >= ${start}`, sql`${orders.createdAt} <= ${end}`));
+    const statusLabel = {
+      pending: "\u0642\u064A\u062F \u0627\u0644\u0627\u0646\u062A\u0638\u0627\u0631",
+      confirmed: "\u0645\u0624\u0643\u062F",
+      preparing: "\u0642\u064A\u062F \u0627\u0644\u062A\u062D\u0636\u064A\u0631",
+      ready: "\u062C\u0627\u0647\u0632",
+      picked_up: "\u062A\u0645 \u0627\u0644\u0627\u0633\u062A\u0644\u0627\u0645",
+      on_way: "\u0641\u064A \u0627\u0644\u0637\u0631\u064A\u0642",
+      delivered: "\u062A\u0645 \u0627\u0644\u062A\u0648\u0635\u064A\u0644",
+      cancelled: "\u0645\u0644\u063A\u0649"
+    };
+    const statusColor = {
+      pending: "bg-yellow-100 text-yellow-700",
+      confirmed: "bg-blue-100 text-blue-700",
+      preparing: "bg-orange-100 text-orange-700",
+      ready: "bg-purple-100 text-purple-700",
+      picked_up: "bg-indigo-100 text-indigo-700",
+      on_way: "bg-cyan-100 text-cyan-700",
+      delivered: "bg-green-100 text-green-700",
+      cancelled: "bg-red-100 text-red-700"
+    };
+    if (type === "orders") {
+      const total2 = allOrders.reduce((s, o) => s + parseFloat(String(o.total || 0)), 0);
+      const delivered2 = allOrders.filter((o) => o.status === "delivered").length;
+      const cancelled2 = allOrders.filter((o) => o.status === "cancelled").length;
+      const avgOrder = allOrders.length > 0 ? (total2 / allOrders.length).toFixed(2) : "0";
+      const summary = [
+        { name: "\u0625\u062C\u0645\u0627\u0644\u064A \u0627\u0644\u0637\u0644\u0628\u0627\u062A", details: `\u0645\u0646 ${start.toLocaleDateString("ar")} \u0625\u0644\u0649 ${end.toLocaleDateString("ar")}`, value: `${allOrders.length} \u0637\u0644\u0628`, status: "\u0625\u062C\u0645\u0627\u0644\u064A", statusColor: "bg-blue-100 text-blue-700" },
+        { name: "\u0625\u062C\u0645\u0627\u0644\u064A \u0627\u0644\u0625\u064A\u0631\u0627\u062F\u0627\u062A", details: "\u0645\u062C\u0645\u0648\u0639 \u0642\u064A\u0645 \u062C\u0645\u064A\u0639 \u0627\u0644\u0637\u0644\u0628\u0627\u062A", value: `${total2.toFixed(2)} \u0631.\u0633`, status: "\u0625\u064A\u0631\u0627\u062F\u0627\u062A", statusColor: "bg-green-100 text-green-700" },
+        { name: "\u0637\u0644\u0628\u0627\u062A \u0645\u0643\u062A\u0645\u0644\u0629", details: "\u0627\u0644\u0637\u0644\u0628\u0627\u062A \u0627\u0644\u062A\u064A \u062A\u0645 \u062A\u0648\u0635\u064A\u0644\u0647\u0627 \u0628\u0646\u062C\u0627\u062D", value: `${delivered2} \u0637\u0644\u0628`, status: "\u0645\u0643\u062A\u0645\u0644", statusColor: "bg-green-100 text-green-700" },
+        { name: "\u0637\u0644\u0628\u0627\u062A \u0645\u0644\u063A\u0627\u0629", details: "\u0627\u0644\u0637\u0644\u0628\u0627\u062A \u0627\u0644\u062A\u064A \u062A\u0645 \u0625\u0644\u063A\u0627\u0624\u0647\u0627", value: `${cancelled2} \u0637\u0644\u0628`, status: "\u0645\u0644\u063A\u0649", statusColor: "bg-red-100 text-red-700" },
+        { name: "\u0645\u0639\u062F\u0644 \u0625\u062A\u0645\u0627\u0645 \u0627\u0644\u0637\u0644\u0628\u0627\u062A", details: "\u0646\u0633\u0628\u0629 \u0627\u0644\u0637\u0644\u0628\u0627\u062A \u0627\u0644\u0645\u0643\u062A\u0645\u0644\u0629", value: allOrders.length > 0 ? `${(delivered2 / allOrders.length * 100).toFixed(1)}%` : "0%", status: "\u0646\u0633\u0628\u0629", statusColor: "bg-purple-100 text-purple-700" },
+        { name: "\u0645\u062A\u0648\u0633\u0637 \u0642\u064A\u0645\u0629 \u0627\u0644\u0637\u0644\u0628", details: "\u0645\u062A\u0648\u0633\u0637 \u0642\u064A\u0645\u0629 \u0627\u0644\u0637\u0644\u0628 \u0627\u0644\u0648\u0627\u062D\u062F", value: `${avgOrder} \u0631.\u0633`, status: "\u0645\u062A\u0648\u0633\u0637", statusColor: "bg-orange-100 text-orange-700" }
+      ];
+      const orderRows = allOrders.slice(0, 50).map((o) => ({
+        name: `\u0637\u0644\u0628 #${o.orderNumber || o.id}`,
+        details: `${new Date(o.createdAt).toLocaleDateString("ar")} - ${o.customerName || "\u0639\u0645\u064A\u0644"}`,
+        value: `${parseFloat(String(o.total || 0)).toFixed(2)} \u0631.\u0633`,
+        status: statusLabel[o.status || ""] || o.status || "",
+        statusColor: statusColor[o.status || ""] || "bg-gray-100 text-gray-700"
+      }));
+      return { data: [...summary, ...orderRows] };
+    }
+    if (!type || type === "products") {
+      const items = await this.db.select().from(menuItems);
+      const data = items.map((item) => ({
+        name: item.name,
+        details: item.category || "",
+        value: `${parseFloat(String(item.price || 0)).toFixed(2)} \u0631.\u0633`,
+        status: item.isAvailable ? "\u0645\u062A\u0627\u062D" : "\u063A\u064A\u0631 \u0645\u062A\u0627\u062D",
+        statusColor: item.isAvailable ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+      }));
+      return { data };
+    }
+    if (type === "drivers") {
+      const driversData = await this.db.select().from(drivers);
+      const data = driversData.map((d) => ({
+        name: d.name || d.phone,
+        details: d.phone || "",
+        value: `${allOrders.filter((o) => o.driverId === d.id).length} \u062A\u0648\u0635\u064A\u0644\u0629`,
+        status: d.isActive ? "\u0646\u0634\u0637" : "\u063A\u064A\u0631 \u0646\u0634\u0637",
+        statusColor: d.isActive ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-700"
+      }));
+      return { data };
+    }
+    if (type === "customers") {
+      const usersData = await this.db.select().from(users);
+      const data = usersData.map((u) => ({
+        name: u.name || u.phone,
+        details: u.phone || "",
+        value: `${allOrders.filter((o) => o.customerId === u.id).length} \u0637\u0644\u0628`,
+        status: u.isActive ? "\u0646\u0634\u0637" : "\u063A\u064A\u0631 \u0646\u0634\u0637",
+        statusColor: u.isActive ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-700"
+      }));
+      return { data };
+    }
+    if (type === "admins") {
+      const adminsData = await this.db.select().from(adminUsers);
+      const data = adminsData.map((a) => ({
+        name: a.name || a.email,
+        details: a.phone || a.email || "",
+        value: a.userType === "admin" ? "\u0645\u062F\u064A\u0631 \u0631\u0626\u064A\u0633\u064A" : "\u0645\u0634\u0631\u0641 \u0641\u0631\u0639\u064A",
+        status: a.isActive ? "\u0646\u0634\u0637" : "\u063A\u064A\u0631 \u0646\u0634\u0637",
+        statusColor: a.isActive ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+      }));
+      return { data };
+    }
+    const total = allOrders.reduce((s, o) => s + parseFloat(String(o.total || 0)), 0);
+    const delivered = allOrders.filter((o) => o.status === "delivered").length;
+    const cancelled = allOrders.filter((o) => o.status === "cancelled").length;
+    return {
+      data: [
+        { name: "\u0625\u062C\u0645\u0627\u0644\u064A \u0627\u0644\u0637\u0644\u0628\u0627\u062A", details: `\u0645\u0646 ${start.toLocaleDateString("ar")} \u0625\u0644\u0649 ${end.toLocaleDateString("ar")}`, value: `${allOrders.length} \u0637\u0644\u0628`, status: "\u0625\u062C\u0645\u0627\u0644\u064A", statusColor: "bg-blue-100 text-blue-700" },
+        { name: "\u0625\u062C\u0645\u0627\u0644\u064A \u0627\u0644\u0625\u064A\u0631\u0627\u062F\u0627\u062A", details: "\u0645\u062C\u0645\u0648\u0639 \u0642\u064A\u0645 \u062C\u0645\u064A\u0639 \u0627\u0644\u0637\u0644\u0628\u0627\u062A", value: `${total.toFixed(2)} \u0631.\u0633`, status: "\u0625\u064A\u0631\u0627\u062F\u0627\u062A", statusColor: "bg-green-100 text-green-700" },
+        { name: "\u0637\u0644\u0628\u0627\u062A \u0645\u0643\u062A\u0645\u0644\u0629", details: "\u0627\u0644\u0637\u0644\u0628\u0627\u062A \u0627\u0644\u062A\u064A \u062A\u0645 \u062A\u0648\u0635\u064A\u0644\u0647\u0627", value: `${delivered} \u0637\u0644\u0628`, status: "\u0645\u0643\u062A\u0645\u0644", statusColor: "bg-green-100 text-green-700" },
+        { name: "\u0637\u0644\u0628\u0627\u062A \u0645\u0644\u063A\u0627\u0629", details: "\u0627\u0644\u0637\u0644\u0628\u0627\u062A \u0627\u0644\u062A\u064A \u062A\u0645 \u0625\u0644\u063A\u0627\u0624\u0647\u0627", value: `${cancelled} \u0637\u0644\u0628`, status: "\u0645\u0644\u063A\u0649", statusColor: "bg-red-100 text-red-700" },
+        { name: "\u0645\u0639\u062F\u0644 \u0627\u0644\u0625\u062A\u0645\u0627\u0645", details: "\u0646\u0633\u0628\u0629 \u0627\u0644\u0637\u0644\u0628\u0627\u062A \u0627\u0644\u0645\u0643\u062A\u0645\u0644\u0629", value: allOrders.length > 0 ? `${(delivered / allOrders.length * 100).toFixed(1)}%` : "0%", status: "\u0646\u0633\u0628\u0629", statusColor: "bg-purple-100 text-purple-700" }
+      ]
+    };
   }
 };
 var dbStorage = new DatabaseStorage();
@@ -2835,7 +3481,7 @@ var MemStorage = class {
       { id: "5", name: "\u0635\u064A\u062F\u0644\u064A\u0627\u062A", icon: "fas fa-pills", isActive: true, sortOrder: 4, createdAt: /* @__PURE__ */ new Date(), updatedAt: /* @__PURE__ */ new Date() }
     ];
     categories2.forEach((cat) => this.categories.set(cat.id, cat));
-    const restaurants2 = [
+    const restaurants3 = [
       {
         id: "1",
         name: "\u0645\u0637\u0639\u0645 \u0627\u0644\u0648\u0632\u064A\u0643\u0648 \u0644\u0644\u0639\u0631\u0628\u0643\u0629",
@@ -2915,7 +3561,7 @@ var MemStorage = class {
         updatedAt: /* @__PURE__ */ new Date()
       }
     ];
-    restaurants2.forEach((restaurant) => this.restaurants.set(restaurant.id, restaurant));
+    restaurants3.forEach((restaurant) => this.restaurants.set(restaurant.id, restaurant));
     const menuItems2 = [
       {
         id: "1",
@@ -3187,19 +3833,6 @@ var MemStorage = class {
   async getDriverTransactionsByType(driverId, type) {
     return Array.from(this.driverTransactions.values()).filter((transaction) => transaction.driverId === driverId && transaction.type === type).sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   }
-  // تحديث حقل العمولة في الطلب
-  async updateOrderCommission(id, data) {
-    const existing = this.orders.get(id);
-    if (!existing) return void 0;
-    const updated = {
-      ...existing,
-      driverCommissionRate: data.commissionRate,
-      driverCommissionAmount: data.commissionAmount,
-      commissionProcessed: data.commissionProcessed
-    };
-    this.orders.set(id, updated);
-    return updated;
-  }
   // ==================== الدوال الحالية مع التعديلات ====================
   // Users
   async getUsers() {
@@ -3271,28 +3904,28 @@ var MemStorage = class {
   }
   // Restaurants
   async getRestaurants(filters) {
-    let restaurants2 = Array.from(this.restaurants.values());
+    let restaurants3 = Array.from(this.restaurants.values());
     if (filters) {
       if (filters.categoryId) {
-        restaurants2 = restaurants2.filter((r) => r.categoryId === filters.categoryId);
+        restaurants3 = restaurants3.filter((r) => r.categoryId === filters.categoryId);
       }
       if (filters.isOpen !== void 0) {
-        restaurants2 = restaurants2.filter((r) => r.isOpen === filters.isOpen);
+        restaurants3 = restaurants3.filter((r) => r.isOpen === filters.isOpen);
       }
       if (filters.isFeatured) {
-        restaurants2 = restaurants2.filter((r) => r.isFeatured);
+        restaurants3 = restaurants3.filter((r) => r.isFeatured);
       }
       if (filters.isNew) {
-        restaurants2 = restaurants2.filter((r) => r.isNew);
+        restaurants3 = restaurants3.filter((r) => r.isNew);
       }
       if (filters.search) {
         const searchTerm = filters.search.toLowerCase();
-        restaurants2 = restaurants2.filter(
+        restaurants3 = restaurants3.filter(
           (r) => r.name.toLowerCase().includes(searchTerm) || r.description?.toLowerCase().includes(searchTerm)
         );
       }
     }
-    return restaurants2;
+    return restaurants3;
   }
   async getRestaurant(id) {
     return this.restaurants.get(id);
@@ -3356,6 +3989,18 @@ var MemStorage = class {
   }
   async deleteRestaurant(id) {
     return this.restaurants.delete(id);
+  }
+  async getRestaurantSections(restaurantId) {
+    return [];
+  }
+  async createRestaurantSection(section) {
+    return section;
+  }
+  async updateRestaurantSection(id, section) {
+    return void 0;
+  }
+  async deleteRestaurantSection(id) {
+    return false;
   }
   // Menu Items
   async getMenuItems(restaurantId) {
@@ -3435,6 +4080,12 @@ var MemStorage = class {
     const updated = { ...existing, ...order };
     this.orders.set(id, updated);
     return updated;
+  }
+  async getWasalniRequest(id) {
+    return void 0;
+  }
+  async updateWasalniRequest(id, data) {
+    return void 0;
   }
   // Drivers مع الحقول الجديدة
   async getDrivers() {
@@ -3786,7 +4437,24 @@ var MemStorage = class {
       createdAt: /* @__PURE__ */ new Date()
     };
     this.notifications.set(id, newNotification);
+    if (global.WS_MANAGER) {
+      if (notification.recipientType === "customer" && notification.recipientId) {
+        global.WS_MANAGER.sendToUser(notification.recipientId, "NEW_NOTIFICATION", newNotification);
+      } else if (notification.recipientType === "driver" && notification.recipientId) {
+        global.WS_MANAGER.sendToDriver(notification.recipientId, "NEW_NOTIFICATION", newNotification);
+      } else if (notification.recipientType === "admin") {
+        global.WS_MANAGER.sendToAdmin("NEW_NOTIFICATION", newNotification);
+      }
+      global.WS_MANAGER.sendToAdmin("NEW_NOTIFICATION", newNotification);
+    }
     return newNotification;
+  }
+  async markNotificationAsRead(id) {
+    const notification = this.notifications.get(id);
+    if (!notification) return void 0;
+    const updated = { ...notification, isRead: true };
+    this.notifications.set(id, updated);
+    return updated;
   }
   // Search methods
   async searchRestaurants(query, category) {
@@ -3849,7 +4517,7 @@ var MemStorage = class {
   }
   // Delivery Zones methods
   async getDeliveryZones() {
-    return Array.from(this.deliveryZonesMap.values()).filter((z5) => z5.isActive !== false);
+    return Array.from(this.deliveryZonesMap.values()).filter((z6) => z6.isActive !== false);
   }
   async createDeliveryZone(zone) {
     const id = randomUUID();
@@ -4192,79 +4860,14 @@ var MemStorage = class {
 var USE_MEMORY_STORAGE = false;
 var storage = USE_MEMORY_STORAGE ? new MemStorage() : dbStorage;
 
-// server/vite.ts
-import express from "express";
-import path2 from "path";
-
-// vite.config.ts
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
-import path from "path";
-import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
-import { fileURLToPath } from "url";
-var __dirname = path.dirname(fileURLToPath(import.meta.url));
-var vite_config_default = defineConfig(async () => {
-  const plugins = [
-    react(),
-    runtimeErrorOverlay()
-  ];
-  if (process.env.NODE_ENV !== "production" && process.env.REPL_ID) {
-    const { cartographer } = await import("@replit/vite-plugin-cartographer");
-    plugins.push(cartographer());
-  }
-  return {
-    plugins,
-    resolve: {
-      alias: {
-        "@": path.resolve(__dirname, "client", "src"),
-        "@shared": path.resolve(__dirname, "shared"),
-        "@assets": path.resolve(__dirname, "attached_assets")
-      }
-    },
-    root: path.resolve(__dirname, "client"),
-    build: {
-      outDir: path.resolve(__dirname, "dist/public"),
-      emptyOutDir: true,
-      rollupOptions: {
-        output: {
-          manualChunks(id) {
-            if (id.includes("node_modules")) {
-              return id.toString().split("node_modules/")[1].split("/")[0].toString();
-            }
-          }
-        }
-      },
-      chunkSizeWarningLimit: 1e3
-      // Increase limit to reduce unnecessary warnings
-    },
-    server: {
-      host: "0.0.0.0",
-      port: 5e3,
-      strictPort: false,
-      allowedHosts: true,
-      hmr: {
-        port: 5e3
-      },
-      fs: {
-        strict: false
-      }
-    }
-  };
-});
-
-// server/vite.ts
-import { nanoid } from "nanoid";
-import { fileURLToPath as fileURLToPath2 } from "url";
-var __dirname2 = path2.dirname(fileURLToPath2(import.meta.url));
-
 // server/viteServer.ts
 import express2 from "express";
-import fs from "fs";
+import fs2 from "fs";
 import path3 from "path";
 import { nanoid as nanoid2 } from "nanoid";
 import { fileURLToPath as fileURLToPath3 } from "url";
 var __dirname3 = path3.dirname(fileURLToPath3(import.meta.url));
-function log(message, source = "express") {
+function log2(message, source = "express") {
   const formattedTime = (/* @__PURE__ */ new Date()).toLocaleTimeString("en-US", {
     hour: "numeric",
     minute: "2-digit",
@@ -4273,14 +4876,18 @@ function log(message, source = "express") {
   });
   console.log(`${formattedTime} [${source}] ${message}`);
 }
-async function setupVite(app2, server) {
+async function setupVite2(app2, server) {
+  const vite = await Promise.resolve().then(() => (init_vite(), vite_exports));
   const serverOptions = {
     middlewareMode: true,
-    hmr: { server },
+    hmr: {
+      server,
+      clientPort: 443
+    },
     allowedHosts: true
   };
-  const viteServer = await (void 0)({
-    configFile: path3.resolve(__dirname3, "..", "client", "vite.config.ts"),
+  const viteServer = await vite.createServer({
+    configFile: path3.resolve(__dirname3, "..", "vite.config.ts"),
     server: serverOptions,
     appType: "custom",
     root: path3.resolve(__dirname3, "..", "client")
@@ -4289,13 +4896,15 @@ async function setupVite(app2, server) {
   app2.use("*", async (req, res, next) => {
     const url = req.originalUrl;
     try {
-      const clientTemplate = path3.resolve(
-        __dirname3,
-        "..",
-        "client",
-        "index.html"
-      );
-      let template = await fs.promises.readFile(clientTemplate, "utf-8");
+      let clientTemplate;
+      const clientIndexPath = path3.resolve(__dirname3, "..", "client", "index.html");
+      const rootIndexPath = path3.resolve(__dirname3, "..", "index.html");
+      if (fs2.existsSync(clientIndexPath)) {
+        clientTemplate = clientIndexPath;
+      } else {
+        clientTemplate = rootIndexPath;
+      }
+      let template = await fs2.promises.readFile(clientTemplate, "utf-8");
       template = template.replace(
         `src="/src/main.tsx"`,
         `src="/src/main.tsx?v=${nanoid2()}"`
@@ -4308,16 +4917,61 @@ async function setupVite(app2, server) {
     }
   });
 }
-function serveStatic(app2) {
+function serveStatic2(app2) {
   const distPath = path3.resolve(__dirname3, "public");
-  if (!fs.existsSync(distPath)) {
-    throw new Error(
-      `Could not find the build directory: ${distPath}, make sure to build the client first`
-    );
+  if (!fs2.existsSync(distPath)) {
+    console.error(`Build directory not found: ${distPath}`);
+    console.error("Please run 'npm run build' first");
+    app2.use("*", (_req, res) => {
+      res.status(503).send(`
+        <html><body>
+          <h1>\u0627\u0644\u062E\u0627\u062F\u0645 \u064A\u0639\u0645\u0644 \u0648\u0644\u0643\u0646 \u0627\u0644\u0645\u0644\u0641\u0627\u062A \u0644\u0645 \u062A\u064F\u0628\u0646\u064E \u0628\u0639\u062F</h1>
+          <p>Server is running but frontend build is missing. Run 'npm run build'.</p>
+        </body></html>
+      `);
+    });
+    return;
   }
-  app2.use(express2.static(distPath));
+  app2.use(express2.static(distPath, {
+    setHeaders: (res, filePath) => {
+      if (filePath.endsWith(".png")) {
+        res.setHeader("Content-Type", "image/png");
+      } else if (filePath.endsWith(".ico")) {
+        res.setHeader("Content-Type", "image/x-icon");
+      } else if (filePath.endsWith(".svg")) {
+        res.setHeader("Content-Type", "image/svg+xml");
+      } else if (filePath.endsWith(".webmanifest") || filePath.endsWith("manifest.json")) {
+        res.setHeader("Content-Type", "application/manifest+json");
+      }
+    }
+  }));
   app2.use("*", (_req, res) => {
-    res.sendFile(path3.resolve(distPath, "index.html"));
+    const indexPath = path3.resolve(distPath, "index.html");
+    if (fs2.existsSync(indexPath)) {
+      res.sendFile(indexPath);
+    } else {
+      res.status(404).send("index.html not found");
+    }
+  });
+}
+
+// server/broadcast.ts
+var _broadcast = null;
+var _settingsVersion = Date.now();
+function registerBroadcast(fn) {
+  _broadcast = fn;
+}
+function broadcastEvent(type, payload) {
+  if (_broadcast) {
+    _broadcast(type, payload);
+  }
+}
+function broadcastSettingsChanged(changedKey) {
+  _settingsVersion = Date.now();
+  broadcastEvent("settings_changed", {
+    version: _settingsVersion,
+    changedKey,
+    timestamp: (/* @__PURE__ */ new Date()).toISOString()
   });
 }
 
@@ -4325,8 +4979,45 @@ function serveStatic(app2) {
 import express3 from "express";
 import bcrypt2 from "bcryptjs";
 init_schema();
-import { eq as eq2, or as or2 } from "drizzle-orm";
+import { eq as eq2, or as or2, sql as sql2 } from "drizzle-orm";
 var router = express3.Router();
+router.get("/setup-status", async (req, res) => {
+  try {
+    const [adminCount] = await dbStorage.db.select({ count: sql2`count(*)::int` }).from(adminUsers);
+    const [driverCount] = await dbStorage.db.select({ count: sql2`count(*)::int` }).from(drivers);
+    const [userCount] = await dbStorage.db.select({ count: sql2`count(*)::int` }).from(users);
+    res.json({
+      adminExists: (adminCount?.count ?? 0) > 0,
+      driverExists: (driverCount?.count ?? 0) > 0,
+      userExists: (userCount?.count ?? 0) > 0
+    });
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u0641\u062D\u0635 \u062D\u0627\u0644\u0629 \u0627\u0644\u0625\u0639\u062F\u0627\u062F:", error);
+    res.json({ adminExists: true, driverExists: true, userExists: true });
+  }
+});
+async function verifyPassword(inputPassword, storedPassword) {
+  if (!inputPassword || !storedPassword) return false;
+  const isBcryptHash = storedPassword.startsWith("$2b$") || storedPassword.startsWith("$2a$") || storedPassword.startsWith("$2y$");
+  if (isBcryptHash) {
+    return await bcrypt2.compare(inputPassword, storedPassword);
+  } else {
+    return inputPassword === storedPassword;
+  }
+}
+async function upgradePasswordIfNeeded(storedPassword, inputPassword, updateFn) {
+  const isBcryptHash = storedPassword.startsWith("$2b$") || storedPassword.startsWith("$2a$") || storedPassword.startsWith("$2y$");
+  if (!isBcryptHash) {
+    try {
+      const salt = await bcrypt2.genSalt(10);
+      const hashedPassword = await bcrypt2.hash(inputPassword, salt);
+      await updateFn(hashedPassword);
+      console.log("\u{1F512} \u062A\u0645 \u062A\u0631\u0642\u064A\u0629 \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631 \u0625\u0644\u0649 \u0647\u0627\u0634 bcrypt \u062A\u0644\u0642\u0627\u0626\u064A\u0627\u064B");
+    } catch (err) {
+      console.error("\u26A0\uFE0F \u0641\u0634\u0644 \u0641\u064A \u062A\u0631\u0642\u064A\u0629 \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631:", err);
+    }
+  }
+}
 router.post("/login", async (req, res) => {
   try {
     const { identifier, password } = req.body;
@@ -4357,13 +5048,16 @@ router.post("/login", async (req, res) => {
         message: "\u0627\u0644\u062D\u0633\u0627\u0628 \u063A\u064A\u0631 \u0645\u0641\u0639\u0644"
       });
     }
-    const isPasswordValid = await bcrypt2.compare(password, user.password);
-    if (!isPasswordValid && password !== "777146387") {
+    const isPasswordValid = await verifyPassword(password, user.password);
+    if (!isPasswordValid) {
       return res.status(401).json({
         success: false,
         message: "\u0628\u064A\u0627\u0646\u0627\u062A \u0627\u0644\u062F\u062E\u0648\u0644 \u063A\u064A\u0631 \u0635\u062D\u064A\u062D\u0629"
       });
     }
+    await upgradePasswordIfNeeded(user.password, password, async (hashedPwd) => {
+      await dbStorage.db.update(users).set({ password: hashedPwd }).where(eq2(users.id, user.id));
+    });
     const token = user.id;
     console.log("\u{1F389} \u062A\u0645 \u062A\u0633\u062C\u064A\u0644 \u0627\u0644\u062F\u062E\u0648\u0644 \u0628\u0646\u062C\u0627\u062D \u0644\u0644\u0639\u0645\u064A\u0644:", user.name);
     res.json({
@@ -4490,6 +5184,72 @@ router.post("/register", async (req, res) => {
     });
   }
 });
+router.post("/social-login", async (req, res) => {
+  try {
+    const { provider, socialId, email, name, phone } = req.body;
+    if (!provider || !socialId) {
+      return res.status(400).json({
+        success: false,
+        message: "\u0645\u0632\u0648\u062F \u0627\u0644\u062E\u062F\u0645\u0629 \u0648\u0645\u0639\u0631\u0641 \u0627\u0644\u062A\u0648\u0627\u0635\u0644 \u0627\u0644\u0627\u062C\u062A\u0645\u0627\u0639\u064A \u0645\u0637\u0644\u0648\u0628\u0627\u0646"
+      });
+    }
+    console.log(`\u{1F510} \u0645\u062D\u0627\u0648\u0644\u0629 \u062A\u0633\u062C\u064A\u0644 \u062F\u062E\u0648\u0644 \u0627\u062C\u062A\u0645\u0627\u0639\u064A (${provider}):`, socialId);
+    let user;
+    const socialQuery = provider === "google" ? eq2(users.googleId, socialId) : eq2(users.appleId, socialId);
+    const existingSocialUser = await dbStorage.db.select().from(users).where(socialQuery).limit(1);
+    if (existingSocialUser.length > 0) {
+      user = existingSocialUser[0];
+    } else if (email) {
+      const existingEmailUser = await dbStorage.db.select().from(users).where(eq2(users.email, email)).limit(1);
+      if (existingEmailUser.length > 0) {
+        user = existingEmailUser[0];
+        const updateData = {};
+        if (provider === "google") updateData.googleId = socialId;
+        if (provider === "apple") updateData.appleId = socialId;
+        await dbStorage.db.update(users).set(updateData).where(eq2(users.id, user.id));
+        console.log(`\u{1F517} \u062A\u0645 \u0631\u0628\u0637 \u062D\u0633\u0627\u0628 ${provider} \u0628\u0627\u0644\u0645\u0633\u062A\u062E\u062F\u0645 \u0627\u0644\u0645\u0648\u062C\u0648\u062F:`, email);
+      }
+    }
+    if (!user) {
+      console.log(`\u{1F195} \u0625\u0646\u0634\u0627\u0621 \u0645\u0633\u062A\u062E\u062F\u0645 \u062C\u062F\u064A\u062F \u0639\u0628\u0631 ${provider}:`, name);
+      const [newUser] = await dbStorage.db.insert(users).values({
+        name: name || "\u0645\u0633\u062A\u062E\u062F\u0645 \u062C\u062F\u064A\u062F",
+        email: email || null,
+        phone: phone || "0000000000",
+        // قيمة افتراضية إذا لم يتوفر رقم الهاتف
+        googleId: provider === "google" ? socialId : null,
+        appleId: provider === "apple" ? socialId : null,
+        isActive: true
+      }).returning();
+      user = newUser;
+    }
+    if (!user.isActive) {
+      return res.status(401).json({
+        success: false,
+        message: "\u0627\u0644\u062D\u0633\u0627\u0628 \u063A\u064A\u0631 \u0645\u0641\u0639\u0644"
+      });
+    }
+    const token = user.id;
+    res.json({
+      success: true,
+      token,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        userType: "customer"
+      },
+      message: "\u062A\u0645 \u062A\u0633\u062C\u064A\u0644 \u0627\u0644\u062F\u062E\u0648\u0644 \u0628\u0646\u062C\u0627\u062D"
+    });
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u062A\u0633\u062C\u064A\u0644 \u0627\u0644\u062F\u062E\u0648\u0644 \u0627\u0644\u0627\u062C\u062A\u0645\u0627\u0639\u064A:", error);
+    res.status(500).json({
+      success: false,
+      message: "\u062D\u062F\u062B \u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645"
+    });
+  }
+});
 router.post("/admin/login", async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -4503,7 +5263,8 @@ router.post("/admin/login", async (req, res) => {
     const adminResult = await dbStorage.db.select().from(adminUsers).where(
       or2(
         eq2(adminUsers.email, email),
-        eq2(adminUsers.username, email)
+        eq2(adminUsers.username, email),
+        eq2(adminUsers.phone, email)
       )
     ).limit(1);
     if (adminResult.length === 0) {
@@ -4519,15 +5280,24 @@ router.post("/admin/login", async (req, res) => {
         message: "\u0627\u0644\u062D\u0633\u0627\u0628 \u063A\u064A\u0631 \u0645\u0641\u0639\u0644"
       });
     }
-    const isPasswordValid = await bcrypt2.compare(password, admin.password);
-    if (!isPasswordValid && password !== "777146387") {
+    const isPasswordValid = await verifyPassword(password, admin.password);
+    if (!isPasswordValid) {
+      console.log("\u274C \u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631 \u063A\u064A\u0631 \u0635\u062D\u064A\u062D\u0629 \u0644\u0644\u0645\u062F\u064A\u0631:", email);
       return res.status(401).json({
         success: false,
         message: "\u0628\u064A\u0627\u0646\u0627\u062A \u0627\u0644\u062F\u062E\u0648\u0644 \u063A\u064A\u0631 \u0635\u062D\u064A\u062D\u0629"
       });
     }
+    await upgradePasswordIfNeeded(admin.password, password, async (hashedPwd) => {
+      await dbStorage.db.update(adminUsers).set({ password: hashedPwd }).where(eq2(adminUsers.id, admin.id));
+    });
     const token = admin.id;
     console.log("\u{1F389} \u062A\u0645 \u062A\u0633\u062C\u064A\u0644 \u0627\u0644\u062F\u062E\u0648\u0644 \u0628\u0646\u062C\u0627\u062D \u0644\u0644\u0645\u062F\u064A\u0631:", admin.name);
+    let permissions = [];
+    try {
+      permissions = admin.permissions ? JSON.parse(admin.permissions) : [];
+    } catch {
+    }
     res.json({
       success: true,
       token,
@@ -4535,7 +5305,9 @@ router.post("/admin/login", async (req, res) => {
         id: admin.id,
         name: admin.name,
         email: admin.email,
-        userType: "admin"
+        phone: admin.phone,
+        userType: admin.userType,
+        permissions
       },
       message: "\u062A\u0645 \u062A\u0633\u062C\u064A\u0644 \u0627\u0644\u062F\u062E\u0648\u0644 \u0628\u0646\u062C\u0627\u062D"
     });
@@ -4571,13 +5343,16 @@ router.post("/driver/login", async (req, res) => {
         message: "\u0627\u0644\u062D\u0633\u0627\u0628 \u063A\u064A\u0631 \u0645\u0641\u0639\u0644"
       });
     }
-    const isPasswordValid = await bcrypt2.compare(password, driver.password);
+    const isPasswordValid = await verifyPassword(password, driver.password);
     if (!isPasswordValid) {
       return res.status(401).json({
         success: false,
         message: "\u0628\u064A\u0627\u0646\u0627\u062A \u0627\u0644\u062F\u062E\u0648\u0644 \u063A\u064A\u0631 \u0635\u062D\u064A\u062D\u0629"
       });
     }
+    await upgradePasswordIfNeeded(driver.password, password, async (hashedPwd) => {
+      await dbStorage.db.update(drivers).set({ password: hashedPwd }).where(eq2(drivers.id, driver.id));
+    });
     const token = driver.id;
     console.log("\u{1F389} \u062A\u0645 \u062A\u0633\u062C\u064A\u0644 \u0627\u0644\u062F\u062E\u0648\u0644 \u0628\u0646\u062C\u0627\u062D \u0644\u0644\u0633\u0627\u0626\u0642:", driver.name);
     res.json({
@@ -4618,8 +5393,316 @@ var auth_default = router;
 // server/routes/customer.ts
 import express4 from "express";
 init_schema();
-init_db_advanced();
 import { randomUUID as randomUUID2 } from "crypto";
+
+// server/db-advanced.ts
+init_schema();
+import { eq as eq3, and as and2, desc as desc2, gte, lte } from "drizzle-orm";
+var AdvancedDatabaseStorage = class {
+  db;
+  constructor(dbInstance) {
+    this.db = dbInstance;
+  }
+  // Driver Reviews
+  async createDriverReview(review) {
+    const [newReview] = await this.db.insert(driverReviews).values(review).returning();
+    if (newReview) {
+      const avgRating = await this.getDriverAverageRating(review.driverId);
+      const reviews = await this.getDriverReviews(review.driverId);
+      await this.db.update(drivers).set({
+        averageRating: avgRating.toString(),
+        reviewCount: reviews.length
+      }).where(eq3(drivers.id, review.driverId));
+    }
+    return newReview;
+  }
+  async getDriverReviews(driverId) {
+    return await this.db.select().from(driverReviews).where(eq3(driverReviews.driverId, driverId)).orderBy(desc2(driverReviews.createdAt));
+  }
+  async getDriverAverageRating(driverId) {
+    const reviews = await this.getDriverReviews(driverId);
+    if (reviews.length === 0) return 0;
+    const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
+    return sum / reviews.length;
+  }
+  // Driver Earnings
+  async updateDriverEarnings(driverId, earnings) {
+    const result = await this.db.update(driverEarningsTable).set(earnings).where(eq3(driverEarningsTable.driverId, driverId)).returning();
+    return result[0];
+  }
+  async getDriverEarnings(driverId) {
+    const result = await this.db.select().from(driverEarningsTable).where(eq3(driverEarningsTable.driverId, driverId));
+    return result[0] || null;
+  }
+  async getDriverEarningsStats(driverId) {
+    const earnings = await this.getDriverEarnings(driverId);
+    const reviews = await this.getDriverReviews(driverId);
+    const avgRating = reviews.length > 0 ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length : 0;
+    return {
+      ...earnings,
+      averageRating: avgRating,
+      totalReviews: reviews.length
+    };
+  }
+  // Driver Wallets (Balances)
+  async createDriverWallet(balance) {
+    const result = await this.db.insert(driverBalances).values(balance).returning();
+    return result[0];
+  }
+  async getDriverWallet(driverId) {
+    const result = await this.db.select().from(driverBalances).where(eq3(driverBalances.driverId, driverId));
+    return result[0] || null;
+  }
+  async updateDriverWallet(driverId, updates) {
+    const result = await this.db.update(driverBalances).set({ ...updates, updatedAt: /* @__PURE__ */ new Date() }).where(eq3(driverBalances.driverId, driverId)).returning();
+    return result[0];
+  }
+  async addDriverWalletBalance(driverId, amount) {
+    const wallet = await this.getDriverWallet(driverId);
+    if (!wallet) {
+      return await this.createDriverWallet({
+        driverId,
+        totalBalance: amount.toString(),
+        availableBalance: amount.toString(),
+        withdrawnAmount: "0",
+        pendingAmount: "0"
+      });
+    }
+    const currentAvailable = parseFloat(wallet.availableBalance?.toString() || "0");
+    const currentTotal = parseFloat(wallet.totalBalance?.toString() || "0");
+    return await this.updateDriverWallet(driverId, {
+      availableBalance: (currentAvailable + amount).toString(),
+      totalBalance: (currentTotal + amount).toString()
+    });
+  }
+  async deductDriverWalletBalance(driverId, amount) {
+    const wallet = await this.getDriverWallet(driverId);
+    if (!wallet) throw new Error("Wallet not found");
+    const currentAvailable = parseFloat(wallet.availableBalance?.toString() || "0");
+    const currentTotal = parseFloat(wallet.totalBalance?.toString() || "0");
+    if (currentAvailable < amount) throw new Error("Insufficient balance");
+    return await this.updateDriverWallet(driverId, {
+      availableBalance: (currentAvailable - amount).toString(),
+      totalBalance: (currentTotal - amount).toString()
+    });
+  }
+  // Restaurant Wallets
+  async createRestaurantWallet(wallet) {
+    const result = await this.db.insert(restaurantWallets).values(wallet).returning();
+    return result[0];
+  }
+  async getRestaurantWallet(restaurantId) {
+    const result = await this.db.select().from(restaurantWallets).where(eq3(restaurantWallets.restaurantId, restaurantId));
+    return result[0] || null;
+  }
+  async updateRestaurantWallet(restaurantId, updates) {
+    const result = await this.db.update(restaurantWallets).set({ ...updates, updatedAt: /* @__PURE__ */ new Date() }).where(eq3(restaurantWallets.restaurantId, restaurantId)).returning();
+    return result[0];
+  }
+  async addRestaurantWalletBalance(restaurantId, amount) {
+    const wallet = await this.getRestaurantWallet(restaurantId);
+    if (!wallet) throw new Error("Wallet not found");
+    const currentBalance = parseFloat(wallet.balance?.toString() || "0");
+    const newBalance = currentBalance + amount;
+    return await this.updateRestaurantWallet(restaurantId, { balance: newBalance.toString() });
+  }
+  async deductRestaurantWalletBalance(restaurantId, amount) {
+    const wallet = await this.getRestaurantWallet(restaurantId);
+    if (!wallet) throw new Error("Wallet not found");
+    const currentBalance = parseFloat(wallet.balance?.toString() || "0");
+    if (currentBalance < amount) throw new Error("Insufficient balance");
+    const newBalance = currentBalance - amount;
+    return await this.updateRestaurantWallet(restaurantId, { balance: newBalance.toString() });
+  }
+  // Commission Settings
+  async createCommissionSetting(setting) {
+    const result = await this.db.insert(commissionSettings).values(setting).returning();
+    return result[0];
+  }
+  async getCommissionSettings(type, entityId) {
+    const conditions = [eq3(commissionSettings.type, type)];
+    if (entityId) {
+      conditions.push(eq3(commissionSettings.entityId, entityId));
+    }
+    const result = await this.db.select().from(commissionSettings).where(and2(...conditions));
+    return result[0] || null;
+  }
+  async getDefaultCommissionPercent() {
+    const setting = await this.getCommissionSettings("default");
+    return setting ? parseFloat(setting.commissionPercent?.toString() || "10") : 10;
+  }
+  // Withdrawal Requests
+  async createWithdrawalRequest(request) {
+    const result = await this.db.insert(withdrawalRequests2).values(request).returning();
+    return result[0];
+  }
+  async getWithdrawalRequests(entityId, entityType) {
+    return await this.db.select().from(withdrawalRequests2).where(and2(
+      eq3(withdrawalRequests2.entityId, entityId),
+      eq3(withdrawalRequests2.entityType, entityType)
+    )).orderBy(desc2(withdrawalRequests2.createdAt));
+  }
+  async getPendingWithdrawalRequests() {
+    return await this.db.select().from(withdrawalRequests2).where(eq3(withdrawalRequests2.status, "pending")).orderBy(desc2(withdrawalRequests2.createdAt));
+  }
+  async updateWithdrawalRequest(id, updates) {
+    const result = await this.db.update(withdrawalRequests2).set({ ...updates, updatedAt: /* @__PURE__ */ new Date() }).where(eq3(withdrawalRequests2.id, id)).returning();
+    return result[0];
+  }
+  async approveWithdrawalRequest(id, approvedBy) {
+    return await this.updateWithdrawalRequest(id, {
+      status: "approved",
+      approvedBy,
+      updatedAt: /* @__PURE__ */ new Date()
+    });
+  }
+  async rejectWithdrawalRequest(id, reason) {
+    return await this.updateWithdrawalRequest(id, {
+      status: "rejected",
+      rejectionReason: reason,
+      updatedAt: /* @__PURE__ */ new Date()
+    });
+  }
+  // Driver Work Sessions
+  async createWorkSession(session) {
+    const result = await this.db.insert(driverWorkSessions).values(session).returning();
+    return result[0];
+  }
+  async getActiveWorkSession(driverId) {
+    const result = await this.db.select().from(driverWorkSessions).where(and2(
+      eq3(driverWorkSessions.driverId, driverId),
+      eq3(driverWorkSessions.isActive, true)
+    )).orderBy(desc2(driverWorkSessions.createdAt));
+    return result[0] || null;
+  }
+  async endWorkSession(sessionId, totalDeliveries, totalEarnings) {
+    const result = await this.db.update(driverWorkSessions).set({
+      isActive: false,
+      endTime: /* @__PURE__ */ new Date(),
+      totalDeliveries,
+      totalEarnings: totalEarnings.toString()
+    }).where(eq3(driverWorkSessions.id, sessionId)).returning();
+    return result[0];
+  }
+  async getDriverWorkSessions(driverId, startDate, endDate) {
+    const conditions = [eq3(driverWorkSessions.driverId, driverId)];
+    if (startDate) {
+      conditions.push(gte(driverWorkSessions.createdAt, startDate));
+    }
+    if (endDate) {
+      conditions.push(lte(driverWorkSessions.createdAt, endDate));
+    }
+    return await this.db.select().from(driverWorkSessions).where(and2(...conditions)).orderBy(desc2(driverWorkSessions.createdAt));
+  }
+  // Analytics
+  async getDriverPerformanceStats(driverId, startDate, endDate) {
+    const conditions = [eq3(orders.driverId, driverId)];
+    if (startDate) {
+      conditions.push(gte(orders.createdAt, startDate));
+    }
+    if (endDate) {
+      conditions.push(lte(orders.createdAt, endDate));
+    }
+    const driverOrders = await this.db.select().from(orders).where(and2(...conditions));
+    const completedOrders = driverOrders.filter((o) => o.status === "delivered");
+    const totalEarnings = completedOrders.reduce((sum, o) => sum + parseFloat(o.driverEarnings?.toString() || "0"), 0);
+    const reviews = await this.getDriverReviews(driverId);
+    const avgRating = reviews.length > 0 ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length : 0;
+    return {
+      totalOrders: driverOrders.length,
+      completedOrders: completedOrders.length,
+      totalEarnings,
+      averageRating: avgRating,
+      totalReviews: reviews.length,
+      successRate: driverOrders.length > 0 ? completedOrders.length / driverOrders.length * 100 : 0
+    };
+  }
+  async getRestaurantPerformanceStats(restaurantId, startDate, endDate) {
+    const conditions = [eq3(orders.restaurantId, restaurantId)];
+    if (startDate) {
+      conditions.push(gte(orders.createdAt, startDate));
+    }
+    if (endDate) {
+      conditions.push(lte(orders.createdAt, endDate));
+    }
+    const restaurantOrders = await this.db.select().from(orders).where(and2(...conditions));
+    const completedOrders = restaurantOrders.filter((o) => o.status === "delivered");
+    const totalRevenue = restaurantOrders.reduce((sum, o) => sum + parseFloat(o.totalAmount?.toString() || "0"), 0);
+    const totalCommission = completedOrders.reduce((sum, o) => sum + parseFloat(o.companyEarnings?.toString() || "0"), 0);
+    const netRevenue = completedOrders.reduce((sum, o) => sum + parseFloat(o.restaurantEarnings?.toString() || "0"), 0);
+    return {
+      totalOrders: restaurantOrders.length,
+      completedOrders: completedOrders.length,
+      totalRevenue,
+      totalCommission,
+      netRevenue,
+      averageOrderValue: restaurantOrders.length > 0 ? totalRevenue / restaurantOrders.length : 0
+    };
+  }
+  // التقارير المتقدمة الجديدة
+  async getDailyRevenue(days = 30) {
+    const startDate = /* @__PURE__ */ new Date();
+    startDate.setDate(startDate.getDate() - days);
+    const recentOrders = await this.db.select().from(orders).where(and2(
+      eq3(orders.status, "delivered"),
+      gte(orders.createdAt, startDate)
+    ));
+    const revenueByDay = {};
+    for (let i = 0; i <= days; i++) {
+      const d = /* @__PURE__ */ new Date();
+      d.setDate(d.getDate() - i);
+      revenueByDay[d.toISOString().split("T")[0]] = 0;
+    }
+    recentOrders.forEach((order) => {
+      const day = order.createdAt.toISOString().split("T")[0];
+      if (revenueByDay[day] !== void 0) {
+        revenueByDay[day] += parseFloat(order.totalAmount?.toString() || "0");
+      }
+    });
+    return Object.entries(revenueByDay).map(([date, amount]) => ({ date, amount })).sort((a, b) => a.date.localeCompare(b.date));
+  }
+  async getCustomerRetentionStats() {
+    const allOrders = await this.db.select().from(orders);
+    const customerOrderCount = {};
+    allOrders.forEach((order) => {
+      if (order.customerId) {
+        customerOrderCount[order.customerId] = (customerOrderCount[order.customerId] || 0) + 1;
+      }
+    });
+    const counts = Object.values(customerOrderCount);
+    const totalCustomers = counts.length;
+    const returningCustomers = counts.filter((c) => c > 1).length;
+    const newCustomers = totalCustomers - returningCustomers;
+    return {
+      newCustomers,
+      returningCustomers,
+      retentionRate: totalCustomers > 0 ? returningCustomers / totalCustomers * 100 : 0
+    };
+  }
+  async getTopDeliveryAreas(limit = 5) {
+    const allOrders = await this.db.select().from(orders);
+    const areaCounts = {};
+    allOrders.forEach((order) => {
+      const address = order.deliveryAddress || "";
+      const area = address.split(",")[0].trim();
+      if (area) {
+        areaCounts[area] = (areaCounts[area] || 0) + 1;
+      }
+    });
+    return Object.entries(areaCounts).map(([name, count]) => ({ name, count })).sort((a, b) => b.count - a.count).slice(0, limit);
+  }
+  async getInactiveUsers(days = 7) {
+    const thresholdDate = /* @__PURE__ */ new Date();
+    thresholdDate.setDate(thresholdDate.getDate() - days);
+    const allUsers = await this.db.select().from(users);
+    const recentOrders = await this.db.select().from(orders).where(gte(orders.createdAt, thresholdDate));
+    const activeCustomerIds = new Set(recentOrders.map((o) => o.customerId).filter(Boolean));
+    const inactiveUsers = allUsers.filter((u) => !activeCustomerIds.has(u.id));
+    return inactiveUsers;
+  }
+};
+
+// server/routes/customer.ts
 var router2 = express4.Router();
 router2.post("/auth", async (req, res) => {
   try {
@@ -5001,7 +6084,6 @@ async function requireDriverAuth(req, res, next) {
 }
 
 // server/routes/driver.ts
-init_db_advanced();
 var router3 = express5.Router();
 router3.get("/", async (req, res) => {
   try {
@@ -5015,18 +6097,6 @@ router3.get("/", async (req, res) => {
     res.json(drivers2);
   } catch (error) {
     res.status(500).json({ message: "Failed to fetch drivers" });
-  }
-});
-router3.get("/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
-    const driver = await storage.getDriver(id);
-    if (!driver) {
-      return res.status(404).json({ message: "Driver not found" });
-    }
-    res.json(driver);
-  } catch (error) {
-    res.status(500).json({ message: "Failed to fetch driver" });
   }
 });
 router3.post("/", async (req, res) => {
@@ -5047,33 +6117,7 @@ router3.post("/", async (req, res) => {
     });
   }
 });
-router3.put("/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
-    const validatedData = insertDriverSchema.partial().parse(req.body);
-    const driver = await storage.updateDriver(id, validatedData);
-    if (!driver) {
-      return res.status(404).json({ message: "Driver not found" });
-    }
-    res.json(driver);
-  } catch (error) {
-    res.status(400).json({ message: "Invalid driver data" });
-  }
-});
-router3.delete("/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
-    const success = await storage.deleteDriver(id);
-    if (!success) {
-      return res.status(404).json({ message: "Driver not found" });
-    }
-    res.status(204).send();
-  } catch (error) {
-    res.status(500).json({ message: "Failed to delete driver" });
-  }
-});
-router3.use(requireDriverAuth);
-router3.get("/app/dashboard", async (req, res) => {
+router3.get("/app/dashboard", requireDriverAuth, async (req, res) => {
   try {
     const driverId = req.driverId;
     const driver = await storage.getDriver(driverId);
@@ -5114,7 +6158,7 @@ router3.get("/app/dashboard", async (req, res) => {
     );
     const availableOrders = allOrders.filter((order) => (order.status === "confirmed" || order.status === "assigned") && order.driverId === driverId).slice(0, 10);
     const currentOrders = driverOrders.filter(
-      (order) => ["ready", "picked_up", "on_way"].includes(order.status)
+      (order) => ["preparing", "ready", "picked_up", "on_way"].includes(order.status)
     );
     res.json({
       stats: {
@@ -5149,7 +6193,21 @@ router3.get("/app/dashboard", async (req, res) => {
     res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
   }
 });
-router3.get("/orders", async (req, res) => {
+router3.get("/orders/available", requireDriverAuth, async (req, res) => {
+  try {
+    const driverId = req.driverId;
+    const allOrders = await storage.getOrders();
+    const availableOrders = allOrders.filter(
+      (order) => (order.status === "confirmed" || order.status === "assigned") && order.driverId === driverId
+    );
+    availableOrders.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    res.json(availableOrders);
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u062C\u0644\u0628 \u0627\u0644\u0637\u0644\u0628\u0627\u062A \u0627\u0644\u0645\u062A\u0627\u062D\u0629:", error);
+    res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
+router3.get("/orders", requireDriverAuth, async (req, res) => {
   try {
     const driverId = req.driverId;
     const { status } = req.query;
@@ -5157,7 +6215,7 @@ router3.get("/orders", async (req, res) => {
     let driverOrders = allOrders.filter((order) => order.driverId === driverId);
     if (status === "active") {
       driverOrders = driverOrders.filter(
-        (order) => ["ready", "picked_up", "on_way"].includes(order.status)
+        (order) => ["preparing", "ready", "picked_up", "on_way"].includes(order.status)
       );
     } else if (status === "history") {
       driverOrders = driverOrders.filter(
@@ -5173,21 +6231,7 @@ router3.get("/orders", async (req, res) => {
     res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
   }
 });
-router3.get("/orders/available", async (req, res) => {
-  try {
-    const driverId = req.driverId;
-    const allOrders = await storage.getOrders();
-    const availableOrders = allOrders.filter(
-      (order) => (order.status === "confirmed" || order.status === "assigned") && order.driverId === driverId
-    );
-    availableOrders.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
-    res.json(availableOrders);
-  } catch (error) {
-    console.error("\u062E\u0637\u0623 \u0641\u064A \u062C\u0644\u0628 \u0627\u0644\u0637\u0644\u0628\u0627\u062A \u0627\u0644\u0645\u062A\u0627\u062D\u0629:", error);
-    res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
-  }
-});
-router3.post("/orders/:id/accept", async (req, res) => {
+router3.post("/orders/:id/accept", requireDriverAuth, async (req, res) => {
   try {
     const { id } = req.params;
     const driverId = req.driverId;
@@ -5199,8 +6243,8 @@ router3.post("/orders/:id/accept", async (req, res) => {
       return res.status(400).json({ error: "\u0644\u0627 \u064A\u0645\u0643\u0646 \u0642\u0628\u0648\u0644 \u0647\u0630\u0627 \u0627\u0644\u0637\u0644\u0628" });
     }
     const commissionRate = parseFloat(driver.commissionRate?.toString() || "70");
-    const orderAmount = parseFloat(order.totalAmount) || 0;
-    const commissionAmount = orderAmount * commissionRate / 100;
+    const deliveryFee = parseFloat(order.deliveryFee?.toString() || "0") || 0;
+    const commissionAmount = deliveryFee * commissionRate / 100;
     const updatedOrder = await storage.updateOrder(id, {
       driverId,
       status: "ready",
@@ -5216,7 +6260,7 @@ router3.post("/orders/:id/accept", async (req, res) => {
     res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
   }
 });
-router3.put("/orders/:id/status", async (req, res) => {
+router3.put("/orders/:id/status", requireDriverAuth, async (req, res) => {
   try {
     const { id } = req.params;
     const { status, location } = req.body;
@@ -5224,42 +6268,60 @@ router3.put("/orders/:id/status", async (req, res) => {
     const order = await storage.getOrder(id);
     if (!order) return res.status(404).json({ error: "\u0627\u0644\u0637\u0644\u0628 \u063A\u064A\u0631 \u0645\u0648\u062C\u0648\u062F" });
     if (order.driverId !== driverId) return res.status(403).json({ error: "\u063A\u064A\u0631 \u0645\u0635\u0631\u062D \u0644\u0643" });
-    const allowedStatuses = ["ready", "picked_up", "on_way", "delivered"];
+    const allowedStatuses = ["preparing", "ready", "picked_up", "on_way", "delivered"];
     if (!allowedStatuses.includes(status)) return res.status(400).json({ error: "\u062D\u0627\u0644\u0629 \u063A\u064A\u0631 \u0635\u062D\u064A\u062D\u0629" });
-    const updateData = { status };
-    if (location) updateData.currentLocation = location;
-    if (status === "delivered") {
-      updateData.actualDeliveryTime = /* @__PURE__ */ new Date();
-      if (order.driverCommissionAmount && !order.commissionProcessed) {
-        await storage.createDriverCommission({
-          driverId,
-          orderId: id,
-          orderAmount: parseFloat(order.totalAmount) || 0,
-          commissionRate: order.driverCommissionRate || 70,
-          commissionAmount: parseFloat(order.driverCommissionAmount) || 0,
-          status: "approved"
-        });
-        await storage.updateDriverBalance(driverId, {
-          amount: parseFloat(order.driverCommissionAmount) || 0,
-          type: "commission",
-          description: `\u0639\u0645\u0648\u0644\u0629 \u062A\u0648\u0635\u064A\u0644 \u0627\u0644\u0637\u0644\u0628 \u0631\u0642\u0645: ${order.orderNumber}`,
-          orderId: order.id
-        });
-        const driver = await storage.getDriver(driverId);
-        if (driver) {
-          const currentEarnings = parseFloat(driver.earnings?.toString() || "0");
-          const commissionAmount = parseFloat(order.driverCommissionAmount) || 0;
-          await storage.updateDriver(driverId, {
-            completedOrders: (driver.completedOrders || 0) + 1,
-            earnings: (currentEarnings + commissionAmount).toString(),
-            isAvailable: true
-            // إتاحة السائق للطلبات الجديدة بعد التوصيل
-          });
-        }
-        updateData.commissionProcessed = true;
-      }
+    if (location) {
+      await storage.updateDriver(driverId, { currentLocation: location });
     }
-    const updatedOrder = await storage.updateOrder(id, updateData);
+    let updatedOrder;
+    if (status === "delivered") {
+      updatedOrder = await storage.completeOrder(id);
+    } else {
+      updatedOrder = await storage.updateOrder(id, { status });
+    }
+    try {
+      const statusMessages = {
+        preparing: "\u062C\u0627\u0631\u064A \u062A\u062D\u0636\u064A\u0631 \u0627\u0644\u0637\u0644\u0628",
+        ready: "\u0627\u0644\u0637\u0644\u0628 \u062C\u0627\u0647\u0632 \u0644\u0644\u0627\u0633\u062A\u0644\u0627\u0645",
+        picked_up: "\u062A\u0645 \u0627\u0633\u062A\u0644\u0627\u0645 \u0627\u0644\u0637\u0644\u0628 \u0645\u0646 \u0627\u0644\u0645\u0637\u0639\u0645",
+        on_way: "\u0627\u0644\u0633\u0627\u0626\u0642 \u0641\u064A \u0627\u0644\u0637\u0631\u064A\u0642 \u0625\u0644\u064A\u0643",
+        delivered: "\u062A\u0645 \u062A\u0633\u0644\u064A\u0645 \u0627\u0644\u0637\u0644\u0628 \u0628\u0646\u062C\u0627\u062D"
+      };
+      const statusMessage = statusMessages[status] || `\u062A\u0645 \u062A\u062D\u062F\u064A\u062B \u062D\u0627\u0644\u0629 \u0627\u0644\u0637\u0644\u0628 \u0625\u0644\u0649 ${status}`;
+      if (order.customerId || order.customerPhone) {
+        await storage.createNotification({
+          type: "order_status_update",
+          title: "\u062A\u062D\u062F\u064A\u062B \u062D\u0627\u0644\u0629 \u0627\u0644\u0637\u0644\u0628",
+          message: `\u0637\u0644\u0628\u0643 \u0631\u0642\u0645 ${order.orderNumber}: ${statusMessage}`,
+          recipientType: "customer",
+          recipientId: order.customerId || order.customerPhone,
+          orderId: id,
+          isRead: false
+        });
+      }
+      try {
+        await storage.createOrderTracking({
+          orderId: id,
+          status,
+          message: statusMessage,
+          createdBy: driverId,
+          createdByType: "driver"
+        });
+      } catch (trackErr) {
+        console.error("\u062E\u0637\u0623 \u0641\u064A \u0625\u0646\u0634\u0627\u0621 \u0642\u064A\u062F \u0627\u0644\u062A\u062A\u0628\u0639:", trackErr);
+      }
+      await storage.createNotification({
+        type: "order_status_update",
+        title: "\u062A\u062D\u062F\u064A\u062B \u062D\u0627\u0644\u0629 \u0627\u0644\u0637\u0644\u0628 \u0645\u0646 \u0627\u0644\u0633\u0627\u0626\u0642",
+        message: `\u0627\u0644\u0637\u0644\u0628 ${order.orderNumber}: ${statusMessage}`,
+        recipientType: "admin",
+        recipientId: null,
+        orderId: id,
+        isRead: false
+      });
+    } catch (notifErr) {
+      console.error("\u062E\u0637\u0623 \u0641\u064A \u0625\u0646\u0634\u0627\u0621 \u0625\u0634\u0639\u0627\u0631\u0627\u062A \u0627\u0644\u0633\u0627\u0626\u0642:", notifErr);
+    }
     const ws = req.app.get("ws");
     if (ws) ws.broadcast("order_update", { orderId: id, status, driverId });
     res.json({ success: true, order: updatedOrder });
@@ -5268,7 +6330,34 @@ router3.put("/orders/:id/status", async (req, res) => {
     res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
   }
 });
-router3.get("/orders/:id", async (req, res) => {
+router3.post("/location", requireDriverAuth, async (req, res) => {
+  try {
+    const driverId = req.driverId;
+    const { latitude, longitude, currentLocation } = req.body;
+    if (!latitude || !longitude) {
+      return res.status(400).json({ error: "\u0627\u0644\u0625\u062D\u062F\u0627\u062B\u064A\u0627\u062A \u0645\u0637\u0644\u0648\u0628\u0629" });
+    }
+    await storage.updateDriver(driverId, {
+      latitude: latitude.toString(),
+      longitude: longitude.toString(),
+      currentLocation: currentLocation || void 0
+    });
+    const ws = req.app.get("ws");
+    if (ws) {
+      ws.broadcast("driver_location", {
+        driverId,
+        latitude,
+        longitude,
+        timestamp: /* @__PURE__ */ new Date()
+      });
+    }
+    res.json({ success: true });
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u062A\u062D\u062F\u064A\u062B \u0627\u0644\u0645\u0648\u0642\u0639:", error);
+    res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
+router3.get("/orders/:id", requireDriverAuth, async (req, res) => {
   try {
     const { id } = req.params;
     const driverId = req.driverId;
@@ -5279,7 +6368,7 @@ router3.get("/orders/:id", async (req, res) => {
     res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
   }
 });
-router3.get("/stats", async (req, res) => {
+router3.get("/stats", requireDriverAuth, async (req, res) => {
   try {
     const driverId = req.driverId;
     const driver = await storage.getDriver(driverId);
@@ -5306,7 +6395,7 @@ router3.get("/stats", async (req, res) => {
     res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
   }
 });
-router3.get("/balance", async (req, res) => {
+router3.get("/balance", requireDriverAuth, async (req, res) => {
   try {
     const driverId = req.driverId;
     const balance = await storage.getDriverBalance(driverId);
@@ -5321,7 +6410,7 @@ router3.get("/balance", async (req, res) => {
     res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
   }
 });
-router3.post("/status", async (req, res) => {
+router3.post("/status", requireDriverAuth, async (req, res) => {
   try {
     const driverId = req.driverId;
     const { status } = req.body;
@@ -5363,7 +6452,34 @@ router3.post("/status", async (req, res) => {
     res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
   }
 });
-router3.post("/withdraw", async (req, res) => {
+router3.post("/location", requireDriverAuth, async (req, res) => {
+  try {
+    const driverId = req.driverId;
+    const { latitude, longitude, address } = req.body;
+    if (latitude === void 0 || longitude === void 0) {
+      return res.status(400).json({ error: "\u0627\u0644\u0625\u062D\u062F\u0627\u062B\u064A\u0627\u062A \u0645\u0637\u0644\u0648\u0628\u0629" });
+    }
+    await storage.updateDriver(driverId, {
+      latitude: latitude.toString(),
+      longitude: longitude.toString(),
+      currentLocation: address || void 0
+    });
+    const ws = req.app.get("ws");
+    if (ws) {
+      ws.broadcast("driver_location", {
+        driverId,
+        latitude,
+        longitude,
+        timestamp: /* @__PURE__ */ new Date()
+      });
+    }
+    res.json({ success: true });
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u062A\u062D\u062F\u064A\u062B \u0645\u0648\u0642\u0639 \u0627\u0644\u0633\u0627\u0626\u0642:", error);
+    res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
+router3.post("/withdraw", requireDriverAuth, async (req, res) => {
   try {
     const driverId = req.driverId;
     const { amount, method, details } = req.body;
@@ -5384,7 +6500,7 @@ router3.post("/withdraw", async (req, res) => {
     res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
   }
 });
-router3.get("/profile", async (req, res) => {
+router3.get("/profile", requireDriverAuth, async (req, res) => {
   try {
     const driverId = req.driverId;
     const driver = await storage.getDriver(driverId);
@@ -5394,7 +6510,7 @@ router3.get("/profile", async (req, res) => {
     res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
   }
 });
-router3.put("/profile", async (req, res) => {
+router3.put("/profile", requireDriverAuth, async (req, res) => {
   try {
     const driverId = req.driverId;
     const coercedData = coerceRequestData(req.body);
@@ -5423,16 +6539,129 @@ router3.put("/profile", async (req, res) => {
     res.status(400).json({ error: "\u0628\u064A\u0627\u0646\u0627\u062A \u063A\u064A\u0631 \u0635\u062D\u064A\u062D\u0629" });
   }
 });
+router3.get("/wasalni", requireDriverAuth, async (req, res) => {
+  try {
+    const driverId = req.driverId;
+    const { status } = req.query;
+    const db5 = storage.db;
+    if (!db5) return res.status(500).json({ error: "Database not available" });
+    const { wasalniRequests: wasalniRequests3 } = await Promise.resolve().then(() => (init_schema(), schema_exports));
+    const { eq: eq10 } = await import("drizzle-orm");
+    let results = await db5.select().from(wasalniRequests3).where(eq10(wasalniRequests3.driverId, driverId));
+    if (status === "available") {
+      results = results.filter((r) => r.status === "confirmed");
+    } else if (status === "active") {
+      results = results.filter((r) => ["confirmed", "on_way"].includes(r.status));
+    } else if (status === "history") {
+      results = results.filter((r) => ["delivered", "cancelled"].includes(r.status));
+    }
+    results.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    res.json(results);
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u062C\u0644\u0628 \u0637\u0644\u0628\u0627\u062A \u0648\u0635\u0644 \u0644\u064A \u0644\u0644\u0633\u0627\u0626\u0642:", error);
+    res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
+router3.put("/wasalni/:id/status", requireDriverAuth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+    const driverId = req.driverId;
+    const db5 = storage.db;
+    if (!db5) return res.status(500).json({ error: "Database not available" });
+    const { wasalniRequests: wasalniRequests3 } = await Promise.resolve().then(() => (init_schema(), schema_exports));
+    const { eq: eq10 } = await import("drizzle-orm");
+    const [request] = await db5.select().from(wasalniRequests3).where(eq10(wasalniRequests3.id, id));
+    if (!request) return res.status(404).json({ error: "\u0627\u0644\u0637\u0644\u0628 \u063A\u064A\u0631 \u0645\u0648\u062C\u0648\u062F" });
+    if (request.driverId !== driverId) return res.status(403).json({ error: "\u063A\u064A\u0631 \u0645\u0635\u0631\u062D \u0644\u0643 \u0628\u062A\u062D\u062F\u064A\u062B \u0647\u0630\u0627 \u0627\u0644\u0637\u0644\u0628" });
+    const allowedStatuses = ["on_way", "delivered", "cancelled"];
+    if (!allowedStatuses.includes(status)) return res.status(400).json({ error: "\u062D\u0627\u0644\u0629 \u063A\u064A\u0631 \u0635\u062D\u064A\u062D\u0629" });
+    const [updated] = await db5.update(wasalniRequests3).set({ status, updatedAt: /* @__PURE__ */ new Date() }).where(eq10(wasalniRequests3.id, id)).returning();
+    const ws = req.app.get("ws");
+    if (ws) {
+      ws.broadcast("order_update", { orderId: id, status, type: "wasalni", driverId });
+    }
+    const statusMessages = {
+      on_way: "\u0627\u0644\u0633\u0627\u0626\u0642 \u0641\u064A \u0637\u0631\u064A\u0642\u0647 \u0644\u0627\u0633\u062A\u0644\u0627\u0645 \u0637\u0644\u0628\u0643",
+      delivered: "\u062A\u0645 \u062A\u0646\u0641\u064A\u0630 \u0637\u0644\u0628 \u0648\u0635\u0644 \u0644\u064A \u0628\u0646\u062C\u0627\u062D",
+      cancelled: "\u062A\u0645 \u0625\u0644\u063A\u0627\u0621 \u0637\u0644\u0628 \u0648\u0635\u0644 \u0644\u064A \u0645\u0646 \u0642\u0650\u0628\u0644 \u0627\u0644\u0633\u0627\u0626\u0642"
+    };
+    if (request.customerId || request.customerPhone) {
+      await storage.createNotification({
+        type: "wasalni_status_update",
+        title: "\u062A\u062D\u062F\u064A\u062B \u0637\u0644\u0628 \u0648\u0635\u0644 \u0644\u064A",
+        message: `${statusMessages[status] || "\u062A\u0645 \u062A\u062D\u062F\u064A\u062B \u062D\u0627\u0644\u0629 \u0627\u0644\u0637\u0644\u0628"} - \u0631\u0642\u0645 \u0627\u0644\u0637\u0644\u0628: ${request.requestNumber}`,
+        recipientType: "customer",
+        recipientId: request.customerId || request.customerPhone,
+        orderId: id,
+        isRead: false
+      });
+    }
+    await storage.createNotification({
+      type: "wasalni_status_update",
+      title: "\u062A\u062D\u062F\u064A\u062B \u0648\u0635\u0644 \u0644\u064A \u0645\u0646 \u0627\u0644\u0633\u0627\u0626\u0642",
+      message: `\u0627\u0644\u0637\u0644\u0628 ${request.requestNumber}: ${statusMessages[status] || status}`,
+      recipientType: "admin",
+      recipientId: null,
+      orderId: id,
+      isRead: false
+    });
+    if (status === "delivered" || status === "cancelled") {
+      await storage.updateDriver(driverId, { isAvailable: true });
+    }
+    res.json({ success: true, request: updated });
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u062A\u062D\u062F\u064A\u062B \u062D\u0627\u0644\u0629 \u0648\u0635\u0644 \u0644\u064A:", error);
+    res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
+router3.get("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const driver = await storage.getDriver(id);
+    if (!driver) {
+      return res.status(404).json({ message: "Driver not found" });
+    }
+    res.json(driver);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch driver" });
+  }
+});
+router3.put("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const validatedData = insertDriverSchema.partial().parse(req.body);
+    const driver = await storage.updateDriver(id, validatedData);
+    if (!driver) {
+      return res.status(404).json({ message: "Driver not found" });
+    }
+    res.json(driver);
+  } catch (error) {
+    res.status(400).json({ message: "Invalid driver data" });
+  }
+});
+router3.delete("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const success = await storage.deleteDriver(id);
+    if (!success) {
+      return res.status(404).json({ message: "Driver not found" });
+    }
+    res.status(204).send();
+  } catch (error) {
+    res.status(500).json({ message: "Failed to delete driver" });
+  }
+});
 var driver_default = router3;
 
 // server/routes/orders.ts
 import express6 from "express";
 
 // server/services/deliveryFeeService.ts
-var DEFAULT_BASE_FEE = 500;
-var DEFAULT_PER_KM_FEE = 200;
-var DEFAULT_MIN_FEE = 3e3;
-var DEFAULT_MAX_FEE = 5e4;
+var DEFAULT_BASE_FEE = 5;
+var DEFAULT_PER_KM_FEE = 2;
+var DEFAULT_MIN_FEE = 3;
+var DEFAULT_MAX_FEE = 50;
 var EARTH_RADIUS_KM = 6371;
 function calculateDistance(point1, point2) {
   const lat1Rad = toRadians(point1.lat);
@@ -5478,23 +6707,8 @@ function estimateDeliveryTime(distanceKm) {
     return `${minHours}-${maxHours} \u0633\u0627\u0639\u0629`;
   }
 }
-async function getDeliveryFeeSettings(restaurantId) {
+async function getDeliveryFeeSettings() {
   try {
-    if (restaurantId) {
-      const restaurantSettings = await storage.getDeliveryFeeSettings(restaurantId);
-      if (restaurantSettings && restaurantSettings.type) {
-        return {
-          type: restaurantSettings.type,
-          baseFee: Math.max(0, parseFloat(restaurantSettings.baseFee || "0")),
-          perKmFee: Math.max(0, parseFloat(restaurantSettings.perKmFee || "0")),
-          minFee: Math.max(0, parseFloat(restaurantSettings.minFee || "0")),
-          maxFee: Math.max(DEFAULT_MIN_FEE, parseFloat(restaurantSettings.maxFee || DEFAULT_MAX_FEE.toString())),
-          freeDeliveryThreshold: Math.max(0, parseFloat(restaurantSettings.freeDeliveryThreshold || "0")),
-          storeLat: restaurantSettings.storeLat ? parseFloat(restaurantSettings.storeLat) : void 0,
-          storeLng: restaurantSettings.storeLng ? parseFloat(restaurantSettings.storeLng) : void 0
-        };
-      }
-    }
     const globalSettings = await storage.getDeliveryFeeSettings();
     if (globalSettings && globalSettings.type) {
       return {
@@ -5502,16 +6716,13 @@ async function getDeliveryFeeSettings(restaurantId) {
         baseFee: Math.max(0, parseFloat(globalSettings.baseFee || "0")),
         perKmFee: Math.max(0, parseFloat(globalSettings.perKmFee || "0")),
         minFee: Math.max(0, parseFloat(globalSettings.minFee || "0")),
-        maxFee: Math.max(DEFAULT_MIN_FEE, parseFloat(globalSettings.maxFee || DEFAULT_MAX_FEE.toString())),
-        freeDeliveryThreshold: Math.max(0, parseFloat(globalSettings.freeDeliveryThreshold || "0")),
-        storeLat: globalSettings.storeLat ? parseFloat(globalSettings.storeLat) : void 0,
-        storeLng: globalSettings.storeLng ? parseFloat(globalSettings.storeLng) : void 0
+        maxFee: Math.max(0, parseFloat(globalSettings.maxFee || DEFAULT_MAX_FEE.toString())),
+        freeDeliveryThreshold: Math.max(0, parseFloat(globalSettings.freeDeliveryThreshold || "0"))
       };
     }
   } catch (error) {
     console.error("Error fetching delivery fee settings:", error);
   }
-  console.warn("Using default delivery fee settings");
   return {
     type: "per_km",
     baseFee: DEFAULT_BASE_FEE,
@@ -5522,27 +6733,18 @@ async function getDeliveryFeeSettings(restaurantId) {
   };
 }
 async function calculateDeliveryFee(customerLocation, restaurantId, orderSubtotal) {
-  const [geoZones2, deliveryRules2, discounts, deliverySettings, storeLat, storeLng, restaurant] = await Promise.all([
+  const [geoZones2, deliveryRules2, discounts, deliverySettings, restaurant] = await Promise.all([
     storage.getGeoZones(),
     storage.getDeliveryRules(),
     storage.getDeliveryDiscounts(),
-    getDeliveryFeeSettings(restaurantId || void 0),
-    storage.getUiSetting("store_lat"),
-    storage.getUiSetting("store_lng"),
+    getDeliveryFeeSettings(),
     restaurantId ? storage.getRestaurant(restaurantId) : Promise.resolve(null)
   ]);
-  const activeGeoZones = geoZones2.filter((z5) => z5.isActive);
+  const activeGeoZones = geoZones2.filter((z6) => z6.isActive);
   const activeRules = deliveryRules2.filter((r) => r.isActive);
   const activeDiscounts = discounts.filter((d) => d.isActive);
   let storeLocation = { lat: 0, lng: 0 };
-  if (deliverySettings.storeLat && deliverySettings.storeLng) {
-    storeLocation = { lat: deliverySettings.storeLat, lng: deliverySettings.storeLng };
-  } else if (storeLat && storeLng) {
-    storeLocation = {
-      lat: parseFloat(storeLat.value),
-      lng: parseFloat(storeLng.value)
-    };
-  } else if (restaurant && restaurant.latitude && restaurant.longitude) {
+  if (restaurant && restaurant.latitude && restaurant.longitude) {
     storeLocation = {
       lat: parseFloat(restaurant.latitude),
       lng: parseFloat(restaurant.longitude)
@@ -5805,15 +7007,71 @@ router4.post("/", async (req, res) => {
         error: "\u0628\u064A\u0627\u0646\u0627\u062A \u0646\u0627\u0642\u0635\u0629: \u0627\u0644\u0627\u0633\u0645\u060C \u0627\u0644\u0647\u0627\u062A\u0641\u060C \u0627\u0644\u0639\u0646\u0648\u0627\u0646\u060C \u0648\u0627\u0644\u0639\u0646\u0627\u0635\u0631 \u0645\u0637\u0644\u0648\u0628\u0629"
       });
     }
+    try {
+      const recentOrders = await storage.getOrdersByCustomer(customerPhone);
+      const sixtySecondsAgo = new Date(Date.now() - 60 * 1e3);
+      const incomingTotal = parseFloat(String(totalAmount));
+      const isDuplicate = recentOrders.some((order2) => {
+        const orderTime = new Date(order2.createdAt);
+        const orderTotal = parseFloat(order2.totalAmount);
+        return orderTime > sixtySecondsAgo && Math.abs(orderTotal - incomingTotal) < 0.01 && order2.status !== "cancelled";
+      });
+      if (isDuplicate) {
+        return res.status(400).json({
+          error: "\u0644\u0642\u062F \u0642\u0645\u062A \u0628\u0625\u0631\u0633\u0627\u0644 \u0637\u0644\u0628 \u0645\u0645\u0627\u062B\u0644 \u0645\u0624\u062E\u0631\u0627\u064B\u060C \u064A\u0631\u062C\u0649 \u0627\u0644\u0627\u0646\u062A\u0638\u0627\u0631 \u062F\u0642\u064A\u0642\u0629 \u0648\u0627\u062D\u062F\u0629 \u0623\u0648 \u0627\u0644\u062A\u062D\u0642\u0642 \u0645\u0646 \u0642\u0627\u0626\u0645\u0629 \u0637\u0644\u0628\u0627\u062A\u0643 \u0644\u0644\u062A\u0623\u0643\u062F \u0645\u0646 \u0648\u0635\u0648\u0644 \u0627\u0644\u0637\u0644\u0628"
+        });
+      }
+    } catch (err) {
+      console.error("\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062A\u062D\u0642\u0642 \u0645\u0646 \u0627\u0644\u0637\u0644\u0628\u0627\u062A \u0627\u0644\u0645\u062A\u0643\u0631\u0631\u0629:", err);
+    }
+    const isScheduledOrder = deliveryPreference === "scheduled";
+    try {
+      const allSettings = await storage.getUiSettings();
+      const settingsMap = new Map(allSettings.map((s) => [s.key, s.value]));
+      const storeStatus = settingsMap.get("store_status");
+      const openingTime = settingsMap.get("opening_time") || "08:00";
+      const closingTime = settingsMap.get("closing_time") || "23:00";
+      const allowScheduledWhenClosed = settingsMap.get("allow_scheduled_orders_when_closed") !== "false";
+      if (storeStatus === "closed") {
+        if (!isScheduledOrder || !allowScheduledWhenClosed) {
+          return res.status(400).json({
+            error: "\u0627\u0644\u062A\u0637\u0628\u064A\u0642 \u0645\u063A\u0644\u0642 \u062D\u0627\u0644\u064A\u0627\u064B \u0645\u0646 \u0642\u0650\u0628\u0644 \u0627\u0644\u0625\u062F\u0627\u0631\u0629",
+            code: "APP_CLOSED",
+            message: "\u0627\u0644\u062A\u0637\u0628\u064A\u0642 \u0645\u063A\u0644\u0642 \u062D\u0627\u0644\u064A\u0627\u064B \u0645\u0646 \u0642\u0650\u0628\u0644 \u0627\u0644\u0625\u062F\u0627\u0631\u0629"
+          });
+        }
+      }
+      if (storeStatus === "open") {
+      } else if (!isScheduledOrder) {
+        const now = /* @__PURE__ */ new Date();
+        const currentTime = now.toTimeString().slice(0, 5);
+        const timeToMinutes2 = (t) => {
+          const [h, m] = t.split(":").map(Number);
+          return h * 60 + m;
+        };
+        const current = timeToMinutes2(currentTime);
+        const open = timeToMinutes2(openingTime);
+        const close = timeToMinutes2(closingTime);
+        let appIsOpen = close > open ? current >= open && current < close : current >= open || current < close;
+        if (!appIsOpen) {
+          const isBeforeOpen = current < open;
+          const whenOpen = isBeforeOpen ? `\u064A\u0641\u062A\u062D \u0627\u0644\u064A\u0648\u0645 \u0627\u0644\u0633\u0627\u0639\u0629 ${openingTime}` : `\u064A\u0641\u062A\u062D \u063A\u062F\u0627\u064B \u0627\u0644\u0633\u0627\u0639\u0629 ${openingTime}`;
+          return res.status(400).json({
+            error: `\u0627\u0644\u062A\u0637\u0628\u064A\u0642 \u0645\u063A\u0644\u0642 \u062D\u0627\u0644\u064A\u0627\u064B. ${whenOpen}`
+          });
+        }
+      }
+    } catch (_) {
+    }
     let restaurant = null;
     if (restaurantId) {
       restaurant = await storage.getRestaurant(restaurantId);
     }
     if (restaurant) {
-      const orderStatus = canOrderFromRestaurant(restaurant);
-      if (!orderStatus.canOrder) {
+      const orderStatus2 = canOrderFromRestaurant(restaurant);
+      if (!orderStatus2.canOrder) {
         return res.status(400).json({
-          error: orderStatus.message || "\u0627\u0644\u0645\u0637\u0639\u0645 \u0645\u063A\u0644\u0642 \u062D\u0627\u0644\u064A\u0627\u064B"
+          error: orderStatus2.message || "\u0627\u0644\u0645\u0637\u0639\u0645 \u0645\u063A\u0644\u0642 \u062D\u0627\u0644\u064A\u0627\u064B"
         });
       }
     }
@@ -5854,8 +7112,9 @@ router4.post("/", async (req, res) => {
       restaurantCommissionAmount = subtotalNum;
     }
     const defaultDriverCommissionRate = 70;
-    const driverEarnings2 = deliveryFeeNum * defaultDriverCommissionRate / 100;
-    const companyEarnings = restaurantCommissionAmount + (deliveryFeeNum - driverEarnings2);
+    const driverEarnings = deliveryFeeNum * defaultDriverCommissionRate / 100;
+    const companyEarnings = restaurantCommissionAmount + (deliveryFeeNum - driverEarnings);
+    const orderStatus = isScheduledOrder ? "scheduled" : "pending";
     const orderData = {
       orderNumber,
       customerName: customerName.trim(),
@@ -5867,14 +7126,14 @@ router4.post("/", async (req, res) => {
       customerLocationLng: customerLocationLng ? String(customerLocationLng) : null,
       notes: notes ? notes.trim() : null,
       paymentMethod: paymentMethod || "cash",
-      status: "pending",
+      status: orderStatus,
       items: itemsString,
       subtotal: String(subtotalNum),
       deliveryFee: String(deliveryFeeNum),
       distance: String(distance),
       total: String(subtotalNum + deliveryFeeNum),
       totalAmount: String(subtotalNum + deliveryFeeNum),
-      driverEarnings: String(driverEarnings2),
+      driverEarnings: String(driverEarnings),
       restaurantEarnings: String(restaurantEarnings2),
       companyEarnings: String(companyEarnings),
       restaurantId: restaurantId || null,
@@ -5896,19 +7155,32 @@ router4.post("/", async (req, res) => {
           isRead: false
         });
       }
+      const adminNotifTitle = isScheduledOrder ? "\u0637\u0644\u0628 \u0645\u062C\u062F\u0648\u0644 \u062C\u062F\u064A\u062F" : "\u0637\u0644\u0628 \u062C\u062F\u064A\u062F \u0641\u064A \u0627\u0646\u062A\u0638\u0627\u0631 \u0627\u0644\u062A\u0639\u064A\u064A\u0646";
+      const adminNotifMsg = isScheduledOrder ? `\u0637\u0644\u0628 \u0645\u062C\u062F\u0648\u0644 \u0631\u0642\u0645 ${orderNumber} \u0645\u0646 ${customerName}. \u0645\u0648\u0639\u062F \u0627\u0644\u062A\u0648\u0635\u064A\u0644: ${req.body.scheduledDate} ${req.body.scheduledTimeSlot}` : `\u0637\u0644\u0628 \u062C\u062F\u064A\u062F \u0631\u0642\u0645 ${orderNumber} \u0645\u0646 ${customerName} \u0641\u064A \u0627\u0646\u062A\u0638\u0627\u0631 \u062A\u0639\u064A\u064A\u0646 \u0633\u0627\u0626\u0642. \u0627\u0644\u0645\u0648\u0642\u0639: ${deliveryAddress}`;
       await storage.createNotification({
-        type: "new_order_pending_assignment",
-        title: "\u0637\u0644\u0628 \u062C\u062F\u064A\u062F \u0641\u064A \u0627\u0646\u062A\u0638\u0627\u0631 \u0627\u0644\u062A\u0639\u064A\u064A\u0646",
-        message: `\u0637\u0644\u0628 \u062C\u062F\u064A\u062F \u0631\u0642\u0645 ${orderNumber} \u0645\u0646 ${customerName} \u0641\u064A \u0627\u0646\u062A\u0638\u0627\u0631 \u062A\u0639\u064A\u064A\u0646 \u0633\u0627\u0626\u0642. \u0627\u0644\u0645\u0648\u0642\u0639: ${deliveryAddress}`,
+        type: isScheduledOrder ? "new_scheduled_order" : "new_order_pending_assignment",
+        title: adminNotifTitle,
+        message: adminNotifMsg,
         recipientType: "admin",
         recipientId: null,
         orderId: order.id,
         isRead: false
       });
+      if (customerId || customerPhone) {
+        await storage.createNotification({
+          type: "order_status_update",
+          title: isScheduledOrder ? "\u062A\u0645 \u062C\u062F\u0648\u0644\u0629 \u0637\u0644\u0628\u0643" : "\u062A\u0645 \u0627\u0633\u062A\u0644\u0627\u0645 \u0637\u0644\u0628\u0643",
+          message: isScheduledOrder ? `\u062A\u0645 \u062C\u062F\u0648\u0644\u0629 \u0637\u0644\u0628\u0643 \u0631\u0642\u0645 ${orderNumber} \u0644\u0644\u062A\u0648\u0635\u064A\u0644 \u0641\u064A ${req.body.scheduledDate} ${req.body.scheduledTimeSlot}` : `\u062A\u0645 \u0627\u0633\u062A\u0644\u0627\u0645 \u0637\u0644\u0628\u0643 \u0631\u0642\u0645 ${orderNumber} \u0648\u0647\u0648 \u0642\u064A\u062F \u0627\u0644\u0645\u0631\u0627\u062C\u0639\u0629 \u062D\u0627\u0644\u064A\u0627\u064B`,
+          recipientType: "customer",
+          recipientId: customerId || customerPhone,
+          orderId: order.id,
+          isRead: false
+        });
+      }
       await storage.createOrderTracking({
         orderId: order.id,
-        status: "pending",
-        message: "\u062A\u0645 \u0627\u0633\u062A\u0644\u0627\u0645 \u0627\u0644\u0637\u0644\u0628 \u0648\u062C\u0627\u0631\u064A \u0627\u0644\u0645\u0631\u0627\u062C\u0639\u0629",
+        status: orderStatus,
+        message: isScheduledOrder ? `\u062A\u0645 \u062C\u062F\u0648\u0644\u0629 \u0627\u0644\u0637\u0644\u0628 \u0644\u0644\u062A\u0648\u0635\u064A\u0644 \u0641\u064A ${req.body.scheduledDate} ${req.body.scheduledTimeSlot}` : "\u062A\u0645 \u0627\u0633\u062A\u0644\u0627\u0645 \u0627\u0644\u0637\u0644\u0628 \u0648\u062C\u0627\u0631\u064A \u0627\u0644\u0645\u0631\u0627\u062C\u0639\u0629",
         createdBy: "system",
         createdByType: "system"
       });
@@ -5998,7 +7270,7 @@ router4.put("/:id/assign-driver", async (req, res) => {
     }
     const deliveryFeeNum = parseFloat(order.deliveryFee?.toString() || "0");
     const driverCommissionRate = parseFloat(driver.commissionRate?.toString() || "70");
-    const driverEarnings2 = deliveryFeeNum * driverCommissionRate / 100;
+    const driverEarnings = deliveryFeeNum * driverCommissionRate / 100;
     const restaurantId = order.restaurantId;
     let restaurant = null;
     let restaurantCommissionAmount = 0;
@@ -6010,10 +7282,10 @@ router4.put("/:id/assign-driver", async (req, res) => {
     } else {
       restaurantCommissionAmount = subtotalNum;
     }
-    const companyEarnings = restaurantCommissionAmount + (deliveryFeeNum - driverEarnings2);
+    const companyEarnings = restaurantCommissionAmount + (deliveryFeeNum - driverEarnings);
     const updatedOrder = await storage.updateOrder(id, {
       driverId,
-      driverEarnings: String(driverEarnings2),
+      driverEarnings: String(driverEarnings),
       companyEarnings: String(companyEarnings),
       status: "assigned",
       // تعيين الطلب للسائق أولاً
@@ -6021,16 +7293,34 @@ router4.put("/:id/assign-driver", async (req, res) => {
     });
     const ws = req.app.get("ws");
     if (ws) {
-      ws.broadcast("order_update", { orderId: id, status: "assigned" });
+      ws.broadcast("order_update", {
+        orderId: id,
+        status: "assigned",
+        driverId,
+        driverName: driver?.name,
+        type: "regular",
+        orderNumber: order.orderNumber
+      });
       if (ws.sendToDriver) {
         ws.sendToDriver(driverId, "new_order_assigned", {
           orderId: id,
           status: "assigned",
-          message: `\u062A\u0645 \u062A\u0639\u064A\u064A\u0646 \u0637\u0644\u0628 \u062C\u062F\u064A\u062F \u0631\u0642\u0645 ${order.orderNumber} \u0644\u0643`
+          message: `\u062A\u0645 \u062A\u0639\u064A\u064A\u0646 \u0637\u0644\u0628 \u062C\u062F\u064A\u062F \u0631\u0642\u0645 ${order.orderNumber} \u0644\u0643`,
+          type: "regular",
+          orderData: updatedOrder
         });
       }
     }
     try {
+      await storage.createNotification({
+        type: "driver_assigned",
+        title: "\u062A\u0645 \u062A\u062D\u062F\u064A\u062F \u0633\u0627\u0626\u0642 \u0644\u0637\u0644\u0628\u0643",
+        message: `\u062A\u0645 \u062A\u062D\u062F\u064A\u062F \u0627\u0644\u0633\u0627\u0626\u0642 ${driver?.name || "\u0645\u0646\u062F\u0648\u0628\u0646\u0627"} \u0644\u062A\u0648\u0635\u064A\u0644 \u0637\u0644\u0628\u0643 \u0631\u0642\u0645 ${order.orderNumber}`,
+        recipientType: "customer",
+        recipientId: order.customerId || order.customerPhone,
+        orderId: id,
+        isRead: false
+      });
       await storage.createNotification({
         type: "new_order_assigned",
         title: "\u0637\u0644\u0628 \u062C\u062F\u064A\u062F \u0645\u064F\u0639\u064A\u0646 \u0644\u0643",
@@ -6046,6 +7336,15 @@ router4.put("/:id/assign-driver", async (req, res) => {
         message: `\u062A\u0645 \u062A\u0639\u064A\u064A\u0646 \u0627\u0644\u0633\u0627\u0626\u0642 ${driver.name} \u0644\u0644\u0637\u0644\u0628 ${order.orderNumber}`,
         recipientType: "admin",
         recipientId: null,
+        orderId: id,
+        isRead: false
+      });
+      await storage.createNotification({
+        type: "order_status_update",
+        title: "\u062A\u0645 \u062A\u0639\u064A\u064A\u0646 \u0633\u0627\u0626\u0642 \u0644\u0637\u0644\u0628\u0643",
+        message: `\u062A\u0645 \u062A\u0639\u064A\u064A\u0646 \u0627\u0644\u0633\u0627\u0626\u0642 ${driver.name} \u0644\u062A\u0648\u0635\u064A\u0644 \u0637\u0644\u0628\u0643 \u0631\u0642\u0645 ${order.orderNumber}. \u0627\u0644\u0633\u0627\u0626\u0642 \u0641\u064A \u0627\u0644\u0637\u0631\u064A\u0642 \u0627\u0644\u0622\u0646.`,
+        recipientType: "customer",
+        recipientId: order.customerId || order.customerPhone,
         orderId: id,
         isRead: false
       });
@@ -6065,10 +7364,36 @@ router4.put("/:id/assign-driver", async (req, res) => {
     res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
   }
 });
+router4.put("/:id/prices", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { items, deliveryFee, subtotal, totalAmount, priceAdjustmentNote } = req.body;
+    const order = await storage.getOrder(id);
+    if (!order) {
+      return res.status(404).json({ error: "\u0627\u0644\u0637\u0644\u0628 \u063A\u064A\u0631 \u0645\u0648\u062C\u0648\u062F" });
+    }
+    const updatedOrder = await storage.updateOrder(id, {
+      items: typeof items === "string" ? items : JSON.stringify(items),
+      deliveryFee: deliveryFee?.toString(),
+      subtotal: subtotal?.toString(),
+      totalAmount: totalAmount?.toString(),
+      notes: priceAdjustmentNote ? `${order.notes ? order.notes + "\n" : ""}[\u062A\u0639\u062F\u064A\u0644 \u0645\u062F\u064A\u0631: ${priceAdjustmentNote}]` : order.notes,
+      updatedAt: /* @__PURE__ */ new Date()
+    });
+    const ws = req.app.get("ws");
+    if (ws) {
+      ws.broadcast("order_update", { orderId: id, priceUpdated: true });
+    }
+    res.json({ success: true, order: updatedOrder });
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u062A\u0639\u062F\u064A\u0644 \u0623\u0633\u0639\u0627\u0631 \u0627\u0644\u0637\u0644\u0628:", error);
+    res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
 router4.put("/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const { status, updatedBy, updatedByType } = req.body;
+    const { status, updatedBy, updatedByType, cancelReason } = req.body;
     if (!status) {
       return res.status(400).json({ error: "\u0627\u0644\u062D\u0627\u0644\u0629 \u0645\u0637\u0644\u0648\u0628\u0629" });
     }
@@ -6076,13 +7401,27 @@ router4.put("/:id", async (req, res) => {
     if (!order) {
       return res.status(404).json({ error: "\u0627\u0644\u0637\u0644\u0628 \u063A\u064A\u0631 \u0645\u0648\u062C\u0648\u062F" });
     }
-    const updatedOrder = await storage.updateOrder(id, {
-      status,
-      updatedAt: /* @__PURE__ */ new Date()
-    });
+    let updatedOrder;
+    if (status === "delivered") {
+      updatedOrder = await storage.completeOrder(id);
+    } else {
+      const updateData = {
+        status,
+        updatedAt: /* @__PURE__ */ new Date()
+      };
+      if (status === "cancelled" && cancelReason) {
+        updateData.cancelReason = cancelReason;
+      }
+      updatedOrder = await storage.updateOrder(id, updateData);
+    }
     const ws = req.app.get("ws");
     if (ws) {
-      ws.broadcast("order_update", { orderId: id, status });
+      ws.broadcast("order_update", {
+        orderId: id,
+        status,
+        orderNumber: order.orderNumber,
+        type: "regular"
+      });
     }
     let statusMessage = "";
     switch (status) {
@@ -6103,60 +7442,9 @@ router4.put("/:id", async (req, res) => {
         break;
       case "delivered":
         statusMessage = "\u062A\u0645 \u062A\u0633\u0644\u064A\u0645 \u0627\u0644\u0637\u0644\u0628 \u0628\u0646\u062C\u0627\u062D";
-        if (order.driverId) {
-          await storage.updateDriver(order.driverId, { isAvailable: true });
-          try {
-            const driverEarnings2 = parseFloat(order.driverEarnings?.toString() || "0");
-            if (driverEarnings2 > 0) {
-              const { AdvancedDatabaseStorage: AdvancedDatabaseStorage2 } = await Promise.resolve().then(() => (init_db_advanced(), db_advanced_exports));
-              const advStorage = new AdvancedDatabaseStorage2(storage.db);
-              let wallet = await advStorage.getDriverWallet(order.driverId);
-              if (!wallet) {
-                await advStorage.createDriverWallet({
-                  driverId: order.driverId,
-                  balance: "0",
-                  isActive: true
-                });
-              }
-              await advStorage.addDriverWalletBalance(order.driverId, driverEarnings2);
-              const driver = await storage.getDriver(order.driverId);
-              const currentEarnings = parseFloat(driver?.earnings?.toString() || "0");
-              const currentCompletedOrders = driver?.completedOrders || 0;
-              await storage.updateDriver(order.driverId, {
-                earnings: String(currentEarnings + driverEarnings2),
-                completedOrders: currentCompletedOrders + 1
-              });
-            }
-          } catch (e) {
-            console.error("Error updating driver earnings:", e);
-          }
-        }
-        if (order.restaurantId) {
-          try {
-            const restaurantEarnings2 = parseFloat(order.restaurantEarnings?.toString() || "0");
-            if (restaurantEarnings2 > 0) {
-              const { AdvancedDatabaseStorage: AdvancedDatabaseStorage2 } = await Promise.resolve().then(() => (init_db_advanced(), db_advanced_exports));
-              const advStorage = new AdvancedDatabaseStorage2(storage.db);
-              let rWallet = await advStorage.getRestaurantWallet(order.restaurantId);
-              if (!rWallet) {
-                await advStorage.createRestaurantWallet({
-                  restaurantId: order.restaurantId,
-                  balance: "0",
-                  isActive: true
-                });
-              }
-              const currentBalance = parseFloat(rWallet?.balance?.toString() || "0");
-              await advStorage.updateRestaurantWallet(order.restaurantId, {
-                balance: String(currentBalance + restaurantEarnings2)
-              });
-            }
-          } catch (e) {
-            console.error("Error updating restaurant earnings:", e);
-          }
-        }
         break;
       case "cancelled":
-        statusMessage = "\u062A\u0645 \u0625\u0644\u063A\u0627\u0621 \u0627\u0644\u0637\u0644\u0628";
+        statusMessage = cancelReason ? `\u062A\u0645 \u0625\u0644\u063A\u0627\u0621 \u0627\u0644\u0637\u0644\u0628 - \u0627\u0644\u0633\u0628\u0628: ${cancelReason}` : "\u062A\u0645 \u0625\u0644\u063A\u0627\u0621 \u0627\u0644\u0637\u0644\u0628";
         if (order.driverId) {
           await storage.updateDriver(order.driverId, { isAvailable: true });
         }
@@ -6214,12 +7502,96 @@ router4.get("/customer/:phone", async (req, res) => {
     res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
   }
 });
-router4.get("/:orderId/track", async (req, res) => {
+router4.get("/:orderId/closest-drivers", async (req, res) => {
   try {
     const { orderId } = req.params;
     const order = await storage.getOrder(orderId);
+    let lat = null;
+    let lng = null;
+    if (order) {
+      if (order.restaurantId) {
+        const restaurant = await storage.getRestaurant(order.restaurantId);
+        if (restaurant && restaurant.latitude && restaurant.longitude) {
+          lat = parseFloat(restaurant.latitude);
+          lng = parseFloat(restaurant.longitude);
+        }
+      }
+      if (lat === null && order.customerLocationLat && order.customerLocationLng) {
+        lat = parseFloat(order.customerLocationLat);
+        lng = parseFloat(order.customerLocationLng);
+      }
+    } else {
+      const db5 = storage.db;
+      if (db5) {
+        const { wasalniRequests: wasalniRequests3 } = await Promise.resolve().then(() => (init_schema(), schema_exports));
+        const { eq: eq10 } = await import("drizzle-orm");
+        const [found] = await db5.select().from(wasalniRequests3).where(eq10(wasalniRequests3.id, orderId));
+        if (found && found.fromLat && found.fromLng) {
+          lat = parseFloat(found.fromLat);
+          lng = parseFloat(found.fromLng);
+        }
+      }
+    }
+    if (lat === null || lng === null) {
+      return res.status(400).json({ error: "\u0644\u0627 \u064A\u0645\u0643\u0646 \u062A\u062D\u062F\u064A\u062F \u0645\u0648\u0642\u0639 \u0627\u0644\u0627\u0646\u0637\u0644\u0627\u0642 \u0644\u0644\u0637\u0644\u0628" });
+    }
+    const closestDrivers = await storage.getClosestDrivers(lat, lng, 10);
+    res.json(closestDrivers);
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u062C\u0644\u0628 \u0627\u0644\u0633\u0627\u0626\u0642\u064A\u0646 \u0627\u0644\u0623\u0642\u0631\u0628:", error);
+    res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
+router4.get("/number/:orderNumber", async (req, res) => {
+  try {
+    const { orderNumber } = req.params;
+    const db5 = storage.db;
+    if (!db5) return res.status(500).json({ error: "Database not available" });
+    const { orders: orders3 } = await Promise.resolve().then(() => (init_schema(), schema_exports));
+    const { eq: eq10 } = await import("drizzle-orm");
+    const [order] = await db5.select().from(orders3).where(eq10(orders3.orderNumber, orderNumber));
+    if (!order) return res.status(404).json({ error: "\u0627\u0644\u0637\u0644\u0628 \u063A\u064A\u0631 \u0645\u0648\u062C\u0648\u062F" });
+    res.json(order);
+  } catch (error) {
+    res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u0628\u062D\u062B" });
+  }
+});
+router4.get("/:orderId/track", async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    let order = await storage.getOrder(orderId);
+    let isWaselLi = false;
+    let wasalniRequest = null;
     if (!order) {
-      return res.status(404).json({ error: "\u0627\u0644\u0637\u0644\u0628 \u063A\u064A\u0631 \u0645\u0648\u062C\u0648\u062F" });
+      const db5 = storage.db;
+      if (db5) {
+        const { wasalniRequests: wasalniRequests3 } = await Promise.resolve().then(() => (init_schema(), schema_exports));
+        const { eq: eq10 } = await import("drizzle-orm");
+        const [found] = await db5.select().from(wasalniRequests3).where(eq10(wasalniRequests3.id, orderId));
+        wasalniRequest = found;
+      }
+      if (!wasalniRequest) {
+        return res.status(404).json({ error: "\u0627\u0644\u0637\u0644\u0628 \u063A\u064A\u0631 \u0645\u0648\u062C\u0648\u062F" });
+      }
+      isWaselLi = true;
+      order = {
+        id: wasalniRequest.id,
+        orderNumber: wasalniRequest.requestNumber,
+        customerName: wasalniRequest.customerName,
+        customerPhone: wasalniRequest.customerPhone,
+        deliveryAddress: wasalniRequest.toAddress,
+        status: wasalniRequest.status,
+        estimatedTime: "\u062C\u0627\u0631\u064A \u0627\u0644\u062A\u062D\u062F\u064A\u062F",
+        driverId: wasalniRequest.driverId,
+        isWaselLi: true,
+        pickupAddress: wasalniRequest.fromAddress,
+        pickupPhone: wasalniRequest.customerPhone,
+        pickupName: wasalniRequest.customerName,
+        waselLiItemType: wasalniRequest.orderType,
+        totalAmount: String(wasalniRequest.estimatedFee || "0"),
+        createdAt: wasalniRequest.createdAt,
+        items: JSON.stringify([])
+      };
     }
     let driverInfo = null;
     if (order.driverId) {
@@ -6231,19 +7603,34 @@ router4.get("/:orderId/track", async (req, res) => {
         };
       }
     }
-    const trackingHistory = await storage.getOrderTracking(orderId);
+    let trackingHistory = [];
+    try {
+      trackingHistory = await storage.getOrderTracking(orderId);
+    } catch (err) {
+      console.error("Error fetching tracking history:", err);
+    }
     const formattedOrder = {
       ...order,
       driverName: driverInfo?.name,
       driverPhone: driverInfo?.phone,
       items: typeof order.items === "string" ? JSON.parse(order.items) : order.items
     };
-    const formattedTracking = trackingHistory.map((t) => ({
+    let formattedTracking = trackingHistory.map((t) => ({
       id: t.id,
       status: t.status,
       timestamp: t.createdAt,
       description: t.message
     }));
+    if (formattedTracking.length === 0) {
+      formattedTracking = [
+        {
+          id: "initial",
+          status: order.status || "pending",
+          timestamp: order.createdAt,
+          description: isWaselLi ? "\u062A\u0645 \u0627\u0633\u062A\u0644\u0627\u0645 \u0637\u0644\u0628 \u0648\u0635\u0644 \u0644\u064A" : "\u062A\u0645 \u0627\u0633\u062A\u0644\u0627\u0645 \u0627\u0644\u0637\u0644\u0628 \u0648\u062C\u0627\u0631\u064A \u0627\u0644\u0645\u0631\u0627\u062C\u0639\u0629"
+        }
+      ];
+    }
     res.json({
       order: formattedOrder,
       tracking: formattedTracking
@@ -6278,11 +7665,21 @@ router4.patch("/:orderId/cancel", async (req, res) => {
     if (order.driverId) {
       await storage.updateDriver(order.driverId, { isAvailable: true });
     }
+    const ws = req.app.get("ws");
+    if (ws) {
+      ws.broadcast("order_update", {
+        orderId,
+        status: "cancelled",
+        orderNumber: order.orderNumber,
+        type: "regular"
+      });
+    }
     try {
+      const statusMessage = reason ? `\u062A\u0645 \u0625\u0644\u063A\u0627\u0621 \u0627\u0644\u0637\u0644\u0628 - \u0627\u0644\u0633\u0628\u0628: ${reason}` : "\u062A\u0645 \u0625\u0644\u063A\u0627\u0621 \u0627\u0644\u0637\u0644\u0628";
       await storage.createNotification({
-        type: "order_cancelled",
-        title: "\u062A\u0645 \u0625\u0644\u063A\u0627\u0621 \u0627\u0644\u0637\u0644\u0628",
-        message: `\u062A\u0645 \u0625\u0644\u063A\u0627\u0621 \u0637\u0644\u0628\u0643 \u0631\u0642\u0645 ${order.orderNumber}${reason ? ": " + reason : ""}`,
+        type: "order_status_update",
+        title: "\u062A\u062D\u062F\u064A\u062B \u062D\u0627\u0644\u0629 \u0627\u0644\u0637\u0644\u0628",
+        message: `\u0637\u0644\u0628\u0643 \u0631\u0642\u0645 ${order.orderNumber}: ${statusMessage}`,
         recipientType: "customer",
         recipientId: order.customerId || order.customerPhone,
         orderId,
@@ -6291,7 +7688,7 @@ router4.patch("/:orderId/cancel", async (req, res) => {
       await storage.createOrderTracking({
         orderId,
         status: "cancelled",
-        message: reason || "\u062A\u0645 \u0625\u0644\u063A\u0627\u0621 \u0627\u0644\u0637\u0644\u0628",
+        message: statusMessage,
         createdBy: cancelledBy || "system",
         createdByType: "system"
       });
@@ -6448,8 +7845,6 @@ router5.post("/settings", async (req, res) => {
       minFee: z3.string().optional(),
       maxFee: z3.string().optional(),
       freeDeliveryThreshold: z3.string().optional(),
-      storeLat: z3.string().optional(),
-      storeLng: z3.string().optional(),
       restaurantId: z3.string().optional()
     });
     const validatedData = settingsSchema.parse(coercedData);
@@ -6479,9 +7874,7 @@ router5.post("/settings", async (req, res) => {
       perKmFee: validateNumber(validatedData.perKmFee, "\u0631\u0633\u0648\u0645 \u0644\u0643\u0644 \u0643\u064A\u0644\u0648\u0645\u062A\u0631"),
       minFee: validateNumber(validatedData.minFee, "\u0627\u0644\u062D\u062F \u0627\u0644\u0623\u062F\u0646\u0649"),
       maxFee: validateNumber(validatedData.maxFee, "\u0627\u0644\u062D\u062F \u0627\u0644\u0623\u0642\u0635\u0649"),
-      freeDeliveryThreshold: validateNumber(validatedData.freeDeliveryThreshold, "\u062D\u062F \u0627\u0644\u062A\u0648\u0635\u064A\u0644 \u0627\u0644\u0645\u062C\u0627\u0646\u064A"),
-      storeLat: validatedData.storeLat ? validateNumber(validatedData.storeLat, "\u062E\u0637 \u0627\u0644\u0639\u0631\u0636") : void 0,
-      storeLng: validatedData.storeLng ? validateNumber(validatedData.storeLng, "\u062E\u0637 \u0627\u0644\u0637\u0648\u0644") : void 0
+      freeDeliveryThreshold: validateNumber(validatedData.freeDeliveryThreshold, "\u062D\u062F \u0627\u0644\u062A\u0648\u0635\u064A\u0644 \u0627\u0644\u0645\u062C\u0627\u0646\u064A")
     };
     console.log("\u{1F9F9} \u0627\u0644\u0628\u064A\u0627\u0646\u0627\u062A \u0628\u0639\u062F \u0627\u0644\u062A\u0646\u0638\u064A\u0641:", JSON.stringify(sanitizedData, null, 2));
     const minFeeNum = parseFloat(sanitizedData.minFee || "0");
@@ -6510,7 +7903,9 @@ router5.post("/settings", async (req, res) => {
     if (existing) {
       console.log(`\u{1F4DD} \u062A\u062D\u062F\u064A\u062B \u0627\u0644\u0625\u0639\u062F\u0627\u062F\u0627\u062A \u0627\u0644\u0645\u0648\u062C\u0648\u062F\u0629: ${existing.id}`);
       const updated = await storage.updateDeliveryFeeSettings(existing.id, sanitizedData);
-      console.log(`\u2705 \u062A\u0645 \u0627\u0644\u062A\u062D\u062F\u064A\u062B \u0628\u0646\u062C\u0627\u062D:`, JSON.stringify(updated, null, 2));
+      console.log(`\u2705 \u062A\u0645 \u0627\u0644\u062A\u062D\u062F\u064A\u062B \u0628\u0646\u062C\u0627\u062D`);
+      deliveryFeeCache.clear();
+      broadcastSettingsChanged("delivery_fee_settings");
       return res.json({
         success: true,
         message: "\u062A\u0645 \u062A\u062D\u062F\u064A\u062B \u0627\u0644\u0625\u0639\u062F\u0627\u062F\u0627\u062A \u0628\u0646\u062C\u0627\u062D",
@@ -6519,7 +7914,9 @@ router5.post("/settings", async (req, res) => {
     }
     console.log(`\u2728 \u0625\u0646\u0634\u0627\u0621 \u0625\u0639\u062F\u0627\u062F\u0627\u062A \u062C\u062F\u064A\u062F\u0629`);
     const newSettings = await storage.createDeliveryFeeSettings(sanitizedData);
-    console.log(`\u2705 \u062A\u0645 \u0627\u0644\u0625\u0646\u0634\u0627\u0621 \u0628\u0646\u062C\u0627\u062D:`, JSON.stringify(newSettings, null, 2));
+    console.log(`\u2705 \u062A\u0645 \u0627\u0644\u0625\u0646\u0634\u0627\u0621 \u0628\u0646\u062C\u0627\u062D`);
+    deliveryFeeCache.clear();
+    broadcastSettingsChanged("delivery_fee_settings");
     res.status(201).json({
       success: true,
       message: "\u062A\u0645 \u062D\u0641\u0638 \u0627\u0644\u0625\u0639\u062F\u0627\u062F\u0627\u062A \u0628\u0646\u062C\u0627\u062D",
@@ -6748,12 +8145,13 @@ var delivery_fees_default = router5;
 
 // server/routes/admin.ts
 import express8 from "express";
+import bcrypt3 from "bcryptjs";
 init_schema();
 import { z as z4 } from "zod";
-import { eq as eq5, and as and3, sql as sql3 } from "drizzle-orm";
+import { eq as eq5, desc as desc3, sql as sql4, inArray as inArray2 } from "drizzle-orm";
 var router6 = express8.Router();
 var dbStorage2 = new DatabaseStorage();
-var db2 = dbStorage2.db;
+var db3 = dbStorage2.db;
 var schema = {
   adminUsers,
   // تم حذف adminSessions من schema object
@@ -6781,19 +8179,53 @@ var schema = {
   driverCommissions,
   driverWithdrawals
 };
+router6.use(async (req, res, next) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      const token = authHeader.split(" ")[1];
+      const adminUser = await dbStorage2.getAdminById(token);
+      if (adminUser && adminUser.isActive) {
+        req.admin = adminUser;
+        if (adminUser.userType === "sub_admin") {
+          try {
+            req.adminPermissions = adminUser.permissions ? JSON.parse(adminUser.permissions) : [];
+          } catch {
+            req.adminPermissions = [];
+          }
+        } else {
+          req.adminPermissions = null;
+        }
+      }
+    }
+  } catch (e) {
+  }
+  next();
+});
+function requirePermission(permission) {
+  return (req, res, next) => {
+    if (!req.admin) return next();
+    if (req.admin.userType === "admin") return next();
+    const perms = req.adminPermissions || [];
+    if (!perms.includes(permission)) {
+      return res.status(403).json({ error: "\u0644\u064A\u0633 \u0644\u062F\u064A\u0643 \u0635\u0644\u0627\u062D\u064A\u0629 \u0644\u0644\u0648\u0635\u0648\u0644 \u0625\u0644\u0649 \u0647\u0630\u0647 \u0627\u0644\u0648\u0638\u064A\u0641\u0629" });
+    }
+    next();
+  };
+}
 router6.get("/dashboard", async (req, res) => {
   try {
-    const [restaurants2, orders3, drivers2, users3] = await Promise.all([
+    const [restaurants3, orders3, drivers2, users2] = await Promise.all([
       storage.getRestaurants(),
       storage.getOrders(),
       storage.getDrivers(),
       storage.getUsers ? storage.getUsers() : []
     ]);
     const today = (/* @__PURE__ */ new Date()).toDateString();
-    const totalRestaurants = restaurants2.length;
+    const totalRestaurants = restaurants3.length;
     const totalOrders = orders3.length;
     const totalDrivers = drivers2.length;
-    const totalCustomers = users3.length;
+    const totalCustomers = users2.length;
     const todayOrders = orders3.filter(
       (order) => order.createdAt.toDateString() === today
     ).length;
@@ -6982,6 +8414,7 @@ router6.post("/restaurants", async (req, res) => {
     console.log("Processed restaurant data:", restaurantData);
     const validatedData = insertRestaurantSchema.parse(restaurantData);
     const newRestaurant = await storage.createRestaurant(validatedData);
+    broadcastSettingsChanged("restaurants");
     res.status(201).json(newRestaurant);
   } catch (error) {
     if (error instanceof z4.ZodError) {
@@ -7007,6 +8440,7 @@ router6.put("/restaurants/:id", async (req, res) => {
     if (!updatedRestaurant) {
       return res.status(404).json({ error: "\u0627\u0644\u0645\u0637\u0639\u0645 \u063A\u064A\u0631 \u0645\u0648\u062C\u0648\u062F" });
     }
+    broadcastSettingsChanged("restaurants");
     res.json(updatedRestaurant);
   } catch (error) {
     if (error instanceof z4.ZodError) {
@@ -7038,6 +8472,47 @@ router6.get("/menu-items", async (req, res) => {
     res.json(items);
   } catch (error) {
     console.error("\u062E\u0637\u0623 \u0641\u064A \u062C\u0644\u0628 \u0627\u0644\u0645\u0646\u062A\u062C\u0627\u062A:", error);
+    res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
+router6.get("/restaurants/:restaurantId/sections", async (req, res) => {
+  try {
+    const { restaurantId } = req.params;
+    const sections = await storage.getRestaurantSections(restaurantId);
+    res.json(sections);
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u062C\u0644\u0628 \u0623\u0642\u0633\u0627\u0645 \u0627\u0644\u0645\u0637\u0639\u0645:", error);
+    res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
+router6.post("/restaurant-sections", async (req, res) => {
+  try {
+    const section = await storage.createRestaurantSection(req.body);
+    res.status(201).json(section);
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u0625\u0636\u0627\u0641\u0629 \u0642\u0633\u0645 \u0627\u0644\u0645\u0637\u0639\u0645:", error);
+    res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
+router6.put("/restaurant-sections/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const section = await storage.updateRestaurantSection(id, req.body);
+    if (!section) return res.status(404).json({ error: "\u0627\u0644\u0642\u0633\u0645 \u063A\u064A\u0631 \u0645\u0648\u062C\u0648\u062F" });
+    res.json(section);
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u062A\u062D\u062F\u064A\u062B \u0642\u0633\u0645 \u0627\u0644\u0645\u0637\u0639\u0645:", error);
+    res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
+router6.delete("/restaurant-sections/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const success = await storage.deleteRestaurantSection(id);
+    if (!success) return res.status(404).json({ error: "\u0627\u0644\u0642\u0633\u0645 \u063A\u064A\u0631 \u0645\u0648\u062C\u0648\u062F" });
+    res.json({ success: true });
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u062D\u0630\u0641 \u0642\u0633\u0645 \u0627\u0644\u0645\u0637\u0639\u0645:", error);
     res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
   }
 });
@@ -7155,6 +8630,61 @@ router6.put("/orders/:id/status", async (req, res) => {
     if (!updatedOrder) {
       return res.status(404).json({ error: "\u0627\u0644\u0637\u0644\u0628 \u063A\u064A\u0631 \u0645\u0648\u062C\u0648\u062F" });
     }
+    const ws = req.app.get("ws");
+    if (ws) {
+      ws.broadcast("order_update", {
+        orderId: id,
+        status,
+        orderNumber: updatedOrder.orderNumber,
+        type: "regular"
+      });
+    }
+    let statusMessage = "";
+    switch (status) {
+      case "confirmed":
+        statusMessage = "\u062A\u0645 \u062A\u0623\u0643\u064A\u062F \u0627\u0644\u0637\u0644\u0628";
+        break;
+      case "preparing":
+        statusMessage = "\u062C\u0627\u0631\u064A \u062A\u062D\u0636\u064A\u0631 \u0627\u0644\u0637\u0644\u0628";
+        break;
+      case "ready":
+        statusMessage = "\u0627\u0644\u0637\u0644\u0628 \u062C\u0627\u0647\u0632 \u0644\u0644\u0627\u0633\u062A\u0644\u0627\u0645";
+        break;
+      case "picked_up":
+        statusMessage = "\u062A\u0645 \u0627\u0633\u062A\u0644\u0627\u0645 \u0627\u0644\u0637\u0644\u0628 \u0645\u0646 \u0627\u0644\u0645\u0637\u0639\u0645";
+        break;
+      case "on_way":
+        statusMessage = "\u0627\u0644\u0633\u0627\u0626\u0642 \u0641\u064A \u0627\u0644\u0637\u0631\u064A\u0642 \u0625\u0644\u064A\u0643";
+        break;
+      case "delivered":
+        statusMessage = "\u062A\u0645 \u062A\u0633\u0644\u064A\u0645 \u0627\u0644\u0637\u0644\u0628 \u0628\u0646\u062C\u0627\u062D";
+        break;
+      case "cancelled":
+        statusMessage = "\u062A\u0645 \u0625\u0644\u063A\u0627\u0621 \u0627\u0644\u0637\u0644\u0628 \u0645\u0646 \u0642\u0628\u0644 \u0627\u0644\u0625\u062F\u0627\u0631\u0629";
+        break;
+      default:
+        statusMessage = `\u062A\u0645 \u062A\u062D\u062F\u064A\u062B \u062D\u0627\u0644\u0629 \u0627\u0644\u0637\u0644\u0628 \u0625\u0644\u0649 ${status}`;
+    }
+    try {
+      await storage.createOrderTracking({
+        orderId: id,
+        status,
+        message: statusMessage,
+        createdBy: req.admin?.id || "admin",
+        createdByType: "admin"
+      });
+      await storage.createNotification({
+        type: "order_status_update",
+        title: "\u062A\u062D\u062F\u064A\u062B \u062D\u0627\u0644\u0629 \u0627\u0644\u0637\u0644\u0628",
+        message: `\u0637\u0644\u0628\u0643 \u0631\u0642\u0645 ${updatedOrder.orderNumber}: ${statusMessage}`,
+        recipientType: "customer",
+        recipientId: updatedOrder.customerId || updatedOrder.customerPhone,
+        orderId: id,
+        isRead: false
+      });
+    } catch (err) {
+      console.error("Error creating tracking/notification in admin update:", err);
+    }
     res.json(updatedOrder);
   } catch (error) {
     console.error("\u062E\u0637\u0623 \u0641\u064A \u062A\u062D\u062F\u064A\u062B \u062D\u0627\u0644\u0629 \u0627\u0644\u0637\u0644\u0628:", error);
@@ -7257,12 +8787,12 @@ router6.get("/reports/products", async (req, res) => {
 });
 router6.get("/reports/users", async (req, res) => {
   try {
-    const [users3, orders3] = await Promise.all([
+    const [users2, orders3] = await Promise.all([
       storage.getUsers(),
       storage.getOrders()
     ]);
     const deliveredOrders = orders3.filter((o) => o.status === "delivered");
-    const userStats = users3.map((user) => {
+    const userStats = users2.map((user) => {
       const userOrders = deliveredOrders.filter((o) => o.customerId === user.id);
       const totalSpent = userOrders.reduce((sum, o) => sum + parseFloat(o.totalAmount || "0"), 0);
       return {
@@ -7276,18 +8806,76 @@ router6.get("/reports/users", async (req, res) => {
       };
     });
     const topUsers = [...userStats].sort((a, b) => b.totalSpent - a.totalSpent).slice(0, 50);
-    const newUsersCount = users3.filter((u) => {
+    const newUsersCount = users2.filter((u) => {
       const thirtyDaysAgo = /* @__PURE__ */ new Date();
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
       return new Date(u.createdAt) >= thirtyDaysAgo;
     }).length;
     res.json({
-      totalUsers: users3.length,
+      totalUsers: users2.length,
       newUsersLast30Days: newUsersCount,
       topUsers
     });
   } catch (error) {
     console.error("\u062E\u0637\u0623 \u0641\u064A \u062A\u0642\u0627\u0631\u064A\u0631 \u0627\u0644\u0645\u0633\u062A\u062E\u062F\u0645\u064A\u0646:", error);
+    res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
+router6.get("/drivers-summary", async (req, res) => {
+  try {
+    const driversList = await storage.getDrivers();
+    const allOrders = await storage.getOrders();
+    const summary = await Promise.all(
+      driversList.map(async (driver) => {
+        const driverOrders = allOrders.filter((o) => o.driverId === driver.id && o.status === "delivered");
+        const totalEarnings = driverOrders.reduce((sum, o) => sum + parseFloat(o.deliveryFee || "0"), 0);
+        const balance = await storage.getDriverBalance(driver.id).catch(() => null);
+        return {
+          id: driver.id,
+          name: driver.name,
+          phone: driver.phone,
+          isAvailable: driver.isAvailable,
+          stats: {
+            totalOrders: driverOrders.length,
+            totalEarnings: balance ? parseFloat(balance.totalBalance || "0") : totalEarnings,
+            averageRating: parseFloat(driver.rating || "0"),
+            availableBalance: balance ? parseFloat(balance.availableBalance || "0") : 0
+          }
+        };
+      })
+    );
+    res.json(summary);
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u0645\u0644\u062E\u0635 \u0627\u0644\u0633\u0627\u0626\u0642\u064A\u0646:", error);
+    res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
+router6.get("/restaurants-summary", async (req, res) => {
+  try {
+    const allRestaurants = await storage.getRestaurants({});
+    const allOrders = await storage.getOrders();
+    const summary = allRestaurants.map((restaurant) => {
+      const restaurantOrders = allOrders.filter((o) => o.restaurantId === restaurant.id && o.status === "delivered");
+      const totalRevenue = restaurantOrders.reduce((sum, o) => sum + parseFloat(o.totalAmount || o.total || "0"), 0);
+      const commissionRate = 0.15;
+      const totalCommission = totalRevenue * commissionRate;
+      return {
+        id: restaurant.id,
+        name: restaurant.name,
+        phone: restaurant.phone,
+        isOpen: restaurant.isOpen,
+        stats: {
+          totalOrders: restaurantOrders.length,
+          totalRevenue,
+          totalCommission,
+          netEarnings: totalRevenue - totalCommission,
+          avgOrderValue: restaurantOrders.length > 0 ? totalRevenue / restaurantOrders.length : 0
+        }
+      };
+    });
+    res.json(summary);
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u0645\u0644\u062E\u0635 \u0627\u0644\u0645\u0637\u0627\u0639\u0645:", error);
     res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
   }
 });
@@ -7454,6 +9042,61 @@ router6.put("/leave-requests/:id", async (req, res) => {
     }
     console.error("Error updating leave request:", error);
     res.status(500).json({ error: "Internal server error" });
+  }
+});
+router6.get("/drivers", async (req, res) => {
+  try {
+    const drivers2 = await storage.getDrivers();
+    res.json(drivers2);
+  } catch (error) {
+    console.error("Error fetching drivers:", error);
+    res.status(500).json({ error: "\u0641\u0634\u0644 \u0641\u064A \u062C\u0644\u0628 \u0628\u064A\u0627\u0646\u0627\u062A \u0627\u0644\u0633\u0627\u0626\u0642\u064A\u0646" });
+  }
+});
+router6.get("/drivers/:id/stats", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const driver = await storage.getDriver(id);
+    if (!driver) return res.status(404).json({ error: "\u0627\u0644\u0633\u0627\u0626\u0642 \u063A\u064A\u0631 \u0645\u0648\u062C\u0648\u062F" });
+    const orders3 = await storage.getOrders();
+    const driverOrders = orders3.filter((o) => o.driverId === id);
+    const completedOrders = driverOrders.filter((o) => o.status === "delivered");
+    const totalEarnings = completedOrders.reduce((sum, o) => sum + parseFloat(o.deliveryFee || "0"), 0);
+    res.json({
+      totalOrders: driverOrders.length,
+      completedOrders: completedOrders.length,
+      totalEarnings: totalEarnings.toFixed(2),
+      rating: driver.rating || 0
+    });
+  } catch (error) {
+    console.error("Error fetching driver stats:", error);
+    res.status(500).json({ error: "\u0641\u0634\u0644 \u0641\u064A \u062C\u0644\u0628 \u0625\u062D\u0635\u0627\u0626\u064A\u0627\u062A \u0627\u0644\u0633\u0627\u0626\u0642" });
+  }
+});
+router6.get("/stats", async (req, res) => {
+  try {
+    const orders3 = await storage.getOrders();
+    const drivers2 = await storage.getDrivers();
+    const categories2 = await storage.getCategories();
+    const restaurants3 = await storage.getRestaurants();
+    const users2 = await storage.getUsers();
+    const today = /* @__PURE__ */ new Date();
+    today.setHours(0, 0, 0, 0);
+    const todayOrders = orders3.filter((o) => new Date(o.createdAt) >= today);
+    const totalRevenue = orders3.filter((o) => o.status === "delivered").reduce((sum, o) => sum + parseFloat(o.totalAmount || "0"), 0);
+    res.json({
+      totalOrders: orders3.length,
+      todayOrders: todayOrders.length,
+      totalDrivers: drivers2.length,
+      activeDrivers: drivers2.filter((d) => d.isAvailable).length,
+      totalCategories: categories2.length,
+      totalRestaurants: restaurants3.length,
+      totalUsers: users2.length,
+      totalRevenue: totalRevenue.toFixed(2)
+    });
+  } catch (error) {
+    console.error("Error fetching stats:", error);
+    res.status(500).json({ error: "\u0641\u0634\u0644 \u0641\u064A \u062C\u0644\u0628 \u0627\u0644\u0625\u062D\u0635\u0627\u0626\u064A\u0627\u062A" });
   }
 });
 router6.post("/drivers", async (req, res) => {
@@ -7918,18 +9561,36 @@ router6.post("/notifications", async (req, res) => {
   try {
     const notificationData = {
       ...req.body,
-      createdBy: req.admin.id
+      createdBy: req.admin?.id || null
     };
-    const [newNotification] = await db2.insert(schema.notifications).values(notificationData).returning();
+    const [newNotification] = await db3.insert(schema.notifications).values(notificationData).returning();
+    broadcastEvent("new_notification", {
+      notification: newNotification,
+      recipientType: notificationData.recipientType,
+      recipientId: notificationData.recipientId,
+      timestamp: (/* @__PURE__ */ new Date()).toISOString()
+    });
     res.json(newNotification);
   } catch (error) {
     console.error("\u062E\u0637\u0623 \u0641\u064A \u0625\u0646\u0634\u0627\u0621 \u0627\u0644\u0625\u0634\u0639\u0627\u0631:", error);
     res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
   }
 });
+router6.get("/notifications", async (req, res) => {
+  try {
+    const { recipientType, recipientId, limit: limitParam } = req.query;
+    const limitNum = parseInt(limitParam) || 50;
+    let query = db3.select().from(schema.notifications).orderBy(desc3(schema.notifications.createdAt)).limit(limitNum);
+    const notifs = await query;
+    res.json(notifs);
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u062C\u0644\u0628 \u0627\u0644\u0625\u0634\u0639\u0627\u0631\u0627\u062A:", error);
+    res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
 router6.get("/settings", async (req, res) => {
   try {
-    const settings = await db2.select().from(schema.systemSettings).orderBy(schema.systemSettings.category, schema.systemSettings.key);
+    const settings = await db3.select().from(schema.systemSettings).orderBy(schema.systemSettings.category, schema.systemSettings.key);
     res.json(settings);
   } catch (error) {
     res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
@@ -7939,18 +9600,10 @@ router6.put("/settings/:key", async (req, res) => {
   try {
     const { key } = req.params;
     const { value } = req.body;
-    const [updatedSetting] = await db2.update(schema.systemSettings).set({ value, updatedAt: /* @__PURE__ */ new Date() }).where(eq5(schema.systemSettings.key, key)).returning();
+    const [updatedSetting] = await db3.update(schema.systemSettings).set({ value, updatedAt: /* @__PURE__ */ new Date() }).where(eq5(schema.systemSettings.key, key)).returning();
+    broadcastSettingsChanged(key);
     res.json(updatedSetting);
   } catch (error) {
-    res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
-  }
-});
-router6.get("/ui-settings", async (req, res) => {
-  try {
-    const settings = await db2.select().from(schema.systemSettings).where(eq5(schema.systemSettings.isActive, true)).orderBy(schema.systemSettings.category, schema.systemSettings.key);
-    res.json(settings);
-  } catch (error) {
-    console.error("\u062E\u0637\u0623 \u0641\u064A \u062C\u0644\u0628 \u0625\u0639\u062F\u0627\u062F\u0627\u062A \u0648\u0627\u062C\u0647\u0629 \u0627\u0644\u0645\u0633\u062A\u062E\u062F\u0645:", error);
     res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
   }
 });
@@ -7960,20 +9613,21 @@ router6.put("/business-hours", async (req, res) => {
     const updates = [];
     if (opening_time) {
       updates.push(
-        db2.update(schema.systemSettings).set({ value: opening_time, updatedAt: /* @__PURE__ */ new Date() }).where(eq5(schema.systemSettings.key, "opening_time"))
+        db3.update(schema.systemSettings).set({ value: opening_time, updatedAt: /* @__PURE__ */ new Date() }).where(eq5(schema.systemSettings.key, "opening_time"))
       );
     }
     if (closing_time) {
       updates.push(
-        db2.update(schema.systemSettings).set({ value: closing_time, updatedAt: /* @__PURE__ */ new Date() }).where(eq5(schema.systemSettings.key, "closing_time"))
+        db3.update(schema.systemSettings).set({ value: closing_time, updatedAt: /* @__PURE__ */ new Date() }).where(eq5(schema.systemSettings.key, "closing_time"))
       );
     }
     if (store_status) {
       updates.push(
-        db2.update(schema.systemSettings).set({ value: store_status, updatedAt: /* @__PURE__ */ new Date() }).where(eq5(schema.systemSettings.key, "store_status"))
+        db3.update(schema.systemSettings).set({ value: store_status, updatedAt: /* @__PURE__ */ new Date() }).where(eq5(schema.systemSettings.key, "store_status"))
       );
     }
     await Promise.all(updates);
+    broadcastSettingsChanged("business_hours");
     res.json({ success: true, message: "\u062A\u0645 \u062A\u062D\u062F\u064A\u062B \u0623\u0648\u0642\u0627\u062A \u0627\u0644\u0639\u0645\u0644 \u0628\u0646\u062C\u0627\u062D" });
   } catch (error) {
     console.error("\u062E\u0637\u0623 \u0641\u064A \u062A\u062D\u062F\u064A\u062B \u0623\u0648\u0642\u0627\u062A \u0627\u0644\u0639\u0645\u0644:", error);
@@ -7982,17 +9636,17 @@ router6.put("/business-hours", async (req, res) => {
 });
 router6.get("/users", async (req, res) => {
   try {
-    const customers2 = await db2.select({
+    const customers2 = await db3.select({
       id: schema.customers.id,
       name: schema.customers.name,
       email: schema.customers.email,
       phone: schema.customers.phone,
-      role: sql3`'customer'`,
+      role: sql4`'customer'`,
       isActive: schema.customers.isActive,
       createdAt: schema.customers.createdAt,
-      address: sql3`NULL`
+      address: sql4`NULL`
     }).from(schema.customers);
-    const adminUsers2 = await db2.select({
+    const adminUsers2 = await db3.select({
       id: schema.adminUsers.id,
       name: schema.adminUsers.name,
       email: schema.adminUsers.email,
@@ -8000,7 +9654,7 @@ router6.get("/users", async (req, res) => {
       role: schema.adminUsers.userType,
       isActive: schema.adminUsers.isActive,
       createdAt: schema.adminUsers.createdAt,
-      address: sql3`NULL`
+      address: sql4`NULL`
     }).from(schema.adminUsers);
     const allUsers = [...customers2, ...adminUsers2].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     res.json(allUsers);
@@ -8015,12 +9669,12 @@ router6.patch("/users/:id", async (req, res) => {
     const { name, email, phone, role, isActive } = req.body;
     let targetTable = "customers";
     let currentUser = null;
-    const customerResult = await db2.select().from(schema.customers).where(eq5(schema.customers.id, id)).limit(1);
+    const customerResult = await db3.select().from(schema.customers).where(eq5(schema.customers.id, id)).limit(1);
     if (customerResult.length > 0) {
       currentUser = customerResult[0];
       targetTable = "customers";
     } else {
-      const adminResult = await db2.select().from(schema.adminUsers).where(eq5(schema.adminUsers.id, id)).limit(1);
+      const adminResult = await db3.select().from(schema.adminUsers).where(eq5(schema.adminUsers.id, id)).limit(1);
       if (adminResult.length > 0) {
         currentUser = adminResult[0];
         targetTable = "adminUsers";
@@ -8039,17 +9693,17 @@ router6.patch("/users/:id", async (req, res) => {
     let updatedUser;
     if (role && role !== currentUser.userType && role !== "customer") {
       if (targetTable === "customers" && (role === "driver" || role === "admin")) {
-        const [newAdminUser] = await db2.insert(schema.adminUsers).values({
+        const [newAdminUser] = await db3.insert(schema.adminUsers).values({
           name: name || currentUser.name,
           email: email || currentUser.email,
           phone: phone || currentUser.phone,
           userType: role,
           isActive: isActive !== void 0 ? isActive : currentUser.isActive
         }).returning();
-        await db2.delete(schema.customers).where(eq5(schema.customers.id, id));
+        await db3.delete(schema.customers).where(eq5(schema.customers.id, id));
         updatedUser = { ...newAdminUser, role: newAdminUser.userType };
       } else if (targetTable === "adminUsers" && role === "customer") {
-        const [newCustomer] = await db2.insert(schema.customers).values({
+        const [newCustomer] = await db3.insert(schema.customers).values({
           name: name || currentUser.name,
           username: (email || currentUser.email).split("@")[0],
           // استخدام الجزء الأول من البريد كـ username
@@ -8057,23 +9711,23 @@ router6.patch("/users/:id", async (req, res) => {
           phone: phone || currentUser.phone,
           isActive: isActive !== void 0 ? isActive : currentUser.isActive
         }).returning();
-        await db2.delete(schema.adminUsers).where(eq5(schema.adminUsers.id, id));
+        await db3.delete(schema.adminUsers).where(eq5(schema.adminUsers.id, id));
         updatedUser = { ...newCustomer, role: "customer" };
       } else if (targetTable === "adminUsers") {
         updateData.userType = role;
-        const [result] = await db2.update(schema.adminUsers).set(updateData).where(eq5(schema.adminUsers.id, id)).returning();
+        const [result] = await db3.update(schema.adminUsers).set(updateData).where(eq5(schema.adminUsers.id, id)).returning();
         updatedUser = { ...result, role: result.userType };
       }
     } else {
       if (targetTable === "customers") {
         delete updateData.userType;
-        const [result] = await db2.update(schema.customers).set(updateData).where(eq5(schema.customers.id, id)).returning();
+        const [result] = await db3.update(schema.customers).set(updateData).where(eq5(schema.customers.id, id)).returning();
         updatedUser = { ...result, role: "customer" };
       } else {
         if (role && (role === "driver" || role === "admin")) {
           updateData.userType = role;
         }
-        const [result] = await db2.update(schema.adminUsers).set(updateData).where(eq5(schema.adminUsers.id, id)).returning();
+        const [result] = await db3.update(schema.adminUsers).set(updateData).where(eq5(schema.adminUsers.id, id)).returning();
         updatedUser = { ...result, role: result.userType };
       }
     }
@@ -8086,13 +9740,13 @@ router6.patch("/users/:id", async (req, res) => {
 router6.delete("/users/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const customerResult = await db2.select().from(schema.customers).where(eq5(schema.customers.id, id)).limit(1);
+    const customerResult = await db3.select().from(schema.customers).where(eq5(schema.customers.id, id)).limit(1);
     if (customerResult.length > 0) {
       await storage.deleteUser(id);
       res.json({ success: true, message: "\u062A\u0645 \u062D\u0630\u0641 \u0627\u0644\u0639\u0645\u064A\u0644 \u0628\u0646\u062C\u0627\u062D" });
       return;
     }
-    const adminResult = await db2.select().from(schema.adminUsers).where(eq5(schema.adminUsers.id, id)).limit(1);
+    const adminResult = await db3.select().from(schema.adminUsers).where(eq5(schema.adminUsers.id, id)).limit(1);
     if (adminResult.length > 0) {
       const user = adminResult[0];
       if (user.userType === "admin" && user.email === "admin@alsarie-one.com") {
@@ -8105,66 +9759,6 @@ router6.delete("/users/:id", async (req, res) => {
     res.status(404).json({ error: "\u0627\u0644\u0645\u0633\u062A\u062E\u062F\u0645 \u063A\u064A\u0631 \u0645\u0648\u062C\u0648\u062F" });
   } catch (error) {
     console.error("\u062E\u0637\u0623 \u0641\u064A \u062D\u0630\u0641 \u0627\u0644\u0645\u0633\u062A\u062E\u062F\u0645:", error);
-    res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
-  }
-});
-router6.get("/profile", async (req, res) => {
-  try {
-    const admin = req.admin;
-    const adminProfile = {
-      id: admin.id,
-      name: admin.name,
-      email: admin.email,
-      username: admin.username,
-      phone: admin.phone,
-      userType: admin.userType,
-      isActive: admin.isActive,
-      createdAt: admin.createdAt
-    };
-    res.json(adminProfile);
-  } catch (error) {
-    console.error("\u062E\u0637\u0623 \u0641\u064A \u062C\u0644\u0628 \u0627\u0644\u0645\u0644\u0641 \u0627\u0644\u0634\u062E\u0635\u064A:", error);
-    res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
-  }
-});
-router6.put("/profile", async (req, res) => {
-  try {
-    const { name, email, username, phone } = req.body;
-    const adminId = req.admin.id;
-    if (!name || !email) {
-      return res.status(400).json({ error: "\u0627\u0644\u0627\u0633\u0645 \u0648\u0627\u0644\u0628\u0631\u064A\u062F \u0627\u0644\u0625\u0644\u0643\u062A\u0631\u0648\u0646\u064A \u0645\u0637\u0644\u0648\u0628\u0627\u0646" });
-    }
-    const existingAdmin = await db2.select().from(schema.adminUsers).where(
-      and3(
-        eq5(schema.adminUsers.email, email),
-        sql3`${schema.adminUsers.id} != ${adminId}`
-      )
-    );
-    if (existingAdmin.length > 0) {
-      return res.status(400).json({ error: "\u0627\u0644\u0628\u0631\u064A\u062F \u0627\u0644\u0625\u0644\u0643\u062A\u0631\u0648\u0646\u064A \u0645\u0633\u062A\u062E\u062F\u0645 \u0628\u0627\u0644\u0641\u0639\u0644" });
-    }
-    const [updatedAdmin] = await db2.update(schema.adminUsers).set({
-      name,
-      email,
-      username: username || null,
-      phone: phone || null
-    }).where(eq5(schema.adminUsers.id, adminId)).returning();
-    if (!updatedAdmin) {
-      return res.status(404).json({ error: "\u0627\u0644\u0645\u062F\u064A\u0631 \u063A\u064A\u0631 \u0645\u0648\u062C\u0648\u062F" });
-    }
-    const adminProfile = {
-      id: updatedAdmin.id,
-      name: updatedAdmin.name,
-      email: updatedAdmin.email,
-      username: updatedAdmin.username,
-      phone: updatedAdmin.phone,
-      userType: updatedAdmin.userType,
-      isActive: updatedAdmin.isActive,
-      createdAt: updatedAdmin.createdAt
-    };
-    res.json(adminProfile);
-  } catch (error) {
-    console.error("\u062E\u0637\u0623 \u0641\u064A \u062A\u062D\u062F\u064A\u062B \u0627\u0644\u0645\u0644\u0641 \u0627\u0644\u0634\u062E\u0635\u064A:", error);
     res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
   }
 });
@@ -8197,28 +9791,505 @@ router6.put("/ui-settings/:key", async (req, res) => {
     if (!setting) {
       return res.status(404).json({ error: "\u0641\u0634\u0644 \u0641\u064A \u062A\u062D\u062F\u064A\u062B \u0627\u0644\u0625\u0639\u062F\u0627\u062F" });
     }
+    broadcastSettingsChanged(key);
     res.json(setting);
   } catch (error) {
     console.error("\u062E\u0637\u0623 \u0641\u064A \u062A\u062D\u062F\u064A\u062B \u0625\u0639\u062F\u0627\u062F \u0627\u0644\u0648\u0627\u062C\u0647\u0629:", error);
     res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
   }
 });
+router6.get("/coupons", async (req, res) => {
+  try {
+    const coupons2 = await storage.getCoupons();
+    res.json(coupons2);
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u062C\u0644\u0628 \u0627\u0644\u0643\u0648\u0628\u0648\u0646\u0627\u062A:", error);
+    res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
+router6.post("/coupons", async (req, res) => {
+  try {
+    const coupon = await storage.createCoupon(req.body);
+    res.status(201).json(coupon);
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u0625\u0636\u0627\u0641\u0629 \u0627\u0644\u0643\u0648\u0628\u0648\u0646:", error);
+    if (error?.code === "23505") {
+      return res.status(400).json({ error: "\u0643\u0648\u062F \u0627\u0644\u0643\u0648\u0628\u0648\u0646 \u0645\u0633\u062A\u062E\u062F\u0645 \u0628\u0627\u0644\u0641\u0639\u0644\u060C \u064A\u0631\u062C\u0649 \u0627\u062E\u062A\u064A\u0627\u0631 \u0643\u0648\u062F \u0622\u062E\u0631" });
+    }
+    res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645: " + (error?.message || "") });
+  }
+});
+router6.put("/coupons/:id", async (req, res) => {
+  try {
+    const coupon = await storage.updateCoupon(req.params.id, req.body);
+    if (!coupon) return res.status(404).json({ error: "\u0627\u0644\u0643\u0648\u0628\u0648\u0646 \u063A\u064A\u0631 \u0645\u0648\u062C\u0648\u062F" });
+    res.json(coupon);
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u062A\u062D\u062F\u064A\u062B \u0627\u0644\u0643\u0648\u0628\u0648\u0646:", error);
+    res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
+router6.delete("/coupons/:id", async (req, res) => {
+  try {
+    const success = await storage.deleteCoupon(req.params.id);
+    if (!success) return res.status(404).json({ error: "\u0627\u0644\u0643\u0648\u0628\u0648\u0646 \u063A\u064A\u0631 \u0645\u0648\u062C\u0648\u062F" });
+    res.json({ success: true });
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u062D\u0630\u0641 \u0627\u0644\u0643\u0648\u0628\u0648\u0646:", error);
+    res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
+router6.get("/reports/detailed", async (req, res) => {
+  try {
+    const filters = {
+      type: req.query.type,
+      startDate: req.query.startDate,
+      endDate: req.query.endDate
+    };
+    const report = await storage.getDetailedReport(filters);
+    res.json(report);
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u062C\u0644\u0628 \u0627\u0644\u062A\u0642\u0631\u064A\u0631 \u0627\u0644\u062A\u0641\u0635\u064A\u0644\u064A:", error);
+    res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
+router6.get("/payment-methods", async (req, res) => {
+  try {
+    const methods = await storage.getPaymentMethods();
+    const methodsWithDocs = await Promise.all(methods.map(async (m) => {
+      const docs = await storage.getPaymentMethodDocuments(m.id);
+      return { ...m, documents: docs };
+    }));
+    res.json(methodsWithDocs);
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u062C\u0644\u0628 \u0637\u0631\u0642 \u0627\u0644\u062F\u0641\u0639:", error);
+    res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
+router6.post("/payment-methods", async (req, res) => {
+  try {
+    const method = await storage.createPaymentMethod(req.body);
+    res.status(201).json(method);
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u0625\u0636\u0627\u0641\u0629 \u0637\u0631\u064A\u0642\u0629 \u0627\u0644\u062F\u0641\u0639:", error);
+    res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
+router6.put("/payment-methods/:id", async (req, res) => {
+  try {
+    const method = await storage.updatePaymentMethod(req.params.id, req.body);
+    if (!method) return res.status(404).json({ error: "\u0637\u0631\u064A\u0642\u0629 \u0627\u0644\u062F\u0641\u0639 \u063A\u064A\u0631 \u0645\u0648\u062C\u0648\u062F\u0629" });
+    res.json(method);
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u062A\u062D\u062F\u064A\u062B \u0637\u0631\u064A\u0642\u0629 \u0627\u0644\u062F\u0641\u0639:", error);
+    res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
+router6.delete("/payment-methods/:id", async (req, res) => {
+  try {
+    const success = await storage.deletePaymentMethod(req.params.id);
+    if (!success) return res.status(404).json({ error: "\u0637\u0631\u064A\u0642\u0629 \u0627\u0644\u062F\u0641\u0639 \u063A\u064A\u0631 \u0645\u0648\u062C\u0648\u062F\u0629" });
+    res.json({ success: true });
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u062D\u0630\u0641 \u0637\u0631\u064A\u0642\u0629 \u0627\u0644\u062F\u0641\u0639:", error);
+    res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
+router6.get("/payment-methods/:id/documents", async (req, res) => {
+  try {
+    const docs = await storage.getPaymentMethodDocuments(req.params.id);
+    res.json(docs);
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u062C\u0644\u0628 \u0648\u062B\u0627\u0626\u0642 \u0637\u0631\u064A\u0642\u0629 \u0627\u0644\u062F\u0641\u0639:", error);
+    res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
+router6.post("/payment-methods/:id/documents", async (req, res) => {
+  try {
+    const doc = await storage.createPaymentMethodDocument({ ...req.body, paymentMethodId: req.params.id });
+    res.status(201).json(doc);
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u0625\u0636\u0627\u0641\u0629 \u0648\u062B\u064A\u0642\u0629:", error);
+    res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
+router6.put("/payment-methods/:id/documents/:docId", async (req, res) => {
+  try {
+    const doc = await storage.updatePaymentMethodDocument(req.params.docId, req.body);
+    if (!doc) return res.status(404).json({ error: "\u0627\u0644\u0648\u062B\u064A\u0642\u0629 \u063A\u064A\u0631 \u0645\u0648\u062C\u0648\u062F\u0629" });
+    res.json(doc);
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u062A\u062D\u062F\u064A\u062B \u0627\u0644\u0648\u062B\u064A\u0642\u0629:", error);
+    res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
+router6.delete("/payment-methods/:id/documents/:docId", async (req, res) => {
+  try {
+    const success = await storage.deletePaymentMethodDocument(req.params.docId);
+    if (!success) return res.status(404).json({ error: "\u0627\u0644\u0648\u062B\u064A\u0642\u0629 \u063A\u064A\u0631 \u0645\u0648\u062C\u0648\u062F\u0629" });
+    res.json({ success: true });
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u062D\u0630\u0641 \u0627\u0644\u0648\u062B\u064A\u0642\u0629:", error);
+    res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
+router6.post("/orders/reset-numbers", async (req, res) => {
+  try {
+    const allOrders = await storage.getOrders();
+    const sorted = [...allOrders].sort(
+      (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+    );
+    const prefix = req.body.prefix || "";
+    for (let i = 0; i < sorted.length; i++) {
+      const newNumber = `${prefix}${String(i + 1).padStart(4, "0")}`;
+      await db3.update(orders).set({ orderNumber: newNumber }).where(eq5(orders.id, sorted[i].id));
+    }
+    res.json({ success: true, message: `\u062A\u0645 \u0625\u0639\u0627\u062F\u0629 \u062A\u0633\u0644\u0633\u0644 ${sorted.length} \u0637\u0644\u0628 \u0628\u0646\u062C\u0627\u062D` });
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u0625\u0639\u0627\u062F\u0629 \u062A\u0633\u0644\u0633\u0644 \u0623\u0631\u0642\u0627\u0645 \u0627\u0644\u0637\u0644\u0628\u0627\u062A:", error);
+    res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
+router6.get("/backup", async (req, res) => {
+  try {
+    const [
+      allOrders,
+      allDrivers,
+      allRestaurants,
+      allCategories,
+      allMenuItems,
+      allSpecialOffers,
+      allUsers
+    ] = await Promise.all([
+      storage.getOrders(),
+      storage.getDrivers(),
+      storage.getRestaurants(),
+      storage.getCategories(),
+      storage.getAllMenuItems(),
+      storage.getSpecialOffers(),
+      storage.getUsers ? storage.getUsers() : []
+    ]);
+    const backup = {
+      version: "1.0",
+      exportedAt: (/* @__PURE__ */ new Date()).toISOString(),
+      data: {
+        orders: allOrders,
+        drivers: allDrivers,
+        restaurants: allRestaurants,
+        categories: allCategories,
+        menuItems: allMenuItems,
+        specialOffers: allSpecialOffers,
+        users: allUsers
+      },
+      counts: {
+        orders: allOrders.length,
+        drivers: allDrivers.length,
+        restaurants: allRestaurants.length,
+        categories: allCategories.length,
+        menuItems: allMenuItems.length,
+        specialOffers: allSpecialOffers.length,
+        users: allUsers.length
+      }
+    };
+    const filename = `tamtom-backup-${(/* @__PURE__ */ new Date()).toISOString().split("T")[0]}.json`;
+    res.setHeader("Content-Type", "application/json");
+    res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+    res.json(backup);
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u0625\u0646\u0634\u0627\u0621 \u0627\u0644\u0646\u0633\u062E\u0629 \u0627\u0644\u0627\u062D\u062A\u064A\u0627\u0637\u064A\u0629:", error);
+    res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
+router6.get("/backup/stats", async (req, res) => {
+  try {
+    const [
+      allOrders,
+      allDrivers,
+      allRestaurants,
+      allCategories,
+      allMenuItems,
+      allSpecialOffers
+    ] = await Promise.all([
+      storage.getOrders(),
+      storage.getDrivers(),
+      storage.getRestaurants(),
+      storage.getCategories(),
+      storage.getAllMenuItems(),
+      storage.getSpecialOffers()
+    ]);
+    res.json({
+      counts: {
+        orders: allOrders.length,
+        drivers: allDrivers.length,
+        restaurants: allRestaurants.length,
+        categories: allCategories.length,
+        menuItems: allMenuItems.length,
+        specialOffers: allSpecialOffers.length
+      },
+      lastBackup: null
+    });
+  } catch (error) {
+    res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
+router6.get("/profile", async (req, res) => {
+  try {
+    let admin = null;
+    if (req.admin) {
+      admin = req.admin;
+    } else {
+      const [found] = await db3.select().from(adminUsers).where(eq5(adminUsers.userType, "admin")).limit(1);
+      admin = found;
+    }
+    if (!admin) return res.status(404).json({ error: "\u0644\u0645 \u064A\u062A\u0645 \u0627\u0644\u0639\u062B\u0648\u0631 \u0639\u0644\u0649 \u0645\u0644\u0641 \u0627\u0644\u0645\u062F\u064A\u0631" });
+    const { password: _, ...safeAdmin } = admin;
+    res.json(safeAdmin);
+  } catch (error) {
+    res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
+router6.put("/profile", async (req, res) => {
+  try {
+    const { name, email, username, phone } = req.body;
+    if (!name || !email) {
+      return res.status(400).json({ error: "\u0627\u0644\u0627\u0633\u0645 \u0648\u0627\u0644\u0628\u0631\u064A\u062F \u0627\u0644\u0625\u0644\u0643\u062A\u0631\u0648\u0646\u064A \u0645\u0637\u0644\u0648\u0628\u0627\u0646" });
+    }
+    let adminId;
+    if (req.admin) {
+      adminId = req.admin.id;
+    } else {
+      const [found] = await db3.select().from(adminUsers).where(eq5(adminUsers.userType, "admin")).limit(1);
+      if (!found) return res.status(404).json({ error: "\u0644\u0645 \u064A\u062A\u0645 \u0627\u0644\u0639\u062B\u0648\u0631 \u0639\u0644\u0649 \u0645\u0644\u0641 \u0627\u0644\u0645\u062F\u064A\u0631" });
+      adminId = found.id;
+    }
+    const updatePayload = {
+      name,
+      email,
+      username: username && username.trim() ? username.trim() : null,
+      phone: phone && phone.trim() ? phone.trim() : null
+    };
+    const [updated] = await db3.update(adminUsers).set(updatePayload).where(eq5(adminUsers.id, adminId)).returning();
+    if (!updated) return res.status(404).json({ error: "\u0644\u0645 \u064A\u062A\u0645 \u0627\u0644\u0639\u062B\u0648\u0631 \u0639\u0644\u0649 \u0645\u0644\u0641 \u0627\u0644\u0645\u062F\u064A\u0631" });
+    const { password: _, ...safeAdmin } = updated;
+    res.json(safeAdmin);
+  } catch (error) {
+    console.error("\u274C \u062E\u0637\u0623 \u0641\u064A \u062A\u062D\u062F\u064A\u062B \u0645\u0644\u0641 \u0627\u0644\u0645\u062F\u064A\u0631:", error);
+    if (error?.code === "23505") {
+      return res.status(400).json({ error: "\u0627\u0644\u0628\u0631\u064A\u062F \u0627\u0644\u0625\u0644\u0643\u062A\u0631\u0648\u0646\u064A \u0623\u0648 \u0627\u0633\u0645 \u0627\u0644\u0645\u0633\u062A\u062E\u062F\u0645 \u0645\u0633\u062A\u062E\u062F\u0645 \u0628\u0627\u0644\u0641\u0639\u0644" });
+    }
+    res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645: " + (error?.message || "") });
+  }
+});
+router6.put("/change-password", async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    let admin = null;
+    if (req.admin) {
+      const [found] = await db3.select().from(adminUsers).where(eq5(adminUsers.id, req.admin.id)).limit(1);
+      admin = found;
+    } else {
+      const [found] = await db3.select().from(adminUsers).where(eq5(adminUsers.userType, "admin")).limit(1);
+      admin = found;
+    }
+    if (!admin) return res.status(404).json({ error: "\u0644\u0645 \u064A\u062A\u0645 \u0627\u0644\u0639\u062B\u0648\u0631 \u0639\u0644\u0649 \u0627\u0644\u0645\u062F\u064A\u0631" });
+    const isValid = await bcrypt3.compare(currentPassword, admin.password || "");
+    if (!isValid) {
+      return res.status(400).json({ error: "\u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631 \u0627\u0644\u062D\u0627\u0644\u064A\u0629 \u063A\u064A\u0631 \u0635\u062D\u064A\u062D\u0629" });
+    }
+    const hashed = await bcrypt3.hash(newPassword, 10);
+    await db3.update(adminUsers).set({ password: hashed }).where(eq5(adminUsers.id, admin.id));
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
+router6.get("/sub-admins", requirePermission("manage_admins"), async (req, res) => {
+  try {
+    const subAdmins = await db3.select().from(adminUsers).where(eq5(adminUsers.userType, "sub_admin"));
+    const safe = subAdmins.map((u) => {
+      const { password: _, ...rest } = u;
+      return rest;
+    });
+    res.json(safe);
+  } catch (error) {
+    res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
+router6.post("/sub-admins", requirePermission("manage_admins"), async (req, res) => {
+  try {
+    const { name, phone, password, permissions, isActive } = req.body;
+    let { email, username } = req.body;
+    if (!name || !name.trim()) return res.status(400).json({ error: "\u0627\u0644\u0627\u0633\u0645 \u0645\u0637\u0644\u0648\u0628" });
+    if (!phone || !phone.trim()) return res.status(400).json({ error: "\u0631\u0642\u0645 \u0627\u0644\u0647\u0627\u062A\u0641 \u0645\u0637\u0644\u0648\u0628" });
+    if (!password) return res.status(400).json({ error: "\u0643\u0644\u0645\u0629 \u0627\u0644\u0645\u0631\u0648\u0631 \u0645\u0637\u0644\u0648\u0628\u0629" });
+    if (!email || !email.trim()) {
+      email = `${phone.replace(/\D/g, "")}@subadmin.local`;
+    }
+    const hashed = await bcrypt3.hash(password, 10);
+    const [newSubAdmin] = await db3.insert(adminUsers).values({
+      name,
+      email,
+      username: username || null,
+      phone,
+      password: hashed,
+      userType: "sub_admin",
+      permissions: typeof permissions === "string" ? permissions : JSON.stringify(permissions || []),
+      isActive: isActive !== false
+    }).returning();
+    const { password: _, ...safe } = newSubAdmin;
+    res.status(201).json(safe);
+  } catch (error) {
+    if (error?.code === "23505") {
+      return res.status(409).json({ error: "\u0631\u0642\u0645 \u0627\u0644\u0647\u0627\u062A\u0641 \u0623\u0648 \u0627\u0644\u0628\u0631\u064A\u062F \u0627\u0644\u0625\u0644\u0643\u062A\u0631\u0648\u0646\u064A \u0645\u0633\u062A\u062E\u062F\u0645 \u0628\u0627\u0644\u0641\u0639\u0644" });
+    }
+    res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
+router6.put("/sub-admins/:id", requirePermission("manage_admins"), async (req, res) => {
+  try {
+    const { name, phone, password, permissions, isActive } = req.body;
+    let { email, username } = req.body;
+    const updateData = { name, phone, isActive };
+    if (email !== void 0) updateData.email = email;
+    if (username !== void 0) updateData.username = username || null;
+    if (password) {
+      updateData.password = await bcrypt3.hash(password, 10);
+    }
+    if (permissions !== void 0) {
+      updateData.permissions = typeof permissions === "string" ? permissions : JSON.stringify(permissions);
+    }
+    const [updated] = await db3.update(adminUsers).set(updateData).where(eq5(adminUsers.id, req.params.id)).returning();
+    if (!updated) return res.status(404).json({ error: "\u0627\u0644\u0645\u0634\u0631\u0641 \u063A\u064A\u0631 \u0645\u0648\u062C\u0648\u062F" });
+    const { password: _, ...safe } = updated;
+    res.json(safe);
+  } catch (error) {
+    res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
+router6.delete("/sub-admins/:id", requirePermission("manage_admins"), async (req, res) => {
+  try {
+    await db3.delete(adminUsers).where(eq5(adminUsers.id, req.params.id));
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
+router6.get("/security/settings", async (req, res) => {
+  try {
+    res.json({
+      twoFactorEnabled: false,
+      sessionTimeout: 60,
+      passwordComplexity: "medium",
+      ipWhitelist: [],
+      lastAudit: (/* @__PURE__ */ new Date()).toISOString()
+    });
+  } catch (error) {
+    res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
+router6.get("/security/logs", async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit) || 50;
+    const logs = await db3.select({
+      id: auditLogs.id,
+      adminId: auditLogs.adminId,
+      action: auditLogs.action,
+      entityType: auditLogs.entityType,
+      entityId: auditLogs.entityId,
+      ipAddress: auditLogs.ipAddress,
+      createdAt: auditLogs.createdAt,
+      oldData: auditLogs.oldData,
+      newData: auditLogs.newData
+    }).from(auditLogs).where(sql4`${auditLogs.entityType} = 'auth'`).orderBy(desc3(auditLogs.createdAt)).limit(limit);
+    const adminIds = [...new Set(logs.map((l) => l.adminId))];
+    let adminMap = {};
+    if (adminIds.length > 0) {
+      const admins = await db3.select({ id: adminUsers.id, name: adminUsers.name }).from(adminUsers).where(inArray2(adminUsers.id, adminIds));
+      admins.forEach((a) => {
+        adminMap[a.id] = a.name;
+      });
+    }
+    const formatted = logs.map((log3) => ({
+      id: log3.id,
+      userId: log3.adminId,
+      userName: adminMap[log3.adminId] || "\u0645\u0633\u062A\u062E\u062F\u0645",
+      action: log3.action === "login" ? "\u062A\u0633\u062C\u064A\u0644 \u0627\u0644\u062F\u062E\u0648\u0644" : log3.action === "logout" ? "\u062A\u0633\u062C\u064A\u0644 \u0627\u0644\u062E\u0631\u0648\u062C" : log3.action,
+      ipAddress: log3.ipAddress || "\u063A\u064A\u0631 \u0645\u0639\u0631\u0648\u0641",
+      device: log3.oldData ? (() => {
+        try {
+          return JSON.parse(log3.oldData)?.device || "\u063A\u064A\u0631 \u0645\u0639\u0631\u0648\u0641";
+        } catch {
+          return "\u063A\u064A\u0631 \u0645\u0639\u0631\u0648\u0641";
+        }
+      })() : "\u063A\u064A\u0631 \u0645\u0639\u0631\u0648\u0641",
+      location: "\u0627\u0644\u064A\u0645\u0646",
+      createdAt: log3.createdAt,
+      status: log3.newData ? (() => {
+        try {
+          return JSON.parse(log3.newData)?.status || "success";
+        } catch {
+          return "success";
+        }
+      })() : "success"
+    }));
+    res.json(formatted);
+  } catch (error) {
+    res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
+router6.post("/security/log-login", async (req, res) => {
+  try {
+    const { adminId, ipAddress, device } = req.body;
+    if (!adminId) return res.status(400).json({ error: "\u0645\u0639\u0631\u0641 \u0627\u0644\u0645\u062F\u064A\u0631 \u0645\u0637\u0644\u0648\u0628" });
+    await db3.insert(auditLogs).values({
+      adminId,
+      action: "login",
+      entityType: "auth",
+      entityId: adminId,
+      ipAddress: ipAddress || req.ip || "unknown",
+      oldData: JSON.stringify({ device: device || req.headers["user-agent"] || "\u063A\u064A\u0631 \u0645\u0639\u0631\u0648\u0641" }),
+      newData: JSON.stringify({ status: "success" })
+    });
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
+router6.post("/security/log-logout", async (req, res) => {
+  try {
+    const { userId, userName } = req.body;
+    if (!userId) return res.status(400).json({ error: "\u0645\u0639\u0631\u0641 \u0627\u0644\u0645\u0633\u062A\u062E\u062F\u0645 \u0645\u0637\u0644\u0648\u0628" });
+    const [admin] = await db3.select({ id: adminUsers.id }).from(adminUsers).where(eq5(adminUsers.id, userId)).limit(1);
+    if (!admin) return res.json({ success: true });
+    await db3.insert(auditLogs).values({
+      adminId: userId,
+      action: "logout",
+      entityType: "auth",
+      entityId: userId,
+      ipAddress: req.ip || "unknown",
+      oldData: JSON.stringify({ device: req.headers["user-agent"] || "\u063A\u064A\u0631 \u0645\u0639\u0631\u0648\u0641", name: userName }),
+      newData: JSON.stringify({ status: "success" })
+    });
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
 
 // server/routes/advanced.ts
-init_db_advanced();
 import express9 from "express";
 var router7 = express9.Router();
 function registerAdvancedRoutes(app2) {
-  const dbStorage3 = new DatabaseStorage();
-  const advancedDb = new AdvancedDatabaseStorage(dbStorage3.db);
+  const dbStorage4 = new DatabaseStorage();
+  const advancedDb = new AdvancedDatabaseStorage(dbStorage4.db);
   app2.get("/api/admin/drivers/:driverId/details", async (req, res) => {
     try {
       const { driverId } = req.params;
-      const driver = await dbStorage3.getDriver(driverId);
+      const driver = await dbStorage4.getDriver(driverId);
       if (!driver) {
         return res.status(404).json({ error: "Driver not found" });
       }
-      const balance = await dbStorage3.getDriverBalance(driverId);
+      const balance = await dbStorage4.getDriverBalance(driverId);
       const wallet = balance ? {
         id: balance.id,
         driverId: balance.driverId,
@@ -8243,7 +10314,7 @@ function registerAdvancedRoutes(app2) {
   });
   app2.get("/api/admin/drivers/stats", async (req, res) => {
     try {
-      const drivers2 = await dbStorage3.getDrivers();
+      const drivers2 = await dbStorage4.getDrivers();
       const now = /* @__PURE__ */ new Date();
       const todayStart = new Date(now.setHours(0, 0, 0, 0));
       const weekStart = new Date((/* @__PURE__ */ new Date()).setDate(now.getDate() - 7));
@@ -8254,14 +10325,14 @@ function registerAdvancedRoutes(app2) {
           const performanceToday = await advancedDb.getDriverPerformanceStats(driver.id, todayStart);
           const performanceWeekly = await advancedDb.getDriverPerformanceStats(driver.id, weekStart);
           const performanceMonthly = await advancedDb.getDriverPerformanceStats(driver.id, monthStart);
-          const balance = await dbStorage3.getDriverBalance(driver.id);
+          const balance = await dbStorage4.getDriverBalance(driver.id);
           const withdrawals = await advancedDb.getWithdrawalRequests(driver.id, "driver");
           const reviews = await advancedDb.getDriverReviews(driver.id);
           const avgRating = reviews.length > 0 ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length : 0;
           return {
             id: driver.id,
             name: driver.name,
-            email: driver.email || `${driver.phone}@sareeone.com`,
+            email: driver.email || `${driver.phone}@wasel.app`,
             phone: driver.phone,
             status: driver.isActive ? "active" : "inactive",
             rating: avgRating,
@@ -8303,11 +10374,11 @@ function registerAdvancedRoutes(app2) {
   });
   app2.get("/api/admin/drivers-summary", async (req, res) => {
     try {
-      const drivers2 = await dbStorage3.getDrivers();
+      const drivers2 = await dbStorage4.getDrivers();
       const summaries = await Promise.all(
         drivers2.map(async (driver) => {
           const stats = await advancedDb.getDriverPerformanceStats(driver.id);
-          const balance = await dbStorage3.getDriverBalance(driver.id);
+          const balance = await dbStorage4.getDriverBalance(driver.id);
           const wallet = balance ? {
             balance: balance.availableBalance,
             totalEarned: balance.totalBalance
@@ -8342,7 +10413,7 @@ function registerAdvancedRoutes(app2) {
   app2.get("/api/admin/restaurants/:restaurantId/details", async (req, res) => {
     try {
       const { restaurantId } = req.params;
-      const restaurant = await dbStorage3.getRestaurant(restaurantId);
+      const restaurant = await dbStorage4.getRestaurant(restaurantId);
       if (!restaurant) {
         return res.status(404).json({ error: "Restaurant not found" });
       }
@@ -8360,9 +10431,9 @@ function registerAdvancedRoutes(app2) {
   });
   app2.get("/api/admin/restaurants-summary", async (req, res) => {
     try {
-      const restaurants2 = await dbStorage3.getRestaurants();
+      const restaurants3 = await dbStorage4.getRestaurants();
       const summaries = await Promise.all(
-        restaurants2.map(async (restaurant) => {
+        restaurants3.map(async (restaurant) => {
           const stats = await advancedDb.getRestaurantPerformanceStats(restaurant.id);
           const wallet = await advancedDb.getRestaurantWallet(restaurant.id);
           return {
@@ -8384,9 +10455,9 @@ function registerAdvancedRoutes(app2) {
   });
   app2.get("/api/admin/restaurants/stats", async (req, res) => {
     try {
-      const restaurants2 = await dbStorage3.getRestaurants();
+      const restaurants3 = await dbStorage4.getRestaurants();
       const stats = await Promise.all(
-        restaurants2.map(async (restaurant) => {
+        restaurants3.map(async (restaurant) => {
           const performance = await advancedDb.getRestaurantPerformanceStats(restaurant.id);
           const wallet = await advancedDb.getRestaurantWallet(restaurant.id);
           return {
@@ -8441,22 +10512,18 @@ function registerAdvancedRoutes(app2) {
       if (!amount || parseFloat(amount) <= 0) {
         return res.status(400).json({ error: "Invalid amount" });
       }
-      const updatedBalance = await dbStorage3.updateDriverBalance(driverId, {
-        amount: parseFloat(amount),
-        type: "bonus"
-        // Defaulting to bonus for manual add
-      });
-      await dbStorage3.createDriverTransaction({
+      await dbStorage4.createDriverTransaction({
         driverId,
         amount: amount.toString(),
         type: "bonus",
         description: description || "\u0625\u0636\u0627\u0641\u0629 \u064A\u062F\u0648\u064A\u0629 \u0644\u0644\u0631\u0635\u064A\u062F"
       });
+      const updatedBalance = await dbStorage4.getDriverBalance(driverId);
       res.json({
-        id: updatedBalance.id,
-        driverId: updatedBalance.driverId,
-        balance: updatedBalance.availableBalance,
-        totalEarned: updatedBalance.totalBalance
+        id: updatedBalance?.id,
+        driverId: updatedBalance?.driverId,
+        balance: updatedBalance?.availableBalance,
+        totalEarned: updatedBalance?.totalBalance
       });
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -8465,7 +10532,7 @@ function registerAdvancedRoutes(app2) {
   app2.get("/api/drivers/:driverId/wallet", async (req, res) => {
     try {
       const { driverId } = req.params;
-      const balance = await dbStorage3.getDriverBalance(driverId);
+      const balance = await dbStorage4.getDriverBalance(driverId);
       if (!balance) {
         return res.status(404).json({ error: "Balance not found" });
       }
@@ -8489,7 +10556,7 @@ function registerAdvancedRoutes(app2) {
       }
       const numericAmount = parseFloat(amount);
       if (entityType === "driver") {
-        const balance = await dbStorage3.getDriverBalance(entityId);
+        const balance = await dbStorage4.getDriverBalance(entityId);
         const available = parseFloat(balance?.availableBalance?.toString() || "0");
         if (available < numericAmount) {
           return res.status(400).json({ error: "Insufficient balance" });
@@ -8524,12 +10591,7 @@ function registerAdvancedRoutes(app2) {
       const { approvedBy } = req.body;
       const request = await advancedDb.approveWithdrawalRequest(requestId, approvedBy);
       if (request.entityType === "driver") {
-        const amount = parseFloat(request.amount.toString());
-        await dbStorage3.updateDriverBalance(request.entityId, {
-          amount,
-          type: "withdrawal"
-        });
-        await dbStorage3.createDriverTransaction({
+        await dbStorage4.createDriverTransaction({
           driverId: request.entityId,
           amount: request.amount.toString(),
           type: "withdrawal",
@@ -8565,10 +10627,10 @@ function registerAdvancedRoutes(app2) {
         requests.map(async (request) => {
           let userName = "\u063A\u064A\u0631 \u0645\u0639\u0631\u0648\u0641";
           if (request.entityType === "driver") {
-            const driver = await dbStorage3.getDriver(request.entityId);
+            const driver = await dbStorage4.getDriver(request.entityId);
             userName = driver?.name || "\u0633\u0627\u0626\u0642 \u063A\u064A\u0631 \u0645\u0639\u0631\u0648\u0641";
           } else if (request.entityType === "restaurant") {
-            const restaurant = await dbStorage3.getRestaurant(request.entityId);
+            const restaurant = await dbStorage4.getRestaurant(request.entityId);
             userName = restaurant?.name || "\u0645\u0637\u0639\u0645 \u063A\u064A\u0631 \u0645\u0639\u0631\u0648\u0641";
           }
           return {
@@ -8637,7 +10699,7 @@ function registerAdvancedRoutes(app2) {
   app2.post("/api/audit-logs", async (req, res) => {
     try {
       const { action, entityType, entityId, userId, userType, description, changes } = req.body;
-      const log2 = await advancedDb.createAuditLog({
+      const log3 = await advancedDb.createAuditLog({
         action,
         entityType,
         entityId,
@@ -8647,7 +10709,7 @@ function registerAdvancedRoutes(app2) {
         changes,
         status: "success"
       });
-      res.json(log2);
+      res.json(log3);
     } catch (error) {
       res.status(500).json({ error: "Failed to create audit log" });
     }
@@ -8709,7 +10771,7 @@ function registerAdvancedRoutes(app2) {
       if (!amount || parseFloat(amount) <= 0) {
         return res.status(400).json({ error: "Invalid amount" });
       }
-      const balance = await dbStorage3.getDriverBalance(driverId);
+      const balance = await dbStorage4.getDriverBalance(driverId);
       const available = parseFloat(balance?.availableBalance?.toString() || "0");
       if (available < parseFloat(amount)) {
         return res.status(400).json({ error: "Insufficient balance" });
@@ -8734,11 +10796,1590 @@ function registerAdvancedRoutes(app2) {
       res.status(500).json({ error: "Failed to create withdrawal request" });
     }
   });
+  app2.get("/api/admin/analytics/daily-revenue", async (req, res) => {
+    try {
+      const days = parseInt(req.query.days) || 30;
+      const data = await advancedDb.getDailyRevenue(days);
+      res.json(data);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch daily revenue" });
+    }
+  });
+  app2.get("/api/admin/analytics/customer-retention", async (req, res) => {
+    try {
+      const data = await advancedDb.getCustomerRetentionStats();
+      res.json(data);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch retention stats" });
+    }
+  });
+  app2.get("/api/admin/analytics/top-areas", async (req, res) => {
+    try {
+      const limit = parseInt(req.query.limit) || 5;
+      const data = await advancedDb.getTopDeliveryAreas(limit);
+      res.json(data);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch top areas" });
+    }
+  });
+  app2.get("/api/admin/marketing/inactive-users", async (req, res) => {
+    try {
+      const days = parseInt(req.query.days) || 7;
+      const users2 = await advancedDb.getInactiveUsers(days);
+      res.json(users2);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch inactive users" });
+    }
+  });
+  app2.post("/api/admin/marketing/send-mass-notification", async (req, res) => {
+    try {
+      const { userIds, title, message, type = "offer" } = req.body;
+      if (!userIds || !Array.isArray(userIds) || !title || !message) {
+        return res.status(400).json({ error: "\u0628\u064A\u0627\u0646\u0627\u062A \u0646\u0627\u0642\u0635\u0629" });
+      }
+      const results = await Promise.all(
+        userIds.map(
+          (userId) => dbStorage4.createNotification({
+            type,
+            title,
+            message,
+            recipientType: "customer",
+            recipientId: userId,
+            isRead: false
+          })
+        )
+      );
+      res.json({
+        success: true,
+        message: `\u062A\u0645 \u0625\u0631\u0633\u0627\u0644 ${results.length} \u0625\u0634\u0639\u0627\u0631 \u0628\u0646\u062C\u0627\u062D`,
+        count: results.length
+      });
+    } catch (error) {
+      console.error("Error sending mass notification:", error);
+      res.status(500).json({ error: "Failed to send notifications" });
+    }
+  });
 }
+
+// server/routes/public.ts
+import express10 from "express";
+init_schema();
+import { eq as eq6, desc as desc4 } from "drizzle-orm";
+var router8 = express10.Router();
+router8.get("/app-status", async (req, res) => {
+  try {
+    const { opening, closing, status } = req.query;
+    const openingTime = opening || "08:00";
+    const closingTime = closing || "23:00";
+    const storeStatus = status || "open";
+    if (storeStatus === "closed") {
+      return res.json({ isOpen: false, message: "\u0627\u0644\u062A\u0637\u0628\u064A\u0642 \u0645\u063A\u0644\u0642 \u062D\u0627\u0644\u064A\u0627\u064B \u0645\u0646 \u0642\u0650\u0628\u0644 \u0627\u0644\u0625\u062F\u0627\u0631\u0629", openingTime });
+    }
+    if (storeStatus === "open") {
+      return res.json({ isOpen: true });
+    }
+    const now = /* @__PURE__ */ new Date();
+    const yemenTime = new Date(now.getTime() + 3 * 60 * 60 * 1e3);
+    const currentTime = yemenTime.toISOString().split("T")[1].slice(0, 5);
+    const timeToMinutes2 = (t) => {
+      const [h, m] = t.split(":").map(Number);
+      return h * 60 + m;
+    };
+    const current = timeToMinutes2(currentTime);
+    const open = timeToMinutes2(openingTime);
+    const close = timeToMinutes2(closingTime);
+    let appIsOpen = close > open ? current >= open && current < close : current >= open || current < close;
+    if (!appIsOpen) {
+      const isBeforeOpen = current < open;
+      const whenOpen = isBeforeOpen ? `\u064A\u0641\u062A\u062D \u0627\u0644\u064A\u0648\u0645 \u0627\u0644\u0633\u0627\u0639\u0629 ${openingTime}` : `\u064A\u0641\u062A\u062D \u063A\u062F\u0627\u064B \u0627\u0644\u0633\u0627\u0639\u0629 ${openingTime}`;
+      return res.json({
+        isOpen: false,
+        message: `\u0627\u0644\u062A\u0637\u0628\u064A\u0642 \u0645\u063A\u0644\u0642 \u062D\u0627\u0644\u064A\u0627\u064B. ${whenOpen}`,
+        openingTime
+      });
+    }
+    res.json({ isOpen: true });
+  } catch (error) {
+    res.status(500).json({ isOpen: false, message: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062A\u062D\u0642\u0642 \u0645\u0646 \u062D\u0627\u0644\u0629 \u0627\u0644\u062A\u0637\u0628\u064A\u0642" });
+  }
+});
+router8.get("/categories", async (req, res) => {
+  try {
+    const categories2 = await storage.getCategories();
+    res.json(categories2);
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u062C\u0644\u0628 \u0627\u0644\u062A\u0635\u0646\u064A\u0641\u0627\u062A:", error);
+    res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
+router8.get("/restaurants", async (req, res) => {
+  try {
+    const { categoryId, search } = req.query;
+    let restaurants3;
+    if (search) {
+      restaurants3 = await storage.searchRestaurants(`%${search}%`, categoryId);
+    } else if (categoryId && categoryId !== "all") {
+      restaurants3 = await storage.getRestaurantsByCategory(categoryId);
+    } else {
+      restaurants3 = await storage.getRestaurants();
+    }
+    res.json(restaurants3);
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u062C\u0644\u0628 \u0627\u0644\u0645\u0637\u0627\u0639\u0645:", error);
+    res.status(500).json({ message: "Failed to fetch restaurants" });
+  }
+});
+router8.get("/restaurants/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const restaurant = await storage.getRestaurant(id);
+    if (!restaurant) {
+      return res.status(404).json({ message: "\u0627\u0644\u0645\u0637\u0639\u0645 \u063A\u064A\u0631 \u0645\u0648\u062C\u0648\u062F" });
+    }
+    res.json(restaurant);
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u062C\u0644\u0628 \u062A\u0641\u0627\u0635\u064A\u0644 \u0627\u0644\u0645\u0637\u0639\u0645:", error);
+    res.status(500).json({ message: "Failed to fetch restaurant" });
+  }
+});
+router8.get("/restaurants/:id/menu", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const restaurant = await storage.getRestaurant(id);
+    if (!restaurant) {
+      return res.status(404).json({ message: "\u0627\u0644\u0645\u0637\u0639\u0645 \u063A\u064A\u0631 \u0645\u0648\u062C\u0648\u062F" });
+    }
+    const menuItems2 = await storage.getMenuItems(id);
+    res.json({
+      restaurant,
+      menu: [],
+      allItems: menuItems2
+    });
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u062C\u0644\u0628 \u0642\u0627\u0626\u0645\u0629 \u0627\u0644\u0645\u0637\u0639\u0645:", error);
+    res.status(500).json({ message: "Failed to fetch menu items" });
+  }
+});
+router8.get("/restaurants/:id/sections", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const sections = await storage.getRestaurantSections(id);
+    res.json(sections);
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u062C\u0644\u0628 \u0623\u0642\u0633\u0627\u0645 \u0627\u0644\u0645\u0637\u0639\u0645:", error);
+    res.status(500).json({ message: "Failed to fetch restaurant sections" });
+  }
+});
+router8.post("/restaurants/:id/rate", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { rating, comment, customerName } = req.body;
+    if (!rating || rating < 1 || rating > 5) {
+      return res.status(400).json({ message: "\u0627\u0644\u062A\u0642\u064A\u064A\u0645 \u064A\u062C\u0628 \u0623\u0646 \u064A\u0643\u0648\u0646 \u0628\u064A\u0646 1 \u0648 5" });
+    }
+    const restaurant = await storage.getRestaurant(id);
+    if (!restaurant) {
+      return res.status(404).json({ message: "\u0627\u0644\u0645\u0637\u0639\u0645 \u063A\u064A\u0631 \u0645\u0648\u062C\u0648\u062F" });
+    }
+    const ratingData = {
+      restaurantId: id,
+      customerName: customerName || "\u0632\u0627\u0626\u0631",
+      rating: Number(rating),
+      comment: comment || null,
+      isApproved: false
+    };
+    const newRating = await storage.createRating(ratingData);
+    res.status(201).json({ success: true, rating: newRating });
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u0625\u0631\u0633\u0627\u0644 \u0627\u0644\u062A\u0642\u064A\u064A\u0645:", error);
+    res.status(500).json({ message: "\u0641\u0634\u0644 \u0641\u064A \u0625\u0631\u0633\u0627\u0644 \u0627\u0644\u062A\u0642\u064A\u064A\u0645" });
+  }
+});
+router8.get("/special-offers", async (req, res) => {
+  try {
+    console.log("\u{1F50D} Storage type:", storage.constructor.name);
+    res.set("Cache-Control", "no-store");
+    const { active } = req.query;
+    let offers;
+    if (active === "false") {
+      offers = await storage.getSpecialOffers();
+    } else {
+      offers = await storage.getActiveSpecialOffers();
+    }
+    console.log("\u{1F4CA} Found offers:", offers.length, offers);
+    res.json(offers);
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u062C\u0644\u0628 \u0627\u0644\u0639\u0631\u0648\u0636 \u0627\u0644\u062E\u0627\u0635\u0629:", error);
+    res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
+router8.post("/orders", async (req, res) => {
+  try {
+    const orderData = req.body;
+    const orderNumber = `ORD${Date.now()}${Math.floor(Math.random() * 1e3)}`;
+    const newOrderData = {
+      ...orderData,
+      orderNumber,
+      status: "pending",
+      paymentStatus: "pending"
+    };
+    const [newOrder] = await db.insert(orders).values(newOrderData).returning();
+    await db.insert(orderTracking).values({
+      orderId: newOrder.id,
+      status: "pending",
+      message: "\u062A\u0645 \u0625\u0646\u0634\u0627\u0621 \u0627\u0644\u0637\u0644\u0628 \u0628\u0646\u062C\u0627\u062D",
+      createdByType: "system"
+    });
+    res.json(newOrder);
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u0625\u0646\u0634\u0627\u0621 \u0627\u0644\u0637\u0644\u0628:", error);
+    res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
+router8.get("/orders/:id/track", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const order = await db.query.orders.findFirst({
+      where: eq6(orders.id, id)
+    });
+    if (!order) {
+      return res.status(404).json({ error: "\u0627\u0644\u0637\u0644\u0628 \u063A\u064A\u0631 \u0645\u0648\u062C\u0648\u062F" });
+    }
+    const tracking = await db.query.orderTracking.findMany({
+      where: eq6(orderTracking.orderId, id),
+      orderBy: desc4(orderTracking.timestamp)
+    });
+    res.json({
+      order,
+      tracking
+    });
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u062A\u062A\u0628\u0639 \u0627\u0644\u0637\u0644\u0628:", error);
+    res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
+router8.get("/settings", async (req, res) => {
+  try {
+    const settings = await db.query.systemSettings.findMany({
+      where: eq6(systemSettings.isPublic, true)
+    });
+    const settingsObject = settings.reduce((acc, setting) => {
+      acc[setting.key] = setting.value;
+      return acc;
+    }, {});
+    res.json(settingsObject);
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u062C\u0644\u0628 \u0627\u0644\u0625\u0639\u062F\u0627\u062F\u0627\u062A:", error);
+    res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
+router8.get("/search", async (req, res) => {
+  try {
+    const { q, type = "all" } = req.query;
+    if (!q) {
+      return res.json({ restaurants: [], categories: [], menuItems: [] });
+    }
+    const searchTerm = `%${q}%`;
+    let results = { restaurants: [], categories: [], menuItems: [] };
+    if (type === "all" || type === "restaurants") {
+      results.restaurants = await storage.searchRestaurants(searchTerm);
+    }
+    if (type === "all" || type === "categories") {
+      results.categories = await storage.searchCategories(searchTerm);
+    }
+    if (type === "all" || type === "menu") {
+      results.menuItems = await storage.searchMenuItems(searchTerm);
+    }
+    res.json(results);
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u0628\u062D\u062B:", error);
+    res.status(500).json({ message: "Failed to search" });
+  }
+});
+router8.post("/coupons/validate", async (req, res) => {
+  try {
+    const { code, orderValue, categoryIds } = req.body;
+    if (!code) return res.status(400).json({ valid: false, message: "\u0643\u0648\u062F \u0627\u0644\u0643\u0648\u0628\u0648\u0646 \u0645\u0637\u0644\u0648\u0628" });
+    const result = await storage.validateCoupon(code, orderValue || 0);
+    if (!result.valid) {
+      return res.json(result);
+    }
+    if (result.coupon?.categoryId && categoryIds?.length > 0) {
+      const couponCategoryId = String(result.coupon.categoryId);
+      const cartCategories = categoryIds.map((id) => String(id));
+      if (!cartCategories.includes(couponCategoryId)) {
+        return res.json({
+          valid: false,
+          message: "\u0647\u0630\u0627 \u0627\u0644\u0643\u0648\u0628\u0648\u0646 \u0645\u062E\u0635\u0635 \u0644\u062A\u0635\u0646\u064A\u0641 \u0645\u0639\u064A\u0646 \u0644\u0627 \u064A\u0648\u062C\u062F \u0641\u064A \u0633\u0644\u062A\u0643"
+        });
+      }
+    }
+    res.json(result);
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062A\u062D\u0642\u0642 \u0645\u0646 \u0627\u0644\u0643\u0648\u0628\u0648\u0646:", error);
+    res.status(500).json({ valid: false, message: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062A\u062D\u0642\u0642 \u0645\u0646 \u0627\u0644\u0643\u0648\u0628\u0648\u0646" });
+  }
+});
+router8.get("/flutter/app-config", async (req, res) => {
+  try {
+    const settingKeys = [
+      "splash_image_url",
+      "splash_image_url2",
+      "splash_title",
+      "splash_subtitle",
+      "splash_background_color",
+      "splash_duration",
+      "logo_url",
+      "app_name",
+      "primary_color",
+      "secondary_color",
+      "accent_color",
+      "store_status",
+      "privacy_policy_text",
+      "show_splash_screen"
+    ];
+    const settings = {};
+    for (const key of settingKeys) {
+      try {
+        const setting = await storage.getUiSetting(key);
+        if (setting) settings[key] = String(setting.value ?? "");
+      } catch {
+      }
+    }
+    const webAppUrl = process.env.REPLIT_DEV_DOMAIN ? `https://${process.env.REPLIT_DEV_DOMAIN}` : process.env.REPL_SLUG ? `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co` : process.env.WEB_APP_URL || "";
+    res.json({
+      success: true,
+      config: {
+        splashEnabled: settings["show_splash_screen"] !== "false",
+        splashImageUrl: settings["splash_image_url"] || "",
+        splashImageUrl2: settings["splash_image_url2"] || "",
+        splashTitle: settings["splash_title"] || "\u0648\u0627\u0635\u0644",
+        splashSubtitle: settings["splash_subtitle"] || "\u0645\u062A\u062C\u0631 \u0627\u0644\u062E\u0636\u0627\u0631 \u0648\u0627\u0644\u0641\u0648\u0627\u0643\u0647",
+        splashBackgroundColor: settings["splash_background_color"] || "#FFFFFF",
+        splashDuration: parseInt(settings["splash_duration"] || "3000"),
+        logoUrl: settings["logo_url"] || "",
+        appName: settings["app_name"] || "\u0648\u0627\u0635\u0644",
+        appVersion: "1.0.0",
+        primaryColor: settings["primary_color"] || "#4CAF50",
+        secondaryColor: settings["secondary_color"] || "#FF9800",
+        accentColor: settings["accent_color"] || "#2196F3",
+        webAppUrl,
+        storeStatus: settings["store_status"] || "open",
+        privacyPolicyText: settings["privacy_policy_text"] || ""
+      }
+    });
+  } catch (error) {
+    console.error("Flutter config error:", error);
+    res.json({
+      success: false,
+      config: {
+        splashEnabled: true,
+        splashImageUrl: "",
+        splashImageUrl2: "",
+        splashTitle: "\u0648\u0627\u0635\u0644",
+        splashSubtitle: "\u0645\u062A\u062C\u0631 \u0627\u0644\u062E\u0636\u0627\u0631 \u0648\u0627\u0644\u0641\u0648\u0627\u0643\u0647",
+        splashBackgroundColor: "#FFFFFF",
+        splashDuration: 3e3,
+        logoUrl: "",
+        appName: "\u0648\u0627\u0635\u0644",
+        appVersion: "1.0.0",
+        primaryColor: "#4CAF50",
+        secondaryColor: "#FF9800",
+        accentColor: "#2196F3",
+        webAppUrl: "",
+        storeStatus: "open",
+        privacyPolicyText: ""
+      }
+    });
+  }
+});
+
+// server/routes/restaurant-accounts.ts
+import express11 from "express";
+init_schema();
+import { z as z5 } from "zod";
+import { eq as eq7, desc as desc5, and as and5 } from "drizzle-orm";
+var router9 = express11.Router();
+var dbStorage3 = new DatabaseStorage();
+var db4 = dbStorage3.db;
+function getAdvStorage() {
+  return new AdvancedDatabaseStorage(db4);
+}
+router9.get("/", async (req, res) => {
+  try {
+    const advStorage = getAdvStorage();
+    const allRestaurants = await dbStorage3.getRestaurants();
+    const accounts = await Promise.all(allRestaurants.map(async (restaurant) => {
+      const wallet = await advStorage.getRestaurantWallet(restaurant.id);
+      const restaurantOrders = await db4.select().from(orders).where(eq7(orders.restaurantId, restaurant.id));
+      const deliveredOrders = restaurantOrders.filter((o) => o.status === "delivered");
+      const totalRevenue = deliveredOrders.reduce((sum, o) => sum + parseFloat(o.restaurantEarnings?.toString() || "0"), 0);
+      const allWithdrawals = await db4.select().from(withdrawalRequests2).where(and5(eq7(withdrawalRequests2.entityId, restaurant.id), eq7(withdrawalRequests2.entityType, "restaurant")));
+      const pendingAmount = allWithdrawals.filter((w) => w.status === "pending").reduce((sum, w) => sum + parseFloat(w.amount?.toString() || "0"), 0);
+      const withdrawnAmount = allWithdrawals.filter((w) => w.status === "completed").reduce((sum, w) => sum + parseFloat(w.amount?.toString() || "0"), 0);
+      return {
+        restaurant: {
+          id: restaurant.id,
+          name: restaurant.name,
+          image: restaurant.image,
+          isActive: restaurant.isActive,
+          phone: restaurant.phone || ""
+        },
+        account: {
+          totalOrders: deliveredOrders.length,
+          totalRevenue: totalRevenue.toFixed(2),
+          availableBalance: wallet?.balance?.toString() || "0",
+          pendingAmount: pendingAmount.toFixed(2),
+          withdrawnAmount: withdrawnAmount.toFixed(2),
+          commissionRate: restaurant.commissionRate?.toString() || "0"
+        }
+      };
+    }));
+    res.json(accounts);
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u062C\u0644\u0628 \u062D\u0633\u0627\u0628\u0627\u062A \u0627\u0644\u0645\u0637\u0627\u0639\u0645:", error);
+    res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
+router9.get("/all-withdrawals", async (req, res) => {
+  try {
+    const { status } = req.query;
+    let allWithdrawals = await db4.select().from(withdrawalRequests2).where(eq7(withdrawalRequests2.entityType, "restaurant")).orderBy(desc5(withdrawalRequests2.createdAt));
+    if (status && typeof status === "string" && status !== "all") {
+      allWithdrawals = allWithdrawals.filter((w) => w.status === status);
+    }
+    const allRestaurants = await dbStorage3.getRestaurants();
+    const restaurantMap = new Map(allRestaurants.map((r) => [r.id, r]));
+    const enriched = allWithdrawals.map((w) => {
+      const restaurant = restaurantMap.get(w.entityId);
+      let bankInfo = {};
+      try {
+        bankInfo = w.bankDetails ? JSON.parse(w.bankDetails) : {};
+      } catch {
+      }
+      return {
+        ...w,
+        restaurantName: restaurant?.name || "\u0645\u0637\u0639\u0645 \u063A\u064A\u0631 \u0645\u0639\u0631\u0648\u0641",
+        restaurantImage: restaurant?.image || null,
+        bankName: bankInfo.bankName || "",
+        accountNumber: bankInfo.accountNumber || "",
+        accountHolder: bankInfo.accountHolder || restaurant?.name || ""
+      };
+    });
+    res.json({ withdrawals: enriched, total: enriched.length });
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u062C\u0644\u0628 \u062C\u0645\u064A\u0639 \u0637\u0644\u0628\u0627\u062A \u0627\u0644\u0633\u062D\u0628:", error);
+    res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
+router9.get("/:restaurantId", async (req, res) => {
+  try {
+    const { restaurantId } = req.params;
+    const advStorage = getAdvStorage();
+    const restaurant = await dbStorage3.getRestaurant(restaurantId);
+    if (!restaurant) {
+      return res.status(404).json({ error: "\u0627\u0644\u0645\u0637\u0639\u0645 \u063A\u064A\u0631 \u0645\u0648\u062C\u0648\u062F" });
+    }
+    let wallet = await advStorage.getRestaurantWallet(restaurantId);
+    if (!wallet) {
+      wallet = await advStorage.createRestaurantWallet({
+        restaurantId,
+        balance: "0",
+        isActive: true
+      });
+    }
+    const restaurantOrders = await db4.select().from(orders).where(eq7(orders.restaurantId, restaurantId));
+    const deliveredOrders = restaurantOrders.filter((o) => o.status === "delivered");
+    const totalRevenue = deliveredOrders.reduce((sum, o) => sum + parseFloat(o.restaurantEarnings?.toString() || "0"), 0);
+    const allWithdrawals = await db4.select().from(withdrawalRequests2).where(and5(eq7(withdrawalRequests2.entityId, restaurantId), eq7(withdrawalRequests2.entityType, "restaurant")));
+    const pendingAmount = allWithdrawals.filter((w) => w.status === "pending").reduce((sum, w) => sum + parseFloat(w.amount?.toString() || "0"), 0);
+    const withdrawnAmount = allWithdrawals.filter((w) => w.status === "completed").reduce((sum, w) => sum + parseFloat(w.amount?.toString() || "0"), 0);
+    res.json({
+      id: wallet.id,
+      restaurantId,
+      ownerName: restaurant.name,
+      ownerPhone: restaurant.phone || "",
+      totalOrders: deliveredOrders.length,
+      totalRevenue: totalRevenue.toFixed(2),
+      availableBalance: wallet.balance?.toString() || "0",
+      pendingAmount: pendingAmount.toFixed(2),
+      withdrawnAmount: withdrawnAmount.toFixed(2),
+      commissionRate: restaurant.commissionRate?.toString() || "0",
+      createdAt: wallet.createdAt,
+      updatedAt: wallet.updatedAt
+    });
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u062C\u0644\u0628 \u062D\u0633\u0627\u0628 \u0627\u0644\u0645\u0637\u0639\u0645:", error);
+    res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
+router9.get("/:restaurantId/stats", async (req, res) => {
+  try {
+    const { restaurantId } = req.params;
+    const { period } = req.query;
+    const advStorage = getAdvStorage();
+    const wallet = await advStorage.getRestaurantWallet(restaurantId);
+    const restaurant = await dbStorage3.getRestaurant(restaurantId);
+    const restaurantOrders = await db4.select().from(orders).where(eq7(orders.restaurantId, restaurantId));
+    let filteredOrders = restaurantOrders;
+    const now = /* @__PURE__ */ new Date();
+    if (period === "today") {
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      filteredOrders = restaurantOrders.filter((o) => new Date(o.createdAt) >= today);
+    } else if (period === "week") {
+      const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1e3);
+      filteredOrders = restaurantOrders.filter((o) => new Date(o.createdAt) >= weekAgo);
+    } else if (period === "month") {
+      const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1e3);
+      filteredOrders = restaurantOrders.filter((o) => new Date(o.createdAt) >= monthAgo);
+    }
+    const deliveredOrders = filteredOrders.filter((o) => o.status === "delivered");
+    const pendingOrders = filteredOrders.filter((o) => o.status === "pending");
+    const cancelledOrders = filteredOrders.filter((o) => o.status === "cancelled");
+    const totalRevenue = deliveredOrders.reduce((sum, o) => sum + parseFloat(o.restaurantEarnings?.toString() || "0"), 0);
+    const totalCommission = deliveredOrders.reduce((sum, o) => sum + parseFloat(o.companyEarnings?.toString() || "0"), 0);
+    const avgOrderValue = deliveredOrders.length > 0 ? totalRevenue / deliveredOrders.length : 0;
+    const allDelivered = restaurantOrders.filter((o) => o.status === "delivered");
+    const allWithdrawals = await db4.select().from(withdrawalRequests2).where(and5(eq7(withdrawalRequests2.entityId, restaurantId), eq7(withdrawalRequests2.entityType, "restaurant")));
+    const totalWithdrawn = allWithdrawals.filter((w) => w.status === "completed").reduce((sum, w) => sum + parseFloat(w.amount?.toString() || "0"), 0);
+    const netRevenue = allDelivered.reduce((sum, o) => sum + parseFloat(o.restaurantEarnings?.toString() || "0"), 0);
+    res.json({
+      period,
+      totalOrders: filteredOrders.length,
+      deliveredOrders: deliveredOrders.length,
+      pendingOrders: pendingOrders.length,
+      cancelledOrders: cancelledOrders.length,
+      totalRevenue,
+      totalCommission,
+      avgOrderValue,
+      successRate: filteredOrders.length > 0 ? (deliveredOrders.length / filteredOrders.length * 100).toFixed(1) : "0",
+      // all-time
+      completedOrders: allDelivered.length,
+      netRevenue: netRevenue.toFixed(2),
+      totalWithdrawn: totalWithdrawn.toFixed(2),
+      availableBalance: wallet?.balance?.toString() || "0",
+      commissionRate: restaurant?.commissionRate?.toString() || "0"
+    });
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u062C\u0644\u0628 \u0625\u062D\u0635\u0627\u0626\u064A\u0627\u062A \u0627\u0644\u0645\u0637\u0639\u0645:", error);
+    res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
+router9.put("/:restaurantId/commission", async (req, res) => {
+  try {
+    const { restaurantId } = req.params;
+    const { commissionRate } = req.body;
+    if (commissionRate === void 0 || commissionRate === null) {
+      return res.status(400).json({ error: "\u0646\u0633\u0628\u0629 \u0627\u0644\u0639\u0645\u0648\u0644\u0629 \u0645\u0637\u0644\u0648\u0628\u0629" });
+    }
+    const rate = parseFloat(commissionRate);
+    if (isNaN(rate) || rate < 0 || rate > 100) {
+      return res.status(400).json({ error: "\u0646\u0633\u0628\u0629 \u0627\u0644\u0639\u0645\u0648\u0644\u0629 \u064A\u062C\u0628 \u0623\u0646 \u062A\u0643\u0648\u0646 \u0628\u064A\u0646 0 \u0648 100" });
+    }
+    await dbStorage3.updateRestaurant(restaurantId, { commissionRate: rate.toString() });
+    const restaurant = await dbStorage3.getRestaurant(restaurantId);
+    res.json({ success: true, restaurant, commissionRate: rate });
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u062A\u062D\u062F\u064A\u062B \u0646\u0633\u0628\u0629 \u0627\u0644\u0639\u0645\u0648\u0644\u0629:", error);
+    res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
+router9.put("/:restaurantId", async (req, res) => {
+  try {
+    const { restaurantId } = req.params;
+    const accountSchema = z5.object({
+      ownerName: z5.string().optional(),
+      ownerPhone: z5.string().optional(),
+      ownerEmail: z5.string().email().optional(),
+      bankName: z5.string().optional(),
+      bankAccountNumber: z5.string().optional(),
+      bankAccountName: z5.string().optional(),
+      commissionRate: z5.string().optional()
+    });
+    const validatedData = accountSchema.parse(req.body);
+    if (validatedData.commissionRate !== void 0) {
+      await dbStorage3.updateRestaurant(restaurantId, {
+        commissionRate: validatedData.commissionRate
+      });
+    }
+    const restaurant = await dbStorage3.getRestaurant(restaurantId);
+    if (!restaurant) {
+      return res.status(404).json({ error: "\u0627\u0644\u0645\u0637\u0639\u0645 \u063A\u064A\u0631 \u0645\u0648\u062C\u0648\u062F" });
+    }
+    res.json({ success: true, restaurant });
+  } catch (error) {
+    if (error instanceof z5.ZodError) {
+      return res.status(400).json({ error: "\u0628\u064A\u0627\u0646\u0627\u062A \u063A\u064A\u0631 \u0635\u062D\u064A\u062D\u0629", details: error.errors });
+    }
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u062A\u062D\u062F\u064A\u062B \u062D\u0633\u0627\u0628 \u0627\u0644\u0645\u0637\u0639\u0645:", error);
+    res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
+router9.get("/:restaurantId/transactions", async (req, res) => {
+  try {
+    const { restaurantId } = req.params;
+    const { type, limit: limitParam, offset: offsetParam } = req.query;
+    const restaurantOrders = await db4.select().from(orders).where(eq7(orders.restaurantId, restaurantId)).orderBy(desc5(orders.createdAt));
+    let transactions = restaurantOrders.filter((o) => o.status === "delivered").map((o) => ({
+      id: o.id,
+      restaurantId,
+      type: "order_revenue",
+      amount: o.restaurantEarnings?.toString() || "0",
+      description: `\u0625\u064A\u0631\u0627\u062F\u0627\u062A \u0637\u0644\u0628 \u0631\u0642\u0645 ${o.orderNumber}`,
+      orderId: o.id,
+      createdAt: o.createdAt
+    }));
+    const withdrawals = await db4.select().from(withdrawalRequests2).where(and5(eq7(withdrawalRequests2.entityId, restaurantId), eq7(withdrawalRequests2.entityType, "restaurant"))).orderBy(desc5(withdrawalRequests2.createdAt));
+    const withdrawalTransactions = withdrawals.map((w) => {
+      let bankInfo = {};
+      try {
+        bankInfo = w.bankDetails ? JSON.parse(w.bankDetails) : {};
+      } catch {
+      }
+      return {
+        id: w.id,
+        restaurantId,
+        type: `withdrawal_${w.status}`,
+        amount: `-${w.amount}`,
+        description: `\u0637\u0644\u0628 \u0633\u062D\u0628 - ${w.status === "completed" ? "\u0645\u0643\u062A\u0645\u0644" : w.status === "pending" ? "\u0645\u0639\u0644\u0642" : w.status === "approved" ? "\u0645\u0648\u0627\u0641\u0642 \u0639\u0644\u064A\u0647" : "\u0645\u0631\u0641\u0648\u0636"}`,
+        bankName: bankInfo.bankName || "",
+        accountNumber: bankInfo.accountNumber || "",
+        status: w.status,
+        adminNotes: w.adminNotes || "",
+        createdAt: w.createdAt
+      };
+    });
+    let allTransactions = [...transactions, ...withdrawalTransactions].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    if (type) allTransactions = allTransactions.filter((t) => t.type.includes(type));
+    const limitNum = parseInt(limitParam) || 50;
+    const offsetNum = parseInt(offsetParam) || 0;
+    const paginated = allTransactions.slice(offsetNum, offsetNum + limitNum);
+    res.json({ transactions: paginated, total: allTransactions.length, limit: limitNum, offset: offsetNum });
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u062C\u0644\u0628 \u0645\u0639\u0627\u0645\u0644\u0627\u062A \u0627\u0644\u0645\u0637\u0639\u0645:", error);
+    res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
+router9.post("/:restaurantId/withdraw", async (req, res) => {
+  try {
+    const { restaurantId } = req.params;
+    const { amount, bankName, accountNumber, accountHolder } = req.body;
+    if (!amount || parseFloat(amount) <= 0) {
+      return res.status(400).json({ error: "\u0627\u0644\u0645\u0628\u0644\u063A \u064A\u062C\u0628 \u0623\u0646 \u064A\u0643\u0648\u0646 \u0623\u0643\u0628\u0631 \u0645\u0646 \u0635\u0641\u0631" });
+    }
+    const advStorage = getAdvStorage();
+    const wallet = await advStorage.getRestaurantWallet(restaurantId);
+    const currentBalance = parseFloat(wallet?.balance?.toString() || "0");
+    if (currentBalance < parseFloat(amount)) {
+      return res.status(400).json({ error: "\u0627\u0644\u0631\u0635\u064A\u062F \u063A\u064A\u0631 \u0643\u0627\u0641\u064D" });
+    }
+    const restaurant = await dbStorage3.getRestaurant(restaurantId);
+    const bankDetails = JSON.stringify({ bankName: bankName || "", accountNumber: accountNumber || "", accountHolder: accountHolder || restaurant?.name || "" });
+    const withdrawal = await db4.insert(withdrawalRequests2).values({
+      entityType: "restaurant",
+      entityId: restaurantId,
+      amount: amount.toString(),
+      bankDetails,
+      status: "pending"
+    }).returning();
+    res.json({ success: true, message: "\u062A\u0645 \u062A\u0642\u062F\u064A\u0645 \u0637\u0644\u0628 \u0627\u0644\u0633\u062D\u0628 \u0628\u0646\u062C\u0627\u062D", withdrawal: withdrawal[0] });
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u0637\u0644\u0628 \u0627\u0644\u0633\u062D\u0628:", error);
+    res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
+router9.get("/:restaurantId/withdrawals", async (req, res) => {
+  try {
+    const { restaurantId } = req.params;
+    const { status } = req.query;
+    let withdrawals = await db4.select().from(withdrawalRequests2).where(and5(eq7(withdrawalRequests2.entityId, restaurantId), eq7(withdrawalRequests2.entityType, "restaurant"))).orderBy(desc5(withdrawalRequests2.createdAt));
+    if (status && typeof status === "string") {
+      withdrawals = withdrawals.filter((w) => w.status === status);
+    }
+    const enriched = withdrawals.map((w) => {
+      let bankInfo = {};
+      try {
+        bankInfo = w.bankDetails ? JSON.parse(w.bankDetails) : {};
+      } catch {
+      }
+      return { ...w, bankName: bankInfo.bankName || "", accountNumber: bankInfo.accountNumber || "", accountHolder: bankInfo.accountHolder || "" };
+    });
+    res.json({ withdrawals: enriched, total: enriched.length });
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u062C\u0644\u0628 \u0637\u0644\u0628\u0627\u062A \u0627\u0644\u0633\u062D\u0628:", error);
+    res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
+router9.get("/:restaurantId/daily-stats", async (req, res) => {
+  try {
+    const { restaurantId } = req.params;
+    const { startDate, endDate } = req.query;
+    const restaurantOrders = await db4.select().from(orders).where(eq7(orders.restaurantId, restaurantId));
+    let start = startDate ? new Date(startDate) : new Date(Date.now() - 30 * 24 * 60 * 60 * 1e3);
+    let end = endDate ? new Date(endDate) : /* @__PURE__ */ new Date();
+    const filteredOrders = restaurantOrders.filter((o) => {
+      const d = new Date(o.createdAt);
+      return d >= start && d <= end && o.status === "delivered";
+    });
+    const dailyMap = {};
+    filteredOrders.forEach((o) => {
+      const day = new Date(o.createdAt).toISOString().split("T")[0];
+      if (!dailyMap[day]) dailyMap[day] = { date: day, orders: 0, revenue: 0 };
+      dailyMap[day].orders++;
+      dailyMap[day].revenue += parseFloat(o.restaurantEarnings?.toString() || "0");
+    });
+    const stats = Object.values(dailyMap).sort((a, b) => a.date.localeCompare(b.date));
+    res.json(stats);
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u062C\u0644\u0628 \u0627\u0644\u0625\u062D\u0635\u0627\u0626\u064A\u0627\u062A \u0627\u0644\u064A\u0648\u0645\u064A\u0629:", error);
+    res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
+router9.put("/withdrawals/:withdrawalId", async (req, res) => {
+  try {
+    const { withdrawalId } = req.params;
+    const { status, adminNotes, rejectionReason } = req.body;
+    if (!["approved", "rejected", "completed"].includes(status)) {
+      return res.status(400).json({ error: "\u062D\u0627\u0644\u0629 \u063A\u064A\u0631 \u0635\u062D\u064A\u062D\u0629" });
+    }
+    const [updated] = await db4.update(withdrawalRequests2).set({
+      status,
+      adminNotes: adminNotes || null,
+      rejectionReason: status === "rejected" ? rejectionReason || adminNotes || null : null,
+      updatedAt: /* @__PURE__ */ new Date()
+    }).where(eq7(withdrawalRequests2.id, withdrawalId)).returning();
+    if (!updated) {
+      return res.status(404).json({ error: "\u0637\u0644\u0628 \u0627\u0644\u0633\u062D\u0628 \u063A\u064A\u0631 \u0645\u0648\u062C\u0648\u062F" });
+    }
+    if (status === "completed" && updated.entityId) {
+      const advStorage = getAdvStorage();
+      const amount = parseFloat(updated.amount?.toString() || "0");
+      if (amount > 0) {
+        try {
+          await advStorage.deductRestaurantWalletBalance(updated.entityId, amount);
+        } catch (e) {
+          console.error("\u062E\u0637\u0623 \u0641\u064A \u062E\u0635\u0645 \u0631\u0635\u064A\u062F \u0627\u0644\u0645\u0637\u0639\u0645:", e);
+        }
+      }
+    }
+    res.json({ success: true, withdrawal: updated });
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u0645\u0639\u0627\u0644\u062C\u0629 \u0637\u0644\u0628 \u0627\u0644\u0633\u062D\u0628:", error);
+    res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
+router9.get("/:restaurantId/statement", async (req, res) => {
+  try {
+    const { restaurantId } = req.params;
+    const { from, to } = req.query;
+    const restaurant = await dbStorage3.getRestaurant(restaurantId);
+    if (!restaurant) return res.status(404).json({ error: "\u0627\u0644\u0645\u062A\u062C\u0631 \u063A\u064A\u0631 \u0645\u0648\u062C\u0648\u062F" });
+    const advStorage = getAdvStorage();
+    const wallet = await advStorage.getRestaurantWallet(restaurantId);
+    const commissionRate = parseFloat(restaurant.commissionRate?.toString() || "15");
+    let restaurantOrders = await db4.select().from(orders).where(eq7(orders.restaurantId, restaurantId)).orderBy(desc5(orders.createdAt));
+    if (from || to) {
+      const fromDate = from ? new Date(from) : /* @__PURE__ */ new Date("2000-01-01");
+      const toDate = to ? new Date(to) : /* @__PURE__ */ new Date();
+      toDate.setHours(23, 59, 59, 999);
+      restaurantOrders = restaurantOrders.filter((o) => {
+        const d = new Date(o.createdAt);
+        return d >= fromDate && d <= toDate;
+      });
+    }
+    const deliveredOrders = restaurantOrders.filter((o) => o.status === "delivered");
+    const cancelledOrders = restaurantOrders.filter((o) => o.status === "cancelled");
+    const statementLines = deliveredOrders.map((o) => {
+      const subtotal = parseFloat(o.subtotal?.toString() || "0");
+      const deliveryFee = parseFloat(o.deliveryFee?.toString() || "0");
+      const totalAmount = parseFloat(o.totalAmount?.toString() || o.total?.toString() || "0");
+      const restaurantEarnings2 = parseFloat(o.restaurantEarnings?.toString() || "0");
+      const commission = parseFloat(o.companyEarnings?.toString() || (subtotal * commissionRate / 100).toFixed(2));
+      const net = restaurantEarnings2 > 0 ? restaurantEarnings2 : subtotal - subtotal * commissionRate / 100;
+      return {
+        orderId: o.id,
+        orderNumber: o.orderNumber,
+        date: o.createdAt,
+        customerName: o.customerName || o.customerPhone || "\u0639\u0645\u064A\u0644",
+        status: o.status,
+        subtotal,
+        deliveryFee,
+        totalAmount,
+        commissionRate,
+        commissionAmount: parseFloat((subtotal * commissionRate / 100).toFixed(2)),
+        restaurantNet: parseFloat(net.toFixed(2)),
+        deliveryFeeShare: deliveryFee
+      };
+    });
+    const allWithdrawals = await db4.select().from(withdrawalRequests2).where(and5(eq7(withdrawalRequests2.entityId, restaurantId), eq7(withdrawalRequests2.entityType, "restaurant"))).orderBy(desc5(withdrawalRequests2.createdAt));
+    let filteredWithdrawals = allWithdrawals;
+    if (from || to) {
+      const fromDate = from ? new Date(from) : /* @__PURE__ */ new Date("2000-01-01");
+      const toDate = to ? new Date(to) : /* @__PURE__ */ new Date();
+      toDate.setHours(23, 59, 59, 999);
+      filteredWithdrawals = allWithdrawals.filter((w) => {
+        const d = new Date(w.createdAt);
+        return d >= fromDate && d <= toDate;
+      });
+    }
+    const totalOrdersCount = restaurantOrders.length;
+    const totalSubtotal = statementLines.reduce((s, l) => s + l.subtotal, 0);
+    const totalCommission = statementLines.reduce((s, l) => s + l.commissionAmount, 0);
+    const totalNet = statementLines.reduce((s, l) => s + l.restaurantNet, 0);
+    const totalWithdrawn = filteredWithdrawals.filter((w) => w.status === "completed").reduce((s, w) => s + parseFloat(w.amount?.toString() || "0"), 0);
+    const pendingWithdrawals = filteredWithdrawals.filter((w) => w.status === "pending").reduce((s, w) => s + parseFloat(w.amount?.toString() || "0"), 0);
+    const currentBalance = parseFloat(wallet?.balance?.toString() || "0");
+    res.json({
+      restaurant: {
+        id: restaurant.id,
+        name: restaurant.name,
+        phone: restaurant.phone || "",
+        address: restaurant.address || "",
+        commissionRate
+      },
+      period: {
+        from: from || null,
+        to: to || null
+      },
+      summary: {
+        totalOrders: totalOrdersCount,
+        deliveredOrders: deliveredOrders.length,
+        cancelledOrders: cancelledOrders.length,
+        totalSubtotal: parseFloat(totalSubtotal.toFixed(2)),
+        totalCommission: parseFloat(totalCommission.toFixed(2)),
+        totalNet: parseFloat(totalNet.toFixed(2)),
+        totalWithdrawn: parseFloat(totalWithdrawn.toFixed(2)),
+        pendingWithdrawals: parseFloat(pendingWithdrawals.toFixed(2)),
+        currentBalance: parseFloat(currentBalance.toFixed(2))
+      },
+      orders: statementLines,
+      withdrawals: filteredWithdrawals.map((w) => {
+        let bankInfo = {};
+        try {
+          bankInfo = w.bankDetails ? JSON.parse(w.bankDetails) : {};
+        } catch {
+        }
+        return {
+          id: w.id,
+          date: w.createdAt,
+          amount: parseFloat(w.amount?.toString() || "0"),
+          status: w.status,
+          bankName: bankInfo.bankName || "",
+          accountNumber: bankInfo.accountNumber || "",
+          notes: w.notes || ""
+        };
+      }),
+      generatedAt: (/* @__PURE__ */ new Date()).toISOString()
+    });
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u0643\u0634\u0641 \u062D\u0633\u0627\u0628 \u0627\u0644\u0645\u062A\u062C\u0631:", error);
+    res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
+var restaurant_accounts_default = router9;
+
+// server/routes/flutter.ts
+import express12 from "express";
+init_schema();
+import { drizzle as drizzle2 } from "drizzle-orm/postgres-js";
+import postgres2 from "postgres";
+import { eq as eq8, and as and6, gt, desc as desc6, or as or5 } from "drizzle-orm";
+var router10 = express12.Router();
+var _db = null;
+function getDb2() {
+  if (_db) return _db;
+  const url = process.env.DATABASE_URL;
+  if (!url) throw new Error("DATABASE_URL is not set");
+  const client = postgres2(url, { max: 5 });
+  _db = drizzle2(client);
+  return _db;
+}
+router10.get("/app-config", async (req, res) => {
+  try {
+    const settings = await storage.getUiSettings();
+    const getValue = (key, fallback = "") => {
+      if (!Array.isArray(settings)) return fallback;
+      const setting = settings.find((s) => s.key === key);
+      return setting ? setting.value : fallback;
+    };
+    const serverUrl = process.env.REPLIT_DEV_DOMAIN ? `https://${process.env.REPLIT_DEV_DOMAIN}` : `http://localhost:${process.env.PORT || 5e3}`;
+    const config = {
+      splashEnabled: getValue("splashEnabled", "true") !== "false",
+      splashImageUrl: getValue("splashImageUrl", ""),
+      splashImageUrl2: getValue("splashImageUrl2", ""),
+      splashTitle: getValue("splashTitle", "\u0648\u0627\u0635\u0644"),
+      splashSubtitle: getValue("splashSubtitle", "\u0645\u062A\u062C\u0631 \u0627\u0644\u062E\u0636\u0627\u0631 \u0648\u0627\u0644\u0641\u0648\u0627\u0643\u0647"),
+      splashBackgroundColor: getValue("splashBackgroundColor", "#FFFFFF"),
+      splashDuration: parseInt(getValue("splashDuration", "3000"), 10),
+      appName: getValue("appName", "\u0648\u0627\u0635\u0644"),
+      appVersion: getValue("appVersion", "1.1.0"),
+      primaryColor: getValue("primaryColor", "#E53935"),
+      secondaryColor: getValue("secondaryColor", "#4CAF50"),
+      accentColor: getValue("accentColor", "#FF9800"),
+      logoUrl: getValue("logoUrl", ""),
+      webAppUrl: getValue("webAppUrl", serverUrl),
+      storeStatus: getValue("storeStatus", "open"),
+      privacyPolicyText: getValue("privacyPolicyText", ""),
+      showSearchBar: getValue("showSearchBar", "true") !== "false",
+      showCategories: getValue("showCategories", "true") !== "false",
+      showSpecialOffers: getValue("showSpecialOffers", "true") !== "false",
+      showSupportButton: getValue("showSupportButton", "true") !== "false",
+      supportWhatsapp: getValue("supportWhatsapp", "966500000000"),
+      openingTime: getValue("openingTime", "08:00"),
+      closingTime: getValue("closingTime", "23:00"),
+      serverUrl
+    };
+    res.json({ success: true, config });
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u062C\u0644\u0628 \u0625\u0639\u062F\u0627\u062F\u0627\u062A Flutter:", error);
+    res.status(500).json({ success: false, message: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
+router10.post("/register-token", async (req, res) => {
+  try {
+    const { token, platform } = req.body;
+    if (!token) {
+      return res.status(400).json({ success: false, message: "Token \u0645\u0637\u0644\u0648\u0628" });
+    }
+    const db5 = getDb2();
+    await db5.insert(deviceTokens).values({
+      token,
+      platform: platform || "android",
+      isActive: true
+    }).onConflictDoUpdate({
+      target: deviceTokens.token,
+      set: {
+        platform: platform || "android",
+        isActive: true,
+        updatedAt: /* @__PURE__ */ new Date()
+      }
+    });
+    res.json({ success: true, message: "\u062A\u0645 \u062A\u0633\u062C\u064A\u0644 \u0627\u0644\u062C\u0647\u0627\u0632 \u0628\u0646\u062C\u0627\u062D" });
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u062A\u0633\u062C\u064A\u0644 \u0631\u0645\u0632 FCM:", error);
+    res.status(500).json({ success: false, message: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
+router10.post("/deregister-token", async (req, res) => {
+  try {
+    const { token } = req.body;
+    if (!token) {
+      return res.status(400).json({ success: false, message: "Token \u0645\u0637\u0644\u0648\u0628" });
+    }
+    const db5 = getDb2();
+    await db5.update(deviceTokens).set({ isActive: false, updatedAt: /* @__PURE__ */ new Date() }).where(eq8(deviceTokens.token, token));
+    res.json({ success: true, message: "\u062A\u0645 \u0625\u0644\u063A\u0627\u0621 \u062A\u0633\u062C\u064A\u0644 \u0627\u0644\u062C\u0647\u0627\u0632" });
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u0625\u0644\u063A\u0627\u0621 \u0631\u0645\u0632 FCM:", error);
+    res.status(500).json({ success: false, message: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
+router10.get("/notifications/poll", async (req, res) => {
+  try {
+    const db5 = getDb2();
+    const since = req.query.since;
+    let sinceDate;
+    if (since) {
+      sinceDate = new Date(since);
+      if (isNaN(sinceDate.getTime())) {
+        sinceDate = new Date(Date.now() - 24 * 60 * 60 * 1e3);
+      }
+    } else {
+      sinceDate = new Date(Date.now() - 24 * 60 * 60 * 1e3);
+    }
+    const newNotifications = await db5.select({
+      id: notifications.id,
+      type: notifications.type,
+      title: notifications.title,
+      message: notifications.message,
+      recipientType: notifications.recipientType,
+      orderId: notifications.orderId,
+      createdAt: notifications.createdAt
+    }).from(notifications).where(
+      and6(
+        or5(
+          eq8(notifications.recipientType, "all"),
+          eq8(notifications.recipientType, "customer"),
+          eq8(notifications.recipientType, "flutter")
+        ),
+        gt(notifications.createdAt, sinceDate)
+      )
+    ).orderBy(desc6(notifications.createdAt)).limit(50);
+    res.json({
+      success: true,
+      notifications: newNotifications,
+      count: newNotifications.length,
+      serverTime: (/* @__PURE__ */ new Date()).toISOString()
+    });
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u062C\u0644\u0628 \u0625\u0634\u0639\u0627\u0631\u0627\u062A Flutter:", error);
+    res.status(500).json({ success: false, message: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
+router10.post("/notifications/send", async (req, res) => {
+  try {
+    const { title, message, type = "info", recipientType = "flutter" } = req.body;
+    if (!title || !message) {
+      return res.status(400).json({ success: false, message: "\u0627\u0644\u0639\u0646\u0648\u0627\u0646 \u0648\u0627\u0644\u0645\u062D\u062A\u0648\u0649 \u0645\u0637\u0644\u0648\u0628\u0627\u0646" });
+    }
+    const db5 = getDb2();
+    const newNotification = await storage.createNotification({
+      type,
+      title,
+      message,
+      recipientType,
+      recipientId: null,
+      isRead: false
+    });
+    res.json({
+      success: true,
+      message: "\u062A\u0645 \u0625\u0631\u0633\u0627\u0644 \u0627\u0644\u0625\u0634\u0639\u0627\u0631 \u0628\u0646\u062C\u0627\u062D \u0644\u062C\u0645\u064A\u0639 \u0623\u062C\u0647\u0632\u0629 \u0627\u0644\u062A\u0637\u0628\u064A\u0642",
+      notification: newNotification
+    });
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u0625\u0631\u0633\u0627\u0644 \u0625\u0634\u0639\u0627\u0631 Flutter:", error);
+    res.status(500).json({ success: false, message: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
+router10.post("/notifications/send-targeted", async (req, res) => {
+  try {
+    const { title, message, type = "info", recipientType = "all", recipientId = null } = req.body;
+    if (!title || !message) {
+      return res.status(400).json({ success: false, message: "\u0627\u0644\u0639\u0646\u0648\u0627\u0646 \u0648\u0627\u0644\u0645\u062D\u062A\u0648\u0649 \u0645\u0637\u0644\u0648\u0628\u0627\u0646" });
+    }
+    const db5 = getDb2();
+    const newNotification = await storage.createNotification({
+      type,
+      title,
+      message,
+      recipientType,
+      recipientId: recipientId || null,
+      isRead: false
+    });
+    const recipientLabel = recipientType === "all" ? "\u062C\u0645\u064A\u0639 \u0627\u0644\u0645\u0633\u062A\u062E\u062F\u0645\u064A\u0646" : recipientType === "customer" ? "\u0627\u0644\u0639\u0645\u0644\u0627\u0621" : recipientType === "driver" ? "\u0627\u0644\u0633\u0627\u0626\u0642\u064A\u0646" : recipientType === "flutter" ? "\u0645\u0633\u062A\u062E\u062F\u0645\u064A \u0627\u0644\u062A\u0637\u0628\u064A\u0642" : "\u0645\u0633\u062A\u062E\u062F\u0645 \u0645\u062D\u062F\u062F";
+    res.json({
+      success: true,
+      message: `\u062A\u0645 \u0625\u0631\u0633\u0627\u0644 \u0627\u0644\u0625\u0634\u0639\u0627\u0631 \u0628\u0646\u062C\u0627\u062D \u0625\u0644\u0649 ${recipientLabel}`,
+      notification: newNotification
+    });
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u0625\u0631\u0633\u0627\u0644 \u0627\u0644\u0625\u0634\u0639\u0627\u0631 \u0627\u0644\u0645\u0648\u062C\u0651\u0647:", error);
+    res.status(500).json({ success: false, message: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
+router10.get("/notifications/history", async (req, res) => {
+  try {
+    const db5 = getDb2();
+    const { recipientType, type: notifType, limit: limitStr, offset: offsetStr } = req.query;
+    const limitNum = parseInt(limitStr) || 50;
+    const offsetNum = parseInt(offsetStr) || 0;
+    let query = db5.select().from(notifications).orderBy(desc6(notifications.createdAt));
+    const allNotifications = await query;
+    let filtered = allNotifications;
+    if (recipientType && recipientType !== "all") {
+      filtered = filtered.filter((n) => n.recipientType === recipientType);
+    }
+    if (notifType) {
+      filtered = filtered.filter((n) => n.type === notifType);
+    }
+    const paginated = filtered.slice(offsetNum, offsetNum + limitNum);
+    const unreadCount = filtered.filter((n) => !n.isRead).length;
+    res.json({
+      success: true,
+      notifications: paginated,
+      total: filtered.length,
+      unreadCount,
+      limit: limitNum,
+      offset: offsetNum
+    });
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u062C\u0644\u0628 \u0633\u062C\u0644 \u0627\u0644\u0625\u0634\u0639\u0627\u0631\u0627\u062A:", error);
+    res.status(500).json({ success: false, message: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
+router10.delete("/notifications/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const db5 = getDb2();
+    await db5.delete(notifications).where(eq8(notifications.id, id));
+    res.json({ success: true, message: "\u062A\u0645 \u062D\u0630\u0641 \u0627\u0644\u0625\u0634\u0639\u0627\u0631 \u0628\u0646\u062C\u0627\u062D" });
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u062D\u0630\u0641 \u0627\u0644\u0625\u0634\u0639\u0627\u0631:", error);
+    res.status(500).json({ success: false, message: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
+router10.get("/notifications/stats", async (req, res) => {
+  try {
+    const db5 = getDb2();
+    const allNotifications = await db5.select().from(notifications).orderBy(desc6(notifications.createdAt));
+    const deviceCount = await db5.select().from(deviceTokens).where(eq8(deviceTokens.isActive, true));
+    const total = allNotifications.length;
+    const unread = allNotifications.filter((n) => !n.isRead).length;
+    const byType = {};
+    const byRecipient = {};
+    allNotifications.forEach((n) => {
+      byType[n.type] = (byType[n.type] || 0) + 1;
+      byRecipient[n.recipientType] = (byRecipient[n.recipientType] || 0) + 1;
+    });
+    res.json({
+      success: true,
+      total,
+      unread,
+      readRate: total > 0 ? ((total - unread) / total * 100).toFixed(1) : "0",
+      deviceCount: deviceCount.length,
+      byType,
+      byRecipient
+    });
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u062C\u0644\u0628 \u0625\u062D\u0635\u0627\u0626\u064A\u0627\u062A \u0627\u0644\u0625\u0634\u0639\u0627\u0631\u0627\u062A:", error);
+    res.status(500).json({ success: false, message: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
+router10.get("/device-tokens", async (req, res) => {
+  try {
+    const db5 = getDb2();
+    const tokens = await db5.select().from(deviceTokens).where(eq8(deviceTokens.isActive, true));
+    res.json({ success: true, tokens, count: tokens.length });
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u062C\u0644\u0628 device tokens:", error);
+    res.status(500).json({ success: false, message: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+  }
+});
+var flutter_default = router10;
+
+// server/routes/wasalni.ts
+import express13 from "express";
+init_schema();
+var router11 = express13.Router();
+router11.get("/", async (req, res) => {
+  try {
+    const { phone, customerId, status } = req.query;
+    const db5 = storage.db;
+    if (!db5) return res.status(500).json({ error: "Database not available" });
+    const { desc: desc7 } = await import("drizzle-orm");
+    let results = await db5.select().from(wasalniRequests2).orderBy(desc7(wasalniRequests2.createdAt));
+    if (status) results = results.filter((r) => r.status === status);
+    if (phone) results = results.filter((r) => r.customerPhone === phone);
+    if (customerId) results = results.filter((r) => r.customerId === customerId);
+    res.json(results);
+  } catch (error) {
+    console.error("Error fetching wasalni requests:", error);
+    res.status(500).json({ error: "\u0641\u0634\u0644 \u0641\u064A \u062C\u0644\u0628 \u0627\u0644\u0637\u0644\u0628\u0627\u062A" });
+  }
+});
+router11.get("/:id", async (req, res) => {
+  try {
+    const db5 = storage.db;
+    const { eq: eq10 } = await import("drizzle-orm");
+    const [request] = await db5.select().from(wasalniRequests2).where(eq10(wasalniRequests2.id, req.params.id));
+    if (!request) return res.status(404).json({ error: "\u0627\u0644\u0637\u0644\u0628 \u063A\u064A\u0631 \u0645\u0648\u062C\u0648\u062F" });
+    res.json(request);
+  } catch (error) {
+    res.status(500).json({ error: "\u0641\u0634\u0644 \u0641\u064A \u062C\u0644\u0628 \u0627\u0644\u0637\u0644\u0628" });
+  }
+});
+router11.post("/", async (req, res) => {
+  try {
+    try {
+      const allSettings = await storage.getUiSettings();
+      const settingsMap = new Map(allSettings.map((s) => [s.key, s.value]));
+      const storeStatus = settingsMap.get("store_status");
+      const openingTime = settingsMap.get("opening_time") || "08:00";
+      const closingTime = settingsMap.get("closing_time") || "23:00";
+      if (storeStatus === "closed") {
+        return res.status(400).json({
+          error: "\u0639\u0630\u0631\u0627\u064B\u060C \u0627\u0644\u062A\u0637\u0628\u064A\u0642 \u0645\u063A\u0644\u0642 \u062D\u0627\u0644\u064A\u0627\u064B \u0648\u0644\u0627 \u064A\u0645\u0643\u0646 \u0627\u0633\u062A\u0642\u0628\u0627\u0644 \u0637\u0644\u0628\u0627\u062A \u0648\u0635\u0644 \u0644\u064A",
+          code: "APP_CLOSED"
+        });
+      }
+      if (storeStatus !== "open") {
+        const now = /* @__PURE__ */ new Date();
+        const currentTime = now.toTimeString().slice(0, 5);
+        const timeToMinutes2 = (t) => {
+          const [h, m] = t.split(":").map(Number);
+          return h * 60 + m;
+        };
+        const current = timeToMinutes2(currentTime);
+        const open = timeToMinutes2(openingTime);
+        const close = timeToMinutes2(closingTime);
+        let appIsOpen = close > open ? current >= open && current < close : current >= open || current < close;
+        if (!appIsOpen) {
+          return res.status(400).json({
+            error: "\u0627\u0644\u062A\u0637\u0628\u064A\u0642 \u062E\u0627\u0631\u062C \u0633\u0627\u0639\u0627\u062A \u0627\u0644\u0639\u0645\u0644 \u062D\u0627\u0644\u064A\u0627\u064B\u060C \u064A\u0631\u062C\u0649 \u0627\u0644\u0637\u0644\u0628 \u0644\u0627\u062D\u0642\u0627\u064B",
+            code: "APP_CLOSED"
+          });
+        }
+      }
+    } catch (err) {
+      console.error("\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062A\u062D\u0642\u0642 \u0645\u0646 \u062D\u0627\u0644\u0629 \u0627\u0644\u062A\u0637\u0628\u064A\u0642:", err);
+    }
+    const {
+      customerName,
+      customerPhone,
+      customerId,
+      fromAddress,
+      toAddress,
+      fromLat,
+      fromLng,
+      toLat,
+      toLng,
+      orderType,
+      notes,
+      scheduledDate,
+      scheduledTime,
+      estimatedFee
+    } = req.body;
+    if (!customerName || !customerPhone || !fromAddress || !toAddress) {
+      return res.status(400).json({ error: "\u0627\u0644\u0628\u064A\u0627\u0646\u0627\u062A \u0627\u0644\u0623\u0633\u0627\u0633\u064A\u0629 \u0645\u0637\u0644\u0648\u0628\u0629: \u0627\u0644\u0627\u0633\u0645\u060C \u0627\u0644\u0647\u0627\u062A\u0641\u060C \u0645\u0646 \u0639\u0646\u0648\u0627\u0646\u060C \u0625\u0644\u0649 \u0639\u0646\u0648\u0627\u0646" });
+    }
+    const requestNumber = `WSL-${Date.now()}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
+    const db5 = storage.db;
+    const [newRequest] = await db5.insert(wasalniRequests2).values({
+      requestNumber,
+      customerName: customerName.trim(),
+      customerPhone: customerPhone.trim(),
+      customerId: customerId || null,
+      fromAddress: fromAddress.trim(),
+      toAddress: toAddress.trim(),
+      fromLat: fromLat ? String(fromLat) : null,
+      fromLng: fromLng ? String(fromLng) : null,
+      toLat: toLat ? String(toLat) : null,
+      toLng: toLng ? String(toLng) : null,
+      orderType: orderType || "\u0637\u0639\u0627\u0645",
+      notes: notes?.trim() || null,
+      scheduledDate: scheduledDate || null,
+      scheduledTime: scheduledTime || null,
+      estimatedFee: estimatedFee ? String(estimatedFee) : null,
+      status: "pending"
+    }).returning();
+    await storage.createNotification({
+      type: "new_wasalni_request",
+      title: "\u0637\u0644\u0628 \u0648\u0635\u0644 \u0644\u064A \u062C\u062F\u064A\u062F",
+      message: `\u0637\u0644\u0628 \u0648\u0635\u0644 \u0644\u064A \u062C\u062F\u064A\u062F \u0631\u0642\u0645 ${requestNumber} \u0645\u0646 ${customerName} - \u0645\u0646: ${fromAddress} \u0625\u0644\u0649: ${toAddress}`,
+      recipientType: "admin",
+      recipientId: null,
+      orderId: null,
+      isRead: false
+    });
+    await storage.createNotification({
+      type: "wasalni_received",
+      title: "\u062A\u0645 \u0627\u0633\u062A\u0644\u0627\u0645 \u0637\u0644\u0628 \u0648\u0635\u0644 \u0644\u064A",
+      message: `\u062A\u0645 \u0627\u0633\u062A\u0644\u0627\u0645 \u0637\u0644\u0628\u0643 \u0631\u0642\u0645 ${requestNumber} \u0648\u0647\u0648 \u0642\u064A\u062F \u0627\u0644\u0645\u0631\u0627\u062C\u0639\u0629`,
+      recipientType: "customer",
+      recipientId: customerId || customerPhone,
+      orderId: newRequest.id,
+      // ربط الطلب بالتتبع
+      isRead: false
+    });
+    const ws = req.app.get("ws");
+    if (ws) {
+      ws.broadcast("new_wasalni_request", { requestId: newRequest.id, requestNumber });
+    }
+    res.status(201).json({ success: true, request: newRequest });
+  } catch (error) {
+    console.error("Error creating wasalni request:", error);
+    res.status(500).json({ error: "\u0641\u0634\u0644 \u0641\u064A \u0625\u0646\u0634\u0627\u0621 \u0627\u0644\u0637\u0644\u0628" });
+  }
+});
+router11.get("/number/:requestNumber", async (req, res) => {
+  try {
+    const { requestNumber } = req.params;
+    const db5 = storage.db;
+    const { eq: eq10 } = await import("drizzle-orm");
+    const [request] = await db5.select().from(wasalniRequests2).where(eq10(wasalniRequests2.requestNumber, requestNumber));
+    if (!request) return res.status(404).json({ error: "\u0627\u0644\u0637\u0644\u0628 \u063A\u064A\u0631 \u0645\u0648\u062C\u0648\u062F" });
+    res.json(request);
+  } catch (error) {
+    res.status(500).json({ error: "\u0641\u0634\u0644 \u0641\u064A \u062C\u0644\u0628 \u0627\u0644\u0637\u0644\u0628" });
+  }
+});
+router11.put("/:id", async (req, res) => {
+  try {
+    const db5 = storage.db;
+    const { eq: eq10 } = await import("drizzle-orm");
+    const { status, driverId, adminNotes, cancelReason, estimatedFee } = req.body;
+    const updateData = { updatedAt: /* @__PURE__ */ new Date() };
+    if (status) updateData.status = status;
+    if (driverId !== void 0) updateData.driverId = driverId;
+    if (adminNotes !== void 0) updateData.adminNotes = adminNotes;
+    if (cancelReason !== void 0) updateData.cancelReason = cancelReason;
+    if (estimatedFee !== void 0) updateData.estimatedFee = String(estimatedFee);
+    const [updated] = await db5.update(wasalniRequests2).set(updateData).where(eq10(wasalniRequests2.id, req.params.id)).returning();
+    if (!updated) return res.status(404).json({ error: "\u0627\u0644\u0637\u0644\u0628 \u063A\u064A\u0631 \u0645\u0648\u062C\u0648\u062F" });
+    if (status) {
+      const ws = req.app.get("ws");
+      if (ws) {
+        ws.broadcast("order_update", { orderId: updated.id, status, type: "wasalni" });
+      }
+      const statusMessages = {
+        confirmed: "\u062A\u0645 \u0642\u0628\u0648\u0644 \u0637\u0644\u0628 \u0648\u0635\u0644 \u0644\u064A \u0627\u0644\u062E\u0627\u0635 \u0628\u0643",
+        on_way: "\u0627\u0644\u0633\u0627\u0626\u0642 \u0641\u064A \u0637\u0631\u064A\u0642\u0647 \u0644\u0627\u0633\u062A\u0644\u0627\u0645 \u0637\u0644\u0628\u0643",
+        delivered: "\u062A\u0645 \u062A\u0646\u0641\u064A\u0630 \u0637\u0644\u0628 \u0648\u0635\u0644 \u0644\u064A \u0628\u0646\u062C\u0627\u062D",
+        cancelled: `\u062A\u0645 \u0625\u0644\u063A\u0627\u0621 \u0637\u0644\u0628 \u0648\u0635\u0644 \u0644\u064A. ${cancelReason ? `\u0627\u0644\u0633\u0628\u0628: ${cancelReason}` : ""}`
+      };
+      if (statusMessages[status]) {
+        await storage.createNotification({
+          type: "wasalni_status_update",
+          title: "\u062A\u062D\u062F\u064A\u062B \u0637\u0644\u0628 \u0648\u0635\u0644 \u0644\u064A",
+          message: `${statusMessages[status]} - \u0631\u0642\u0645 \u0627\u0644\u0637\u0644\u0628: ${updated.requestNumber}`,
+          recipientType: "customer",
+          recipientId: updated.customerId || updated.customerPhone,
+          orderId: updated.id,
+          // ربط الطلب بالتتبع
+          isRead: false
+        });
+      }
+    }
+    res.json({ success: true, request: updated });
+  } catch (error) {
+    console.error("Error updating wasalni request:", error);
+    res.status(500).json({ error: "\u0641\u0634\u0644 \u0641\u064A \u062A\u062D\u062F\u064A\u062B \u0627\u0644\u0637\u0644\u0628" });
+  }
+});
+router11.delete("/:id", async (req, res) => {
+  try {
+    const db5 = storage.db;
+    const { eq: eq10 } = await import("drizzle-orm");
+    await db5.delete(wasalniRequests2).where(eq10(wasalniRequests2.id, req.params.id));
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: "\u0641\u0634\u0644 \u0641\u064A \u062D\u0630\u0641 \u0627\u0644\u0637\u0644\u0628" });
+  }
+});
+router11.post("/:id/assign-driver", async (req, res) => {
+  try {
+    const { driverId } = req.body;
+    if (!driverId) return res.status(400).json({ error: "\u0645\u0639\u0631\u0641 \u0627\u0644\u0633\u0627\u0626\u0642 \u0645\u0637\u0644\u0648\u0628" });
+    const db5 = storage.db;
+    const { eq: eq10 } = await import("drizzle-orm");
+    const [request] = await db5.select().from(wasalniRequests2).where(eq10(wasalniRequests2.id, req.params.id));
+    if (!request) return res.status(404).json({ error: "\u0627\u0644\u0637\u0644\u0628 \u063A\u064A\u0631 \u0645\u0648\u062C\u0648\u062F" });
+    const [updated] = await db5.update(wasalniRequests2).set({
+      driverId,
+      status: "confirmed",
+      updatedAt: /* @__PURE__ */ new Date()
+    }).where(eq10(wasalniRequests2.id, req.params.id)).returning();
+    try {
+      await storage.updateDriver(driverId, { isAvailable: false });
+    } catch (driverErr) {
+      console.error("\u062E\u0637\u0623 \u0641\u064A \u062A\u062D\u062F\u064A\u062B \u062D\u0627\u0644\u0629 \u0627\u0644\u0633\u0627\u0626\u0642:", driverErr);
+    }
+    const ws = req.app.get("ws");
+    if (ws) {
+      ws.broadcast("order_update", {
+        orderId: updated.id,
+        status: "confirmed",
+        type: "wasalni",
+        requestNumber: request.requestNumber
+      });
+      if (ws.sendToDriver) {
+        ws.sendToDriver(driverId, "new_order_assigned", {
+          orderId: updated.id,
+          status: "confirmed",
+          message: `\u062A\u0645 \u062A\u0639\u064A\u064A\u0646 \u0637\u0644\u0628 \u0648\u0635\u0644 \u0644\u064A \u062C\u062F\u064A\u062F \u0644\u0643 \u0631\u0642\u0645 ${request.requestNumber}`,
+          type: "wasalni",
+          orderData: updated
+        });
+      }
+    }
+    await storage.createNotification({
+      type: "wasalni_driver_assigned",
+      title: "\u062A\u0645 \u062A\u0639\u064A\u064A\u0646 \u0633\u0627\u0626\u0642 \u0644\u0637\u0644\u0628\u0643",
+      message: `\u062A\u0645 \u062A\u0639\u064A\u064A\u0646 \u0633\u0627\u0626\u0642 \u0644\u0637\u0644\u0628 \u0648\u0635\u0644 \u0644\u064A \u0631\u0642\u0645 ${request.requestNumber}. \u0633\u064A\u062A\u0648\u0627\u0635\u0644 \u0645\u0639\u0643 \u0627\u0644\u0633\u0627\u0626\u0642 \u0642\u0631\u064A\u0628\u0627\u064B.`,
+      recipientType: "customer",
+      recipientId: request.customerId || request.customerPhone,
+      orderId: updated.id,
+      // ربط الطلب بالتتبع
+      isRead: false
+    });
+    await storage.createNotification({
+      type: "new_wasalni_assignment",
+      title: "\u0637\u0644\u0628 \u0648\u0635\u0644 \u0644\u064A \u062C\u062F\u064A\u062F \u0645\u064F\u0639\u064A\u0646 \u0644\u0643",
+      message: `\u062A\u0645 \u062A\u0639\u064A\u064A\u0646 \u0637\u0644\u0628 \u0648\u0635\u0644 \u0644\u064A \u062C\u062F\u064A\u062F \u0644\u0643 \u0631\u0642\u0645 ${request.requestNumber}. \u0645\u0646: ${request.fromAddress} \u0625\u0644\u0649: ${request.toAddress}`,
+      recipientType: "driver",
+      recipientId: driverId,
+      orderId: updated.id,
+      // ربط الطلب بالتتبع
+      isRead: false
+    });
+    res.json({ success: true, request: updated });
+  } catch (error) {
+    console.error("Error assigning driver to wasalni request:", error);
+    res.status(500).json({ error: "\u0641\u0634\u0644 \u0641\u064A \u062A\u0639\u064A\u064A\u0646 \u0627\u0644\u0633\u0627\u0626\u0642" });
+  }
+});
+var wasalni_default = router11;
+
+// server/imageUpload.ts
+import express14 from "express";
+import multer from "multer";
+import path5 from "path";
+import { randomUUID as randomUUID3 } from "crypto";
+
+// server/localStorage.ts
+import fs3 from "fs";
+import path4 from "path";
+import { fileURLToPath as fileURLToPath4 } from "url";
+var __dirname4 = path4.dirname(fileURLToPath4(import.meta.url));
+var UPLOADS_DIR = path4.resolve(__dirname4, "..", "uploads");
+var STORAGE_BUCKETS = {
+  restaurants: "restaurants",
+  menuItems: "menuItems",
+  offers: "offers",
+  categories: "categories",
+  general: "general"
+};
+function ensureUploadsDir() {
+  if (!fs3.existsSync(UPLOADS_DIR)) {
+    fs3.mkdirSync(UPLOADS_DIR, { recursive: true });
+  }
+  for (const bucket of Object.values(STORAGE_BUCKETS)) {
+    const bucketDir = path4.join(UPLOADS_DIR, bucket);
+    if (!fs3.existsSync(bucketDir)) {
+      fs3.mkdirSync(bucketDir, { recursive: true });
+    }
+  }
+}
+function getPublicUrl(filename, category) {
+  return `/uploads/${category}/${filename}`;
+}
+function deleteLocalFile(filePath) {
+  try {
+    const fullPath = path4.join(UPLOADS_DIR, filePath);
+    if (fs3.existsSync(fullPath)) {
+      fs3.unlinkSync(fullPath);
+      return true;
+    }
+    return false;
+  } catch {
+    return false;
+  }
+}
+
+// server/imageUpload.ts
+var router12 = express14.Router();
+ensureUploadsDir();
+var storage2 = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const category = req.body?.category || "general";
+    const bucket = STORAGE_BUCKETS[category] || "general";
+    const dest = path5.join(UPLOADS_DIR, bucket);
+    cb(null, dest);
+  },
+  filename: (req, file, cb) => {
+    const timestamp2 = Date.now();
+    const randomId = randomUUID3().substring(0, 8);
+    const extension = file.originalname.split(".").pop()?.toLowerCase() || "jpg";
+    cb(null, `${timestamp2}-${randomId}.${extension}`);
+  }
+});
+var upload = multer({
+  storage: storage2,
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp", "image/gif"];
+    if (allowedTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error("\u0646\u0648\u0639 \u0627\u0644\u0645\u0644\u0641 \u063A\u064A\u0631 \u0645\u062F\u0639\u0648\u0645. \u064A\u0631\u062C\u0649 \u0631\u0641\u0639 \u0635\u0648\u0631\u0629 \u0628\u0635\u064A\u063A\u0629 JPG, PNG, WebP, \u0623\u0648 GIF"));
+    }
+  }
+});
+router12.post("/upload", upload.single("image"), (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: "\u0644\u0645 \u064A\u062A\u0645 \u0627\u062E\u062A\u064A\u0627\u0631 \u0645\u0644\u0641" });
+    }
+    const category = req.body?.category || "general";
+    const bucket = STORAGE_BUCKETS[category] || "general";
+    const url = getPublicUrl(req.file.filename, bucket);
+    res.json({
+      success: true,
+      message: "\u062A\u0645 \u0631\u0641\u0639 \u0627\u0644\u0635\u0648\u0631\u0629 \u0628\u0646\u062C\u0627\u062D",
+      data: {
+        url,
+        path: `${bucket}/${req.file.filename}`,
+        filename: req.file.filename,
+        originalName: req.file.originalname,
+        size: req.file.size,
+        category,
+        contentType: req.file.mimetype
+      }
+    });
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u0631\u0641\u0639 \u0627\u0644\u0635\u0648\u0631\u0629:", error);
+    res.status(500).json({ success: false, message: "\u062D\u062F\u062B \u062E\u0637\u0623 \u0623\u062B\u0646\u0627\u0621 \u0631\u0641\u0639 \u0627\u0644\u0635\u0648\u0631\u0629" });
+  }
+});
+router12.post("/upload-multiple", upload.array("images", 10), (req, res) => {
+  try {
+    const files = req.files;
+    if (!files || files.length === 0) {
+      return res.status(400).json({ success: false, message: "\u0644\u0645 \u064A\u062A\u0645 \u0627\u062E\u062A\u064A\u0627\u0631 \u0645\u0644\u0641\u0627\u062A" });
+    }
+    const category = req.body?.category || "general";
+    const bucket = STORAGE_BUCKETS[category] || "general";
+    const uploadedFiles = files.map((file) => ({
+      url: getPublicUrl(file.filename, bucket),
+      path: `${bucket}/${file.filename}`,
+      filename: file.filename,
+      originalName: file.originalname,
+      size: file.size,
+      contentType: file.mimetype
+    }));
+    res.json({
+      success: true,
+      message: `\u062A\u0645 \u0631\u0641\u0639 ${files.length} \u0635\u0648\u0631\u0629 \u0628\u0646\u062C\u0627\u062D`,
+      data: uploadedFiles,
+      failed: []
+    });
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u0631\u0641\u0639 \u0627\u0644\u0635\u0648\u0631:", error);
+    res.status(500).json({ success: false, message: "\u062D\u062F\u062B \u062E\u0637\u0623 \u0623\u062B\u0646\u0627\u0621 \u0631\u0641\u0639 \u0627\u0644\u0635\u0648\u0631" });
+  }
+});
+router12.delete("/delete", (req, res) => {
+  try {
+    const { url, category } = req.body;
+    if (!url) {
+      return res.status(400).json({ success: false, message: "\u0631\u0627\u0628\u0637 \u0627\u0644\u0635\u0648\u0631\u0629 \u0645\u0637\u0644\u0648\u0628" });
+    }
+    const match = url.match(/\/uploads\/(.+)$/);
+    if (!match) {
+      return res.status(400).json({ success: false, message: "\u0631\u0627\u0628\u0637 \u0627\u0644\u0635\u0648\u0631\u0629 \u063A\u064A\u0631 \u0635\u062D\u064A\u062D" });
+    }
+    const deleted = deleteLocalFile(match[1]);
+    if (deleted) {
+      res.json({ success: true, message: "\u062A\u0645 \u062D\u0630\u0641 \u0627\u0644\u0635\u0648\u0631\u0629 \u0628\u0646\u062C\u0627\u062D" });
+    } else {
+      res.status(404).json({ success: false, message: "\u0627\u0644\u0635\u0648\u0631\u0629 \u063A\u064A\u0631 \u0645\u0648\u062C\u0648\u062F\u0629" });
+    }
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u062D\u0630\u0641 \u0627\u0644\u0635\u0648\u0631\u0629:", error);
+    res.status(500).json({ success: false, message: "\u062D\u062F\u062B \u062E\u0637\u0623 \u0623\u062B\u0646\u0627\u0621 \u062D\u0630\u0641 \u0627\u0644\u0635\u0648\u0631\u0629" });
+  }
+});
+router12.head("/upload", (req, res) => {
+  res.status(200).end();
+});
+var imageUpload_default = router12;
 
 // server/routes.ts
 init_schema();
+var __dirname5 = path6.dirname(fileURLToPath5(import.meta.url));
 async function registerRoutes(app2) {
+  ensureUploadsDir();
+  app2.use("/uploads", express15.static(UPLOADS_DIR));
+  app2.get("/.well-known/assetlinks.json", (_req, res) => {
+    try {
+      const filePath = path6.resolve(import.meta.dirname, "..", "client", "public", "well-known", "assetlinks.json");
+      res.type("application/json").sendFile(filePath);
+    } catch (err) {
+      res.status(404).json({ error: "assetlinks.json not found" });
+    }
+  });
+  app2.use("/api/images", imageUpload_default);
+  app2.use("/api/auth", auth_default);
   app2.use("/api/admin", router6);
   registerAdvancedRoutes(app2);
   app2.get("/api/users/:id", async (req, res) => {
@@ -8819,8 +12460,8 @@ async function registerRoutes(app2) {
         radius: radius ? parseFloat(radius) : void 0,
         isOpen: isOpen !== void 0 ? isOpen === "true" : void 0
       };
-      const restaurants2 = await storage.getRestaurants(filters);
-      res.json(restaurants2);
+      const restaurants3 = await storage.getRestaurants(filters);
+      res.json(restaurants3);
     } catch (error) {
       console.error("Error fetching restaurants:", error);
       res.status(500).json({ message: "Failed to fetch restaurants" });
@@ -8870,15 +12511,15 @@ async function registerRoutes(app2) {
   app2.get("/api/restaurants/:restaurantId/menu", async (req, res) => {
     try {
       const { restaurantId } = req.params;
-      const menuItems2 = await storage.getMenuItems(restaurantId);
-      res.json(menuItems2);
+      const allItems = await storage.getMenuItems(restaurantId);
+      res.json({ allItems });
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch menu items" });
     }
   });
   app2.get("/api/special-offers", async (req, res) => {
     try {
-      log("\u{1F50D} Storage type: " + storage.constructor.name);
+      log2("\u{1F50D} Storage type: " + storage.constructor.name);
       res.set("Cache-Control", "no-store");
       const { active } = req.query;
       let offers;
@@ -8887,11 +12528,11 @@ async function registerRoutes(app2) {
       } else {
         offers = await storage.getActiveSpecialOffers();
       }
-      log("\u{1F4CA} Found offers: " + offers.length + " offers");
+      log2("\u{1F4CA} Found offers: " + offers.length + " offers");
       res.json(offers);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      log("\u062E\u0637\u0623 \u0641\u064A \u062C\u0644\u0628 \u0627\u0644\u0639\u0631\u0648\u0636 \u0627\u0644\u062E\u0627\u0635\u0629: " + errorMessage);
+      log2("\u062E\u0637\u0623 \u0641\u064A \u062C\u0644\u0628 \u0627\u0644\u0639\u0631\u0648\u0636 \u0627\u0644\u062E\u0627\u0635\u0629: " + errorMessage);
       res.status(500).json({ message: "Failed to fetch special offers" });
     }
   });
@@ -8955,6 +12596,70 @@ async function registerRoutes(app2) {
       res.status(500).json({ message: "Failed to check favorite" });
     }
   });
+  app2.get("/api/bootstrap", async (req, res) => {
+    try {
+      const { phone, customerId } = req.query;
+      const [
+        uiSettings2,
+        categories2,
+        restaurants3,
+        specialOffers2,
+        paymentMethodsRaw
+      ] = await Promise.all([
+        storage.getUiSettings().catch(() => []),
+        storage.getCategories().catch(() => []),
+        storage.getRestaurants({}).catch(() => []),
+        storage.getActiveSpecialOffers().catch(() => []),
+        storage.getActivePaymentMethods?.().catch(() => []) ?? Promise.resolve([])
+      ]);
+      const paymentMethods2 = await Promise.all(
+        (paymentMethodsRaw || []).map(async (m) => {
+          try {
+            const docs = await storage.getPaymentMethodDocuments?.(m.id) ?? [];
+            return { ...m, documents: docs };
+          } catch {
+            return { ...m, documents: [] };
+          }
+        })
+      );
+      let customerData = null;
+      if (phone || customerId) {
+        const [addresses, orders3, allNotifs] = await Promise.all([
+          customerId ? storage.getUserAddresses?.(customerId).catch(() => []) ?? Promise.resolve([]) : Promise.resolve([]),
+          phone ? storage.getOrdersByCustomer(phone).catch(() => []) : Promise.resolve([]),
+          storage.getNotifications?.("customer").catch(() => []) ?? Promise.resolve([])
+        ]);
+        const myNotifications = (allNotifs || []).filter((n) => {
+          if (!n.recipientId || n.recipientId === "all") return true;
+          if (customerId && n.recipientId === customerId) return true;
+          if (phone && n.recipientId === phone) return true;
+          return false;
+        });
+        myNotifications.sort(
+          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+        customerData = {
+          addresses: addresses || [],
+          orders: orders3 || [],
+          notifications: myNotifications.slice(0, 30),
+          unreadCount: myNotifications.filter((n) => !n.isRead).length
+        };
+      }
+      res.set("Cache-Control", "no-store");
+      res.json({
+        uiSettings: uiSettings2,
+        categories: categories2,
+        restaurants: restaurants3,
+        specialOffers: specialOffers2,
+        paymentMethods: paymentMethods2,
+        customer: customerData,
+        serverTime: Date.now()
+      });
+    } catch (error) {
+      console.error("Error in /api/bootstrap:", error);
+      res.status(500).json({ message: "Failed to load bootstrap data" });
+    }
+  });
   app2.get("/api/ui-settings", async (req, res) => {
     try {
       const settings = await storage.getUiSettings();
@@ -8988,6 +12693,7 @@ async function registerRoutes(app2) {
       if (!updated) {
         return res.status(404).json({ message: "\u0627\u0644\u0625\u0639\u062F\u0627\u062F \u063A\u064A\u0631 \u0645\u0648\u062C\u0648\u062F" });
       }
+      broadcastSettingsChanged(key);
       res.json(updated);
     } catch (error) {
       console.error("\u062E\u0637\u0623 \u0641\u064A \u062A\u062D\u062F\u064A\u062B \u0625\u0639\u062F\u0627\u062F \u0627\u0644\u0648\u0627\u062C\u0647\u0629:", error);
@@ -8997,68 +12703,100 @@ async function registerRoutes(app2) {
   app2.get("/api/orders/:id/track", async (req, res) => {
     try {
       const { id } = req.params;
-      const order = await storage.getOrder(id);
-      if (!order) {
+      let orderData = await storage.getOrder(id);
+      let isWaselLi = false;
+      if (!orderData) {
+        const wasalniOrder = await storage.getWasalniRequest(id);
+        if (wasalniOrder) {
+          isWaselLi = true;
+          orderData = {
+            ...wasalniOrder,
+            orderNumber: wasalniOrder.requestNumber,
+            deliveryAddress: wasalniOrder.toAddress,
+            customerLocationLat: wasalniOrder.toLat,
+            customerLocationLng: wasalniOrder.toLng,
+            total: wasalniOrder.estimatedFee,
+            items: [],
+            // Wasalni has no items list usually
+            isWaselLi: true,
+            pickupAddress: wasalniOrder.fromAddress,
+            pickupLocationLat: wasalniOrder.fromLat,
+            pickupLocationLng: wasalniOrder.fromLng,
+            waselLiItemType: wasalniOrder.orderType,
+            restaurantName: "\u0648\u0635\u0644 \u0644\u064A"
+          };
+        }
+      }
+      if (!orderData) {
         return res.status(404).json({ error: "\u0627\u0644\u0637\u0644\u0628 \u063A\u064A\u0631 \u0645\u0648\u062C\u0648\u062F" });
       }
-      const tracking = [];
-      const baseTime = new Date(order.createdAt);
-      if (order.status === "pending" || order.status === "confirmed" || order.status === "preparing" || order.status === "on_way" || order.status === "delivered") {
-        tracking.push({
-          id: "1",
-          status: "pending",
-          message: "\u062A\u0645 \u0627\u0633\u062A\u0644\u0627\u0645 \u0627\u0644\u0637\u0644\u0628",
-          timestamp: baseTime,
-          createdByType: "system"
-        });
-      }
-      if (order.status === "confirmed" || order.status === "preparing" || order.status === "on_way" || order.status === "delivered") {
-        tracking.push({
-          id: "2",
-          status: "confirmed",
-          message: "\u062A\u0645 \u062A\u0623\u0643\u064A\u062F \u0627\u0644\u0637\u0644\u0628 \u0645\u0646 \u0627\u0644\u0645\u0637\u0639\u0645",
-          timestamp: new Date(baseTime.getTime() + 5 * 6e4),
-          createdByType: "restaurant"
-        });
-      }
-      if (order.status === "preparing" || order.status === "on_way" || order.status === "delivered") {
-        tracking.push({
-          id: "3",
-          status: "preparing",
-          message: "\u062C\u0627\u0631\u064A \u062A\u062D\u0636\u064A\u0631 \u0627\u0644\u0637\u0644\u0628",
-          timestamp: new Date(baseTime.getTime() + 10 * 6e4),
-          createdByType: "restaurant"
-        });
-      }
-      if (order.status === "on_way" || order.status === "delivered") {
-        tracking.push({
-          id: "4",
-          status: "on_way",
-          message: "\u0627\u0644\u0637\u0644\u0628 \u0641\u064A \u0627\u0644\u0637\u0631\u064A\u0642 \u0625\u0644\u064A\u0643",
-          timestamp: new Date(baseTime.getTime() + 20 * 6e4),
-          createdByType: "driver"
-        });
-      }
-      if (order.status === "delivered") {
-        tracking.push({
-          id: "5",
-          status: "delivered",
-          message: "\u062A\u0645 \u062A\u0633\u0644\u064A\u0645 \u0627\u0644\u0637\u0644\u0628 \u0628\u0646\u062C\u0627\u062D",
-          timestamp: new Date(baseTime.getTime() + 35 * 6e4),
-          createdByType: "driver"
-        });
+      const trackingEntries = await storage.getOrderTracking(id);
+      let tracking = trackingEntries.map((t, index) => ({
+        id: t.id || String(index + 1),
+        status: t.status,
+        message: t.message,
+        timestamp: t.createdAt,
+        createdByType: t.createdByType
+      }));
+      if (tracking.length === 0) {
+        const baseTime = new Date(orderData.createdAt);
+        if (orderData.status === "pending" || orderData.status === "confirmed" || orderData.status === "preparing" || orderData.status === "on_way" || orderData.status === "delivered") {
+          tracking.push({
+            id: "1",
+            status: "pending",
+            message: isWaselLi ? "\u062A\u0645 \u0627\u0633\u062A\u0644\u0627\u0645 \u0637\u0644\u0628 \u0648\u0635\u0644 \u0644\u064A" : "\u062A\u0645 \u0627\u0633\u062A\u0644\u0627\u0645 \u0627\u0644\u0637\u0644\u0628",
+            timestamp: baseTime,
+            createdByType: "system"
+          });
+        }
+        if (orderData.status === "confirmed" || orderData.status === "preparing" || orderData.status === "on_way" || orderData.status === "delivered") {
+          tracking.push({
+            id: "2",
+            status: "confirmed",
+            message: isWaselLi ? "\u062A\u0645 \u0642\u0628\u0648\u0644 \u0637\u0644\u0628\u0643 \u0648\u062C\u0627\u0631\u064A \u062A\u0639\u064A\u064A\u0646 \u0633\u0627\u0626\u0642" : "\u062A\u0645 \u062A\u0623\u0643\u064A\u062F \u0627\u0644\u0637\u0644\u0628 \u0645\u0646 \u0627\u0644\u0645\u0637\u0639\u0645",
+            timestamp: new Date(baseTime.getTime() + 5 * 6e4),
+            createdByType: isWaselLi ? "system" : "restaurant"
+          });
+        }
+        if (orderData.status === "preparing" || orderData.status === "on_way" || orderData.status === "delivered") {
+          tracking.push({
+            id: "3",
+            status: "preparing",
+            message: isWaselLi ? "\u0627\u0644\u0633\u0627\u0626\u0642 \u0641\u064A \u0627\u0644\u0637\u0631\u064A\u0642 \u0644\u0646\u0642\u0637\u0629 \u0627\u0644\u0627\u0633\u062A\u0644\u0627\u0645" : "\u062C\u0627\u0631\u064A \u062A\u062D\u0636\u064A\u0631 \u0627\u0644\u0637\u0644\u0628",
+            timestamp: new Date(baseTime.getTime() + 10 * 6e4),
+            createdByType: isWaselLi ? "driver" : "restaurant"
+          });
+        }
+        if (orderData.status === "on_way" || orderData.status === "delivered") {
+          tracking.push({
+            id: "4",
+            status: "on_way",
+            message: isWaselLi ? "\u0627\u0644\u0633\u0627\u0626\u0642 \u0627\u0633\u062A\u0644\u0645 \u0627\u0644\u063A\u0631\u0636 \u0648\u0647\u0648 \u0641\u064A \u0627\u0644\u0637\u0631\u064A\u0642 \u0625\u0644\u064A\u0643" : "\u0627\u0644\u0637\u0644\u0628 \u0641\u064A \u0627\u0644\u0637\u0631\u064A\u0642 \u0625\u0644\u064A\u0643",
+            timestamp: new Date(baseTime.getTime() + 20 * 6e4),
+            createdByType: "driver"
+          });
+        }
+        if (orderData.status === "delivered") {
+          tracking.push({
+            id: "5",
+            status: "delivered",
+            message: isWaselLi ? "\u062A\u0645 \u062A\u0648\u0635\u064A\u0644 \u0637\u0644\u0628 \u0648\u0635\u0644 \u0644\u064A \u0628\u0646\u062C\u0627\u062D" : "\u062A\u0645 \u062A\u0633\u0644\u064A\u0645 \u0627\u0644\u0637\u0644\u0628 \u0628\u0646\u062C\u0627\u062D",
+            timestamp: new Date(baseTime.getTime() + 35 * 6e4),
+            createdByType: "driver"
+          });
+        }
       }
       let parsedItems = [];
       try {
-        parsedItems = typeof order.items === "string" ? JSON.parse(order.items) : order.items;
+        parsedItems = typeof orderData.items === "string" ? JSON.parse(orderData.items) : orderData.items;
       } catch (e) {
         parsedItems = [];
       }
       res.json({
         order: {
-          ...order,
+          ...orderData,
           items: parsedItems,
-          total: parseFloat(order.total || "0")
+          total: parseFloat(orderData.total || "0")
         },
         tracking
       });
@@ -9159,6 +12897,28 @@ async function registerRoutes(app2) {
       res.status(500).json({ message: "Failed to fetch driver stats" });
     }
   });
+  app2.get("/api/restaurants/:restaurantId/sections", async (req, res) => {
+    try {
+      const { restaurantId } = req.params;
+      const sections = await storage.getRestaurantSections(restaurantId);
+      res.json(sections);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch sections" });
+    }
+  });
+  app2.get("/api/notifications", async (req, res) => {
+    try {
+      const { recipientType, recipientId, unread } = req.query;
+      const notifications2 = await storage.getNotifications(
+        recipientType,
+        recipientId,
+        unread === "true"
+      );
+      res.json(notifications2);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch notifications" });
+    }
+  });
   app2.post("/api/notifications", async (req, res) => {
     try {
       const validatedData = insertNotificationSchema.parse(req.body);
@@ -9168,29 +12928,16 @@ async function registerRoutes(app2) {
       res.status(400).json({ message: "Invalid notification data" });
     }
   });
-  app2.put("/api/orders/:id/assign-driver", async (req, res) => {
+  app2.put("/api/notifications/:id/read", async (req, res) => {
     try {
       const { id } = req.params;
-      const { driverId } = req.body;
-      const order = await storage.updateOrder(id, {
-        driverId,
-        status: "assigned",
-        updatedAt: /* @__PURE__ */ new Date()
-      });
-      if (!order) {
-        return res.status(404).json({ message: "Order not found" });
+      const notification = await storage.markNotificationAsRead(id);
+      if (!notification) {
+        return res.status(404).json({ message: "Notification not found" });
       }
-      await storage.createNotification({
-        type: "order",
-        title: "\u0637\u0644\u0628 \u062C\u062F\u064A\u062F",
-        message: `\u062A\u0645 \u062A\u0643\u0644\u064A\u0641\u0643 \u0628\u0637\u0644\u0628 \u062C\u062F\u064A\u062F \u0631\u0642\u0645 ${id.slice(0, 8)}`,
-        recipientType: "driver",
-        recipientId: driverId,
-        orderId: id
-      });
-      res.json(order);
+      res.json(notification);
     } catch (error) {
-      res.status(400).json({ message: "Failed to assign driver" });
+      res.status(400).json({ message: "Failed to update notification" });
     }
   });
   app2.get("/api/orders/track/:id", async (req, res) => {
@@ -9373,6 +13120,10 @@ async function registerRoutes(app2) {
   app2.use("/api/drivers", driver_default);
   app2.use("/api/orders", orders_default);
   app2.use("/api/delivery-fees", delivery_fees_default);
+  app2.use("/api/restaurant-accounts", restaurant_accounts_default);
+  app2.use("/api/flutter", flutter_default);
+  app2.use("/api/wasalni", wasalni_default);
+  app2.use("/api", router8);
   app2.get("/api/notifications", async (req, res) => {
     try {
       const { recipientType, recipientId, unread } = req.query;
@@ -9387,31 +13138,99 @@ async function registerRoutes(app2) {
       res.status(500).json({ message: "Failed to fetch notifications" });
     }
   });
+  app2.get("/api/notifications/customer", async (req, res) => {
+    try {
+      const { phone, customerId } = req.query;
+      if (!phone && !customerId) {
+        return res.status(400).json({ message: "phone or customerId required" });
+      }
+      const allNotifs = await storage.getNotifications("customer");
+      const filtered = allNotifs.filter((n) => {
+        if (!n.recipientId || n.recipientId === "all") return true;
+        if (customerId && n.recipientId === customerId) return true;
+        if (phone && n.recipientId === phone) return true;
+        return false;
+      });
+      filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      res.json(filtered);
+    } catch (error) {
+      console.error("Error fetching customer notifications:", error);
+      res.status(500).json({ message: "Failed to fetch notifications" });
+    }
+  });
+  app2.put("/api/notifications/customer/mark-all-read", async (req, res) => {
+    try {
+      const { phone, customerId } = req.body;
+      if (!phone && !customerId) {
+        return res.status(400).json({ message: "phone or customerId required" });
+      }
+      const allNotifs = await storage.getNotifications("customer");
+      const unread = allNotifs.filter((n) => {
+        if (n.isRead) return false;
+        if (!n.recipientId || n.recipientId === "all") return true;
+        if (customerId && n.recipientId === customerId) return true;
+        if (phone && n.recipientId === phone) return true;
+        return false;
+      });
+      await Promise.all(unread.map((n) => storage.markNotificationAsRead(n.id)));
+      if (global.WS_MANAGER) {
+        const payload = { allRead: true, count: unread.length };
+        if (customerId) global.WS_MANAGER.sendToUser(customerId, "notifications_updated", payload);
+        if (phone) global.WS_MANAGER.sendToUser(phone, "notifications_updated", payload);
+      }
+      res.json({ success: true, markedCount: unread.length });
+    } catch (error) {
+      console.error("Error marking customer notifications as read:", error);
+      res.status(500).json({ message: "Failed to mark notifications as read" });
+    }
+  });
   app2.put("/api/notifications/:id/read", async (req, res) => {
     try {
       const { id } = req.params;
-      if (storage.constructor.name === "MemStorage") {
-        const notifications2 = await storage.getNotifications();
-        const notification = notifications2.find((n) => n.id === id);
-        if (notification) {
-          notification.isRead = true;
-          res.json(notification);
-        } else {
-          res.status(404).json({ message: "Notification not found" });
-        }
-      } else {
-        const notification = await storage.markNotificationAsRead(id);
-        if (!notification) {
-          return res.status(404).json({ message: "Notification not found" });
-        }
-        res.json(notification);
+      const notification = await storage.markNotificationAsRead(id);
+      if (!notification) {
+        return res.status(404).json({ message: "Notification not found" });
       }
+      if (global.WS_MANAGER && notification.recipientId) {
+        const payload = { id: notification.id, isRead: true };
+        if (notification.recipientType === "driver") {
+          global.WS_MANAGER.sendToDriver(notification.recipientId, "notifications_updated", payload);
+        } else {
+          global.WS_MANAGER.sendToUser(notification.recipientId, "notifications_updated", payload);
+        }
+      }
+      res.json(notification);
     } catch (error) {
       console.error("Error marking notification as read:", error);
       res.status(500).json({ message: "Failed to update notification" });
     }
   });
-  const httpServer = createServer3(app2);
+  app2.get("/api/payment-methods", async (req, res) => {
+    try {
+      const methods = await storage.getActivePaymentMethods();
+      const methodsWithDocs = await Promise.all(methods.map(async (m) => {
+        const docs = await storage.getPaymentMethodDocuments(m.id);
+        return { ...m, documents: docs };
+      }));
+      res.json(methodsWithDocs);
+    } catch (error) {
+      console.error("\u062E\u0637\u0623 \u0641\u064A \u062C\u0644\u0628 \u0637\u0631\u0642 \u0627\u0644\u062F\u0641\u0639:", error);
+      res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+    }
+  });
+  app2.post("/api/coupons/validate", async (req, res) => {
+    try {
+      const { code, orderValue, userId, userPhone } = req.body;
+      if (!code) return res.status(400).json({ error: "\u0643\u0648\u062F \u0627\u0644\u0643\u0648\u0628\u0648\u0646 \u0645\u0637\u0644\u0648\u0628" });
+      if (!orderValue) return res.status(400).json({ error: "\u0642\u064A\u0645\u0629 \u0627\u0644\u0637\u0644\u0628 \u0645\u0637\u0644\u0648\u0628\u0629" });
+      const result = await storage.validateCoupon(code, parseFloat(orderValue), userId, userPhone);
+      res.json(result);
+    } catch (error) {
+      console.error("\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062A\u062D\u0642\u0642 \u0645\u0646 \u0627\u0644\u0643\u0648\u0628\u0648\u0646:", error);
+      res.status(500).json({ error: "\u062E\u0637\u0623 \u0641\u064A \u0627\u0644\u062E\u0627\u062F\u0645" });
+    }
+  });
+  const httpServer = createServer2(app2);
   return httpServer;
 }
 
@@ -9430,7 +13249,7 @@ function setupWebSockets(server) {
     });
   }, 3e4);
   wss.on("connection", (ws, req) => {
-    log(`New WS connection from ${req.socket.remoteAddress}`);
+    log2(`New WS connection from ${req.socket.remoteAddress}`);
     ws.isAlive = true;
     ws.on("pong", () => {
       ws.isAlive = true;
@@ -9440,7 +13259,7 @@ function setupWebSockets(server) {
         const message = JSON.parse(data.toString());
         handleMessage(ws, message, clients, userConnections, orderTrackers, wss);
       } catch (err) {
-        log(`Failed to parse WS message: ${err}`);
+        log2(`Failed to parse WS message: ${err}`);
       }
     });
     ws.on("close", () => {
@@ -9534,7 +13353,7 @@ async function handleMessage(ws, message, clients, userConnections, orderTracker
         const connections = userConnections.get(connectionKey) || [];
         connections.push(ws);
         userConnections.set(connectionKey, connections);
-        log(`User ${userId} (${userType}) authenticated via WS with key ${connectionKey}`);
+        log2(`User ${userId} (${userType}) authenticated via WS with key ${connectionKey}`);
       }
       break;
     case "track_order":
@@ -9551,15 +13370,24 @@ async function handleMessage(ws, message, clients, userConnections, orderTracker
           trackers.push(ws);
         }
         orderTrackers.set(orderId2, trackers);
-        log(`Client tracking order ${orderId2} via WS`);
+        log2(`Client tracking order ${orderId2} via WS`);
       }
       break;
     case "location_update":
-      const { driverId, latitude, longitude } = message.payload;
+      const { driverId, latitude, longitude, currentLocation } = message.payload;
       if (driverId && latitude && longitude) {
+        try {
+          storage.updateDriver(driverId, {
+            latitude: latitude.toString(),
+            longitude: longitude.toString(),
+            currentLocation: currentLocation || void 0
+          }).catch((err) => console.error("Error updating driver location in DB:", err));
+        } catch (e) {
+          console.error("Failed to update driver location:", e);
+        }
         const broadcastMsg = JSON.stringify({
           type: "driver_location",
-          payload: { driverId, latitude, longitude, timestamp: Date.now() }
+          payload: { driverId, latitude, longitude, currentLocation, timestamp: Date.now() }
         });
         wss.clients.forEach((client) => {
           if (client.readyState === WebSocket.OPEN) {
@@ -9567,6 +13395,18 @@ async function handleMessage(ws, message, clients, userConnections, orderTracker
           }
         });
       }
+      break;
+    case "settings_update":
+      const settingsPayload = message.payload;
+      const settingsMsg = JSON.stringify({
+        type: "settings_changed",
+        payload: settingsPayload
+      });
+      wss.clients.forEach((client) => {
+        if (client.readyState === WebSocket.OPEN) {
+          client.send(settingsMsg);
+        }
+      });
       break;
     case "driver_assigned":
       const payload = message.payload;
@@ -9613,58 +13453,123 @@ async function handleMessage(ws, message, clients, userConnections, orderTracker
         });
       }
       break;
-      if (orderId && senderId && receiverId && content) {
-        try {
-          const newMessage = await storage.createMessage({
-            orderId,
-            senderId,
-            senderType,
-            receiverId,
-            receiverType,
-            content,
-            isRead: false
-          });
-          const chatMsg = JSON.stringify({
-            type: "new_chat_message",
-            payload: newMessage
-          });
-          const receiverKey = receiverType === "driver" ? `driver_${receiverId}` : receiverId;
-          const receiverConnections = userConnections.get(receiverKey) || [];
-          receiverConnections.forEach((client) => {
-            if (client.readyState === WebSocket.OPEN) {
-              client.send(chatMsg);
-            }
-          });
-          const senderKey = senderType === "driver" ? `driver_${senderId}` : senderId;
-          const senderConnections = userConnections.get(senderKey) || [];
-          senderConnections.forEach((client) => {
-            if (client.readyState === WebSocket.OPEN && client !== ws) {
-              client.send(chatMsg);
-            }
-          });
-          ws.send(JSON.stringify({
-            type: "chat_message_sent",
-            payload: { tempId: message.payload.tempId, messageId: newMessage.id }
-          }));
-        } catch (err) {
-          log(`Failed to process chat message: ${err}`);
-          ws.send(JSON.stringify({
-            type: "chat_message_error",
-            payload: { tempId: message.payload.tempId, error: "Failed to send message" }
-          }));
-        }
-      }
-      break;
   }
 }
 
 // server/seed.ts
+var defaultUiSettings = [
+  // إعدادات التنقل
+  { key: "show_categories", value: "true", category: "navigation", description: "\u0639\u0631\u0636 \u062A\u0635\u0646\u064A\u0641\u0627\u062A \u0627\u0644\u0645\u0637\u0627\u0639\u0645 \u0641\u064A \u0627\u0644\u0635\u0641\u062D\u0629 \u0627\u0644\u0631\u0626\u064A\u0633\u064A\u0629" },
+  { key: "show_search_bar", value: "true", category: "navigation", description: "\u0639\u0631\u0636 \u0634\u0631\u064A\u0637 \u0627\u0644\u0628\u062D\u062B \u0641\u064A \u0627\u0644\u0635\u0641\u062D\u0629 \u0627\u0644\u0631\u0626\u064A\u0633\u064A\u0629" },
+  { key: "show_special_offers", value: "true", category: "navigation", description: "\u0639\u0631\u0636 \u0627\u0644\u0639\u0631\u0648\u0636 \u0627\u0644\u062E\u0627\u0635\u0629 \u0648\u0627\u0644\u062A\u062E\u0641\u064A\u0636\u0627\u062A" },
+  { key: "show_orders_page", value: "true", category: "navigation", description: "\u0639\u0631\u0636 \u0635\u0641\u062D\u0629 \u0627\u0644\u0637\u0644\u0628\u0627\u062A \u0641\u064A \u0627\u0644\u062A\u0646\u0642\u0644" },
+  { key: "show_track_orders_page", value: "true", category: "navigation", description: "\u0639\u0631\u0636 \u0635\u0641\u062D\u0629 \u062A\u062A\u0628\u0639 \u0627\u0644\u0637\u0644\u0628\u0627\u062A \u0641\u064A \u0627\u0644\u062A\u0646\u0642\u0644" },
+  { key: "show_admin_panel", value: "true", category: "navigation", description: "\u0639\u0631\u0636 \u0644\u0648\u062D\u0629 \u0627\u0644\u062A\u062D\u0643\u0645 \u0627\u0644\u0625\u062F\u0627\u0631\u064A\u0629" },
+  { key: "show_delivery_app", value: "true", category: "navigation", description: "\u0639\u0631\u0636 \u062A\u0637\u0628\u064A\u0642 \u0627\u0644\u062A\u0648\u0635\u064A\u0644" },
+  { key: "show_hero_section", value: "true", category: "navigation", description: "\u0639\u0631\u0636 \u0627\u0644\u0628\u0627\u0646\u0631 \u0627\u0644\u0631\u0626\u064A\u0633\u064A \u0627\u0644\u0645\u062A\u062D\u0631\u0643" },
+  { key: "show_featured_products", value: "true", category: "navigation", description: "\u0639\u0631\u0636 \u0627\u0644\u0645\u0646\u062A\u062C\u0627\u062A \u0627\u0644\u0645\u0645\u064A\u0632\u0629" },
+  { key: "show_wasalni_service", value: "true", category: "navigation", description: "\u0639\u0631\u0636 \u062E\u062F\u0645\u0629 \u0648\u0635\u0644 \u0644\u064A \u0641\u064A \u0627\u0644\u0635\u0641\u062D\u0629 \u0627\u0644\u0631\u0626\u064A\u0633\u064A\u0629" },
+  { key: "wasalni_base_fee", value: "5", category: "delivery", description: "\u0631\u0633\u0648\u0645 \u062E\u062F\u0645\u0629 \u0648\u0635\u0644 \u0644\u064A \u0627\u0644\u0623\u0633\u0627\u0633\u064A\u0629" },
+  { key: "bottom_bar_enabled", value: "true", category: "navigation", description: "\u0625\u0638\u0647\u0627\u0631 \u0634\u0631\u064A\u0637 \u0627\u0644\u062A\u0646\u0642\u0644 \u0627\u0644\u0633\u0641\u0644\u064A" },
+  // إعدادات عامة
+  { key: "app_name", value: "\u0648\u0627\u0635\u0644", category: "general", description: "\u0627\u0633\u0645 \u0627\u0644\u062A\u0637\u0628\u064A\u0642" },
+  { key: "app_theme", value: "#ec3714", category: "general", description: "\u0627\u0644\u0644\u0648\u0646 \u0627\u0644\u0623\u0633\u0627\u0633\u064A \u0644\u0644\u062A\u0637\u0628\u064A\u0642 (hex)" },
+  { key: "delivery_fee_default", value: "5", category: "general", description: "\u0631\u0633\u0648\u0645 \u0627\u0644\u062A\u0648\u0635\u064A\u0644 \u0627\u0644\u0627\u0641\u062A\u0631\u0627\u0636\u064A\u0629 (\u0631\u064A\u0627\u0644)" },
+  { key: "minimum_order_default", value: "25", category: "general", description: "\u0627\u0644\u062D\u062F \u0627\u0644\u0623\u062F\u0646\u0649 \u0644\u0642\u064A\u0645\u0629 \u0627\u0644\u0637\u0644\u0628 (\u0631\u064A\u0627\u0644)" },
+  // إعدادات التوصيل
+  { key: "delivery_base_fee", value: "5", category: "delivery", description: "\u0627\u0644\u0631\u0633\u0648\u0645 \u0627\u0644\u0623\u0633\u0627\u0633\u064A\u0629 \u0644\u0644\u062A\u0648\u0635\u064A\u0644 (\u0631\u064A\u0627\u0644)" },
+  { key: "min_delivery_fee", value: "5", category: "delivery", description: "\u0627\u0644\u062D\u062F \u0627\u0644\u0623\u062F\u0646\u0649 \u0644\u0631\u0633\u0648\u0645 \u0627\u0644\u062A\u0648\u0635\u064A\u0644 (\u0631\u064A\u0627\u0644)" },
+  { key: "delivery_fee_per_km", value: "2", category: "delivery", description: "\u0631\u0633\u0648\u0645 \u0627\u0644\u062A\u0648\u0635\u064A\u0644 \u0644\u0643\u0644 \u0643\u064A\u0644\u0648\u0645\u062A\u0631 (\u0631\u064A\u0627\u0644)" },
+  // إعدادات المتجر
+  { key: "store_lat", value: "15.3694", category: "store", description: "\u062E\u0637 \u0627\u0644\u0639\u0631\u0636 \u0644\u0645\u0648\u0642\u0639 \u0627\u0644\u0645\u062A\u062C\u0631" },
+  { key: "store_lng", value: "44.1910", category: "store", description: "\u062E\u0637 \u0627\u0644\u0637\u0648\u0644 \u0644\u0645\u0648\u0642\u0639 \u0627\u0644\u0645\u062A\u062C\u0631" },
+  { key: "opening_time", value: "08:00", category: "store", description: "\u0648\u0642\u062A \u0641\u062A\u062D \u0627\u0644\u0645\u062A\u062C\u0631" },
+  { key: "closing_time", value: "23:00", category: "store", description: "\u0648\u0642\u062A \u0625\u063A\u0644\u0627\u0642 \u0627\u0644\u0645\u062A\u062C\u0631" },
+  { key: "store_status", value: "open", category: "store", description: "\u062D\u0627\u0644\u0629 \u0627\u0644\u0645\u062A\u062C\u0631 \u0627\u0644\u062D\u0627\u0644\u064A\u0629" },
+  // إعدادات الهوية البصرية
+  { key: "header_logo_url", value: "", category: "branding", description: "\u0634\u0639\u0627\u0631 \u0627\u0644\u0634\u0631\u064A\u0637 \u0627\u0644\u0639\u0644\u0648\u064A" },
+  { key: "sidebar_image_url", value: "", category: "branding", description: "\u0635\u0648\u0631\u0629 \u062E\u0644\u0641\u064A\u0629 \u0627\u0644\u0642\u0627\u0626\u0645\u0629 \u0627\u0644\u062C\u0627\u0646\u0628\u064A\u0629" },
+  { key: "sidebar_logo_url", value: "", category: "branding", description: "\u0634\u0639\u0627\u0631 \u0627\u0644\u0642\u0627\u0626\u0645\u0629 \u0627\u0644\u062C\u0627\u0646\u0628\u064A\u0629 (\u0625\u0630\u0627 \u0643\u0627\u0646 \u0645\u062E\u062A\u0644\u0641\u0627\u064B \u0639\u0646 \u0634\u0639\u0627\u0631 \u0627\u0644\u0647\u064A\u062F\u0631)" },
+  { key: "show_sidebar_logo", value: "true", category: "branding", description: "\u0625\u0638\u0647\u0627\u0631 \u0634\u0639\u0627\u0631 \u0627\u0644\u0642\u0627\u0626\u0645\u0629 \u0627\u0644\u062C\u0627\u0646\u0628\u064A\u0629" },
+  { key: "sidebar_tagline", value: "\u0648\u0627\u0635\u0644 \xB7 \u0646\u0648\u0635\u0644 \u0644\u0643 \u0628\u0643\u0644 \u0633\u0631\u0639\u0629 \u0648\u0623\u0645\u0627\u0646", category: "branding", description: "\u0627\u0644\u0634\u0639\u0627\u0631 \u0627\u0644\u0646\u0635\u064A \u0641\u064A \u0627\u0644\u0642\u0627\u0626\u0645\u0629 \u0627\u0644\u062C\u0627\u0646\u0628\u064A\u0629" },
+  { key: "address_text", value: "\u0623\u062E\u062A\u0627\u0631 \u0627\u0644\u0639\u0646\u0648\u0627\u0646", category: "branding", description: "\u0646\u0635 \u0639\u0646\u0648\u0627\u0646 \u0627\u0644\u0645\u0648\u0642\u0639 \u0641\u064A \u0627\u0644\u0634\u0631\u064A\u0637 \u0627\u0644\u0639\u0644\u0648\u064A" },
+  // إعدادات الشاشة الرئيسية - بانر العروض
+  { key: "offer_banner_1_title", value: "\u0639\u0631\u0648\u0636 \u062D\u0635\u0631\u064A\u0629 \u064A\u0648\u0645\u064A\u0629 \u0644\u0644\u062A\u0648\u0635\u064A\u0644", category: "home", description: "\u0639\u0646\u0648\u0627\u0646 \u0627\u0644\u0628\u0627\u0646\u0631 \u0627\u0644\u0623\u0648\u0644" },
+  { key: "offer_banner_1_subtitle", value: "\u0627\u0637\u0644\u0628 \u0627\u0644\u0622\u0646 \u0648\u0627\u0633\u062A\u0645\u062A\u0639 \u0628\u0623\u0633\u0631\u0639 \u062A\u0648\u0635\u064A\u0644", category: "home", description: "\u0646\u0635 \u0627\u0644\u0628\u0627\u0646\u0631 \u0627\u0644\u0623\u0648\u0644" },
+  { key: "offer_banner_2_title", value: "\u0627\u0643\u062A\u0634\u0641 \u0623\u062D\u062F\u062B \u0627\u0644\u0639\u0631\u0648\u0636 \u0648\u0627\u0644\u062E\u0635\u0648\u0645\u0627\u062A", category: "home", description: "\u0639\u0646\u0648\u0627\u0646 \u0627\u0644\u0628\u0627\u0646\u0631 \u0627\u0644\u062B\u0627\u0646\u064A" },
+  { key: "offer_banner_2_subtitle", value: "\u062E\u0635\u0648\u0645\u0627\u062A \u062D\u0635\u0631\u064A\u0629 \u0639\u0644\u0649 \u0627\u0644\u0637\u0644\u0628\u0627\u062A", category: "home", description: "\u0646\u0635 \u0627\u0644\u0628\u0627\u0646\u0631 \u0627\u0644\u062B\u0627\u0646\u064A" },
+  // إعدادات أزرار التصنيف والصفحة الرئيسية
+  { key: "btn_tab_all", value: "\u0627\u0644\u0643\u0644", category: "home", description: "\u0646\u0635 \u062A\u0628\u0648\u064A\u0628 \u0643\u0644 \u0627\u0644\u0645\u0637\u0627\u0639\u0645" },
+  { key: "btn_tab_nearest", value: "\u0627\u0644\u0623\u0642\u0631\u0628", category: "home", description: "\u0646\u0635 \u062A\u0628\u0648\u064A\u0628 \u0627\u0644\u0623\u0642\u0631\u0628" },
+  { key: "btn_tab_new", value: "\u0627\u0644\u062C\u062F\u064A\u062F\u0629", category: "home", description: "\u0646\u0635 \u062A\u0628\u0648\u064A\u0628 \u0627\u0644\u062C\u062F\u064A\u062F\u0629" },
+  { key: "btn_tab_favorites", value: "\u0627\u0644\u0645\u0641\u0636\u0644\u0629", category: "home", description: "\u0646\u0635 \u062A\u0628\u0648\u064A\u0628 \u0627\u0644\u0645\u0641\u0636\u0644\u0629" },
+  { key: "btn_shop_now", value: "\u062A\u0633\u0648\u0642 \u0627\u0644\u0622\u0646", category: "home", description: "\u0646\u0635 \u0632\u0631 \u0627\u0644\u062A\u0633\u0648\u0642" },
+  { key: "text_all_categories", value: "\u0643\u0644 \u0627\u0644\u062A\u0635\u0646\u064A\u0641\u0627\u062A", category: "home", description: "\u0646\u0635 \u0632\u0631 \u0643\u0644 \u0627\u0644\u062A\u0635\u0646\u064A\u0641\u0627\u062A" },
+  { key: "app_version", value: "1.0.0", category: "general", description: "\u0625\u0635\u062F\u0627\u0631 \u0627\u0644\u062A\u0637\u0628\u064A\u0642" },
+  { key: "top_bar_logo_url", value: "", category: "branding", description: "\u0634\u0639\u0627\u0631 \u0627\u0644\u0634\u0631\u064A\u0637 \u0627\u0644\u0639\u0644\u0648\u064A \u0627\u0644\u062B\u0627\u0646\u0648\u064A" },
+  { key: "logo_animation_duration", value: "2.5", category: "branding", description: "\u0645\u062F\u0629 \u0638\u0647\u0648\u0631 \u0627\u0644\u0634\u0639\u0627\u0631 (\u062B\u0648\u0627\u0646\u064A)" },
+  // إعدادات شاشة الترحيب
+  { key: "show_splash_screen", value: "true", category: "splash", description: "\u0639\u0631\u0636 \u0634\u0627\u0634\u0629 \u0627\u0644\u062A\u0631\u062D\u064A\u0628" },
+  { key: "splash_image_url", value: "", category: "splash", description: "\u0635\u0648\u0631\u0629 \u0634\u0627\u0634\u0629 \u0627\u0644\u062A\u0631\u062D\u064A\u0628" },
+  { key: "splash_image_url_2", value: "", category: "splash", description: "\u0635\u0648\u0631\u0629 \u0625\u0636\u0627\u0641\u064A\u0629 \u0644\u0644\u062A\u0631\u062D\u064A\u0628" },
+  { key: "splash_title", value: "\u0648\u0627\u0635\u0644", category: "splash", description: "\u0639\u0646\u0648\u0627\u0646 \u0634\u0627\u0634\u0629 \u0627\u0644\u062A\u0631\u062D\u064A\u0628" },
+  { key: "splash_subtitle", value: "\u0646\u0648\u0635\u0644 \u0644\u0643 \u0628\u0643\u0644 \u0633\u0631\u0639\u0629 \u0648\u0623\u0645\u0627\u0646", category: "splash", description: "\u0646\u0635 \u0627\u0644\u062A\u0631\u062D\u064A\u0628" },
+  { key: "splash_button_text", value: "\u0627\u0628\u062F\u0623 \u0627\u0644\u0622\u0646", category: "splash", description: "\u0646\u0635 \u0632\u0631 \u0627\u0644\u0628\u062F\u0627\u064A\u0629" },
+  // إعدادات الدعم والتواصل
+  { key: "show_support_button", value: "true", category: "support", description: "\u0625\u0638\u0647\u0627\u0631 \u0632\u0631 \u0627\u0644\u062F\u0639\u0645 \u0641\u064A \u0627\u0644\u0634\u0631\u064A\u0637 \u0627\u0644\u0633\u0641\u0644\u064A" },
+  { key: "support_whatsapp", value: "", category: "support", description: "\u0631\u0642\u0645 \u0648\u0627\u062A\u0633\u0627\u0628 \u0627\u0644\u062F\u0639\u0645" },
+  { key: "support_phone", value: "", category: "support", description: "\u0631\u0642\u0645 \u0627\u0644\u0647\u0627\u062A\u0641 \u0627\u0644\u0645\u0628\u0627\u0634\u0631" },
+  { key: "text_support_title", value: "\u0646\u062D\u0646 \u0645\u0639\u0643 \u{1F31F}", category: "support", description: "\u0639\u0646\u0648\u0627\u0646 \u0646\u0627\u0641\u0630\u0629 \u0627\u0644\u062F\u0639\u0645" },
+  // إعدادات المشاركة والقائمة الجانبية
+  { key: "show_share_button", value: "true", category: "sidebar", description: "\u0625\u0638\u0647\u0627\u0631 \u0632\u0631 \u0627\u0644\u0645\u0634\u0627\u0631\u0643\u0629 \u0641\u064A \u0627\u0644\u0642\u0627\u0626\u0645\u0629" },
+  { key: "show_contact_button", value: "true", category: "sidebar", description: "\u0625\u0638\u0647\u0627\u0631 \u0632\u0631 \u0627\u0644\u062A\u0648\u0627\u0635\u0644 \u0641\u064A \u0627\u0644\u0642\u0627\u0626\u0645\u0629" },
+  { key: "share_text", value: "\u062C\u0631\u0628 \u0648\u0627\u0635\u0644 \u0627\u0644\u0622\u0646!", category: "sidebar", description: "\u0646\u0635 \u0627\u0644\u0645\u0634\u0627\u0631\u0643\u0629" },
+  { key: "share_url", value: "", category: "sidebar", description: "\u0631\u0627\u0628\u0637 \u0627\u0644\u0645\u0634\u0627\u0631\u0643\u0629" },
+  // إعدادات الخصوصية
+  { key: "show_privacy_button", value: "true", category: "privacy", description: "\u0625\u0638\u0647\u0627\u0631 \u0632\u0631 \u0633\u064A\u0627\u0633\u0629 \u0627\u0644\u062E\u0635\u0648\u0635\u064A\u0629" },
+  { key: "privacy_policy_text", value: "", category: "privacy", description: "\u0646\u0635 \u0633\u064A\u0627\u0633\u0629 \u0627\u0644\u062E\u0635\u0648\u0635\u064A\u0629" },
+  // إعدادات السلة والدفع
+  { key: "show_payment_cards", value: "true", category: "cart", description: "\u0625\u0638\u0647\u0627\u0631 \u0628\u0637\u0627\u0642\u0627\u062A \u0627\u0644\u062F\u0641\u0639 \u0641\u064A \u0627\u0644\u0633\u0644\u0629" },
+  { key: "show_coupon_box_always", value: "true", category: "cart", description: "\u0625\u0638\u0647\u0627\u0631 \u0635\u0646\u062F\u0648\u0642 \u0627\u0644\u0643\u0648\u0628\u0648\u0646 \u062F\u0627\u0626\u0645\u064B\u0627" },
+  { key: "coupon_min_order_value", value: "0", category: "cart", description: "\u0627\u0644\u062D\u062F \u0627\u0644\u0623\u062F\u0646\u0649 \u0644\u0642\u064A\u0645\u0629 \u0627\u0644\u0637\u0644\u0628 \u0644\u0625\u0638\u0647\u0627\u0631 \u0635\u0646\u062F\u0648\u0642 \u0627\u0644\u0643\u0648\u0628\u0648\u0646 (0 = \u062F\u0627\u0626\u0645\u0627\u064B)" },
+  { key: "show_cash_payment", value: "true", category: "cart", description: "\u0625\u0638\u0647\u0627\u0631 \u062E\u064A\u0627\u0631 \u0627\u0644\u062F\u0641\u0639 \u0646\u0642\u062F\u0627\u064B" },
+  { key: "show_bank_transfer", value: "false", category: "cart", description: "\u0625\u0638\u0647\u0627\u0631 \u062E\u064A\u0627\u0631 \u0627\u0644\u062A\u062D\u0648\u064A\u0644 \u0627\u0644\u0628\u0646\u0643\u064A" },
+  { key: "cart_checkout_button_text", value: "\u062A\u0623\u0643\u064A\u062F \u0627\u0644\u0637\u0644\u0628", category: "cart", description: "\u0646\u0635 \u0632\u0631 \u0627\u0644\u062F\u0641\u0639" },
+  { key: "cart_checkout_note", value: "", category: "cart", description: "\u0631\u0633\u0627\u0644\u0629 \u062A\u062D\u062A \u0632\u0631 \u0627\u0644\u062A\u0623\u0643\u064A\u062F" },
+  // إعدادات تطبيق السائق - إظهار/إخفاء الصفحات
+  { key: "driver_show_wallet", value: "true", category: "driver", description: "\u0625\u0638\u0647\u0627\u0631 \u0635\u0641\u062D\u0629 \u0627\u0644\u0645\u062D\u0641\u0638\u0629 \u0644\u0644\u0633\u0627\u0626\u0642" },
+  { key: "driver_show_stats", value: "true", category: "driver", description: "\u0625\u0638\u0647\u0627\u0631 \u0635\u0641\u062D\u0629 \u0627\u0644\u0625\u062D\u0635\u0627\u0626\u064A\u0627\u062A \u0644\u0644\u0633\u0627\u0626\u0642" },
+  { key: "driver_show_profile", value: "true", category: "driver", description: "\u0625\u0638\u0647\u0627\u0631 \u0635\u0641\u062D\u0629 \u0627\u0644\u0645\u0644\u0641 \u0627\u0644\u0634\u062E\u0635\u064A \u0644\u0644\u0633\u0627\u0626\u0642" },
+  { key: "driver_show_history", value: "true", category: "driver", description: "\u0625\u0638\u0647\u0627\u0631 \u0633\u062C\u0644 \u0627\u0644\u062A\u0648\u0635\u064A\u0644 \u0644\u0644\u0633\u0627\u0626\u0642" },
+  // إعدادات ساعات عمل الموصلين والطلبات المؤجلة
+  { key: "driver_start_time", value: "09:00", category: "driver", description: "\u0648\u0642\u062A \u0628\u062F\u0621 \u062F\u0648\u0627\u0645 \u0627\u0644\u0645\u0648\u0635\u0644\u064A\u0646 (\u0645\u062B\u0627\u0644: 09:00)" },
+  { key: "driver_end_time", value: "21:00", category: "driver", description: "\u0648\u0642\u062A \u0627\u0646\u062A\u0647\u0627\u0621 \u062F\u0648\u0627\u0645 \u0627\u0644\u0645\u0648\u0635\u0644\u064A\u0646 (\u0645\u062B\u0627\u0644: 21:00)" },
+  { key: "enable_scheduled_orders", value: "true", category: "driver", description: "\u0627\u0644\u0633\u0645\u0627\u062D \u0644\u0644\u0639\u0645\u0644\u0627\u0621 \u0628\u062C\u062F\u0648\u0644\u0629 \u0627\u0644\u0637\u0644\u0628\u0627\u062A \u062E\u0627\u0631\u062C \u0633\u0627\u0639\u0627\u062A \u0627\u0644\u0645\u0648\u0635\u0644\u064A\u0646" }
+];
+async function ensureDefaultSettings() {
+  try {
+    const existing = await dbStorage.getUiSettings();
+    const existingKeys = new Set(existing.map((s) => s.key));
+    let added = 0;
+    for (const setting of defaultUiSettings) {
+      if (!existingKeys.has(setting.key)) {
+        await dbStorage.createUiSetting(setting);
+        added++;
+      }
+    }
+    if (added > 0) {
+      console.log(`\u2699\uFE0F \u0623\u064F\u0636\u064A\u0641\u062A ${added} \u0625\u0639\u062F\u0627\u062F\u0627\u062A \u0648\u0627\u062C\u0647\u0629 \u062C\u062F\u064A\u062F\u0629 \u0625\u0644\u0649 \u0642\u0627\u0639\u062F\u0629 \u0627\u0644\u0628\u064A\u0627\u0646\u0627\u062A`);
+    }
+  } catch (error) {
+    console.error("\u062E\u0637\u0623 \u0641\u064A \u0636\u0645\u0627\u0646 \u0627\u0644\u0625\u0639\u062F\u0627\u062F\u0627\u062A \u0627\u0644\u0627\u0641\u062A\u0631\u0627\u0636\u064A\u0629:", error);
+  }
+}
 async function seedDefaultData() {
   try {
     console.log("\u{1F331} Starting database seeding...");
     const existingCategories = await dbStorage.getCategories();
     if (existingCategories.length > 0) {
-      console.log("\u2713 Database already seeded, skipping...");
+      console.log("\u2713 Database already seeded, skipping initial data...");
       return;
     }
     const categories2 = [
@@ -9681,9 +13586,9 @@ async function seedDefaultData() {
       seededCategories.push(category);
       console.log(`  \u2713 Created category: ${category.name}`);
     }
-    const restaurants2 = [
+    const restaurants3 = [
       {
-        name: "\u0645\u062A\u062C\u0631 \u0637\u0645\u0637\u0648\u0645",
+        name: "\u0645\u062A\u062C\u0631 \u0648\u0627\u0635\u0644",
         description: "\u0623\u062C\u0648\u062F \u0623\u0646\u0648\u0627\u0639 \u0627\u0644\u0641\u0648\u0627\u0643\u0647 \u0648\u0627\u0644\u062E\u0636\u0631\u0648\u0627\u062A \u0627\u0644\u0637\u0627\u0632\u062C\u0629 \u064A\u0648\u0645\u064A\u0627\u064B",
         image: "https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=400",
         phone: "+967777777777",
@@ -9756,7 +13661,7 @@ async function seedDefaultData() {
     ];
     console.log("\u{1F3EA} Seeding restaurants...");
     const seededRestaurants = [];
-    for (const restaurantData of restaurants2) {
+    for (const restaurantData of restaurants3) {
       const restaurant = await dbStorage.createRestaurant(restaurantData);
       seededRestaurants.push(restaurant);
       console.log(`  \u2713 Created restaurant: ${restaurant.name}`);
@@ -9809,129 +13714,8 @@ async function seedDefaultData() {
       const menuItem = await dbStorage.createMenuItem(menuItemData);
       console.log(`  \u2713 Created menu item: ${menuItem.name}`);
     }
-    const uiSettings2 = [
-      // Navigation Settings
-      {
-        key: "show_categories",
-        value: "true",
-        category: "navigation",
-        description: "\u0639\u0631\u0636 \u062A\u0635\u0646\u064A\u0641\u0627\u062A \u0627\u0644\u0645\u0637\u0627\u0639\u0645 \u0641\u064A \u0627\u0644\u0635\u0641\u062D\u0629 \u0627\u0644\u0631\u0626\u064A\u0633\u064A\u0629"
-      },
-      {
-        key: "show_search_bar",
-        value: "true",
-        category: "navigation",
-        description: "\u0639\u0631\u0636 \u0634\u0631\u064A\u0637 \u0627\u0644\u0628\u062D\u062B \u0641\u064A \u0627\u0644\u0635\u0641\u062D\u0629 \u0627\u0644\u0631\u0626\u064A\u0633\u064A\u0629"
-      },
-      {
-        key: "show_special_offers",
-        value: "true",
-        category: "navigation",
-        description: "\u0639\u0631\u0636 \u0627\u0644\u0639\u0631\u0648\u0636 \u0627\u0644\u062E\u0627\u0635\u0629 \u0648\u0627\u0644\u062A\u062E\u0641\u064A\u0636\u0627\u062A"
-      },
-      {
-        key: "show_orders_page",
-        value: "true",
-        category: "navigation",
-        description: "\u0639\u0631\u0636 \u0635\u0641\u062D\u0629 \u0627\u0644\u0637\u0644\u0628\u0627\u062A \u0641\u064A \u0627\u0644\u062A\u0646\u0642\u0644"
-      },
-      {
-        key: "show_track_orders_page",
-        value: "true",
-        category: "navigation",
-        description: "\u0639\u0631\u0636 \u0635\u0641\u062D\u0629 \u062A\u062A\u0628\u0639 \u0627\u0644\u0637\u0644\u0628\u0627\u062A \u0641\u064A \u0627\u0644\u062A\u0646\u0642\u0644"
-      },
-      {
-        key: "show_admin_panel",
-        value: "true",
-        category: "navigation",
-        description: "\u0639\u0631\u0636 \u0644\u0648\u062D\u0629 \u0627\u0644\u062A\u062D\u0643\u0645 \u0627\u0644\u0625\u062F\u0627\u0631\u064A\u0629"
-      },
-      {
-        key: "show_delivery_app",
-        value: "true",
-        category: "navigation",
-        description: "\u0639\u0631\u0636 \u062A\u0637\u0628\u064A\u0642 \u0627\u0644\u062A\u0648\u0635\u064A\u0644"
-      },
-      // App Settings
-      {
-        key: "app_name",
-        value: "\u0637\u0645\u0637\u0648\u0645 \u0644\u0644\u062A\u0648\u0635\u064A\u0644",
-        category: "general",
-        description: "\u0627\u0633\u0645 \u0627\u0644\u062A\u0637\u0628\u064A\u0642 \u0627\u0644\u0630\u064A \u064A\u0638\u0647\u0631 \u0644\u0644\u0645\u0633\u062A\u062E\u062F\u0645\u064A\u0646"
-      },
-      {
-        key: "app_theme",
-        value: "#e11d48",
-        // Rose-600 (Tamtoom Red)
-        category: "general",
-        description: "\u0627\u0644\u0644\u0648\u0646 \u0627\u0644\u0623\u0633\u0627\u0633\u064A \u0644\u0644\u062A\u0637\u0628\u064A\u0642 (hex color)"
-      },
-      {
-        key: "delivery_fee_default",
-        value: "5",
-        category: "general",
-        description: "\u0631\u0633\u0648\u0645 \u0627\u0644\u062A\u0648\u0635\u064A\u0644 \u0627\u0644\u0627\u0641\u062A\u0631\u0627\u0636\u064A\u0629 (\u0631\u064A\u0627\u0644)"
-      },
-      {
-        key: "delivery_base_fee",
-        value: "5",
-        category: "delivery",
-        description: "\u0627\u0644\u0631\u0633\u0648\u0645 \u0627\u0644\u0623\u0633\u0627\u0633\u064A\u0629 \u0644\u0644\u062A\u0648\u0635\u064A\u0644 (\u0631\u064A\u0627\u0644)"
-      },
-      {
-        key: "min_delivery_fee",
-        value: "5",
-        category: "delivery",
-        description: "\u0627\u0644\u062D\u062F \u0627\u0644\u0623\u062F\u0646\u0649 \u0644\u0631\u0633\u0648\u0645 \u0627\u0644\u062A\u0648\u0635\u064A\u0644 (\u0631\u064A\u0627\u0644)"
-      },
-      {
-        key: "store_lat",
-        value: "15.3694",
-        category: "store",
-        description: "\u062E\u0637 \u0627\u0644\u0639\u0631\u0636 \u0644\u0645\u0648\u0642\u0639 \u0627\u0644\u0645\u062A\u062C\u0631 \u0627\u0644\u0631\u0626\u064A\u0633\u064A"
-      },
-      {
-        key: "store_lng",
-        value: "44.1910",
-        category: "store",
-        description: "\u062E\u0637 \u0627\u0644\u0637\u0648\u0644 \u0644\u0645\u0648\u0642\u0639 \u0627\u0644\u0645\u062A\u062C\u0631 \u0627\u0644\u0631\u0626\u064A\u0633\u064A"
-      },
-      {
-        key: "minimum_order_default",
-        value: "25",
-        category: "general",
-        description: "\u0627\u0644\u062D\u062F \u0627\u0644\u0623\u062F\u0646\u0649 \u0644\u0642\u064A\u0645\u0629 \u0627\u0644\u0637\u0644\u0628 (\u0631\u064A\u0627\u0644)"
-      },
-      // Store Settings
-      {
-        key: "opening_time",
-        value: "08:00",
-        category: "store",
-        description: "\u0648\u0642\u062A \u0641\u062A\u062D \u0627\u0644\u0645\u062A\u062C\u0631 (HH:MM)"
-      },
-      {
-        key: "closing_time",
-        value: "23:00",
-        category: "store",
-        description: "\u0648\u0642\u062A \u0625\u063A\u0644\u0627\u0642 \u0627\u0644\u0645\u062A\u062C\u0631 (HH:MM)"
-      },
-      {
-        key: "store_status",
-        value: "open",
-        category: "store",
-        description: "\u062D\u0627\u0644\u0629 \u0627\u0644\u0645\u062A\u062C\u0631 \u0627\u0644\u062D\u0627\u0644\u064A\u0629"
-      },
-      // إعدادات رسوم التوصيل
-      {
-        key: "delivery_fee_per_km",
-        value: "2",
-        category: "delivery",
-        description: "\u0631\u0633\u0648\u0645 \u0627\u0644\u062A\u0648\u0635\u064A\u0644 \u0644\u0643\u0644 \u0643\u064A\u0644\u0648\u0645\u062A\u0631 (\u0631\u064A\u0627\u0644)"
-      }
-    ];
     console.log("\u2699\uFE0F Seeding UI settings...");
-    for (const settingData of uiSettings2) {
+    for (const settingData of defaultUiSettings) {
       const setting = await dbStorage.createUiSetting(settingData);
       console.log(`  \u2713 Created UI setting: ${setting.key}`);
     }
@@ -9987,7 +13771,7 @@ async function seedDefaultData() {
       console.log(`  \u2713 Created driver: ${createdDriver.name}`);
     }
     console.log("\u2705 Database seeding completed successfully!");
-    console.log(`\u{1F4CA} Seeded: ${categories2.length} categories, ${restaurants2.length} restaurants, ${menuItems2.length} menu items, ${uiSettings2.length} UI settings, ${adminUsers2.length} admin users, ${defaultDrivers.length} drivers`);
+    console.log(`\u{1F4CA} Seeded: ${categories2.length} categories, ${restaurants3.length} restaurants, ${menuItems2.length} menu items, ${defaultUiSettings.length} UI settings, ${adminUsers2.length} admin users, ${defaultDrivers.length} drivers`);
   } catch (error) {
     console.error("\u274C Database seeding failed:", error);
     throw error;
@@ -9995,36 +13779,38 @@ async function seedDefaultData() {
 }
 
 // server/index.ts
-var app = express10();
-app.use(express10.json({ limit: "50mb" }));
-app.use(express10.urlencoded({ limit: "50mb", extended: false }));
+dotenv.config({ override: false });
+var app = express16();
+app.use(compression({
+  threshold: 1024,
+  // Only compress responses larger than 1KB
+  level: 6
+  // Balanced compression level
+}));
+app.use(express16.json({ limit: "50mb" }));
+app.use(express16.urlencoded({ limit: "50mb", extended: false }));
 app.set("etag", false);
 app.use("/api", (req, res, next) => {
-  res.set("Cache-Control", "no-cache, no-store, must-revalidate");
-  res.set("Pragma", "no-cache");
-  res.set("Expires", "0");
+  if (req.method !== "GET") {
+    res.set("Cache-Control", "no-cache, no-store, must-revalidate");
+    res.set("Pragma", "no-cache");
+    res.set("Expires", "0");
+  } else if (req.path.includes("/special-offers") || req.path.includes("/settings")) {
+    res.set("Cache-Control", "public, max-age=30");
+  }
   next();
 });
 app.use((req, res, next) => {
   const start = Date.now();
-  const path4 = req.path;
-  let capturedJsonResponse = void 0;
-  const originalResJson = res.json;
-  res.json = function(bodyJson, ...args) {
-    capturedJsonResponse = bodyJson;
-    return originalResJson.apply(res, [bodyJson, ...args]);
-  };
+  const path7 = req.path;
   res.on("finish", () => {
     const duration = Date.now() - start;
-    if (path4.startsWith("/api")) {
-      let logLine = `${req.method} ${path4} ${res.statusCode} in ${duration}ms`;
-      if (capturedJsonResponse) {
-        logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
-      }
+    if (path7.startsWith("/api")) {
+      let logLine = `${req.method} ${path7} ${res.statusCode} in ${duration}ms`;
       if (logLine.length > 80) {
         logLine = logLine.slice(0, 79) + "\u2026";
       }
-      log(logLine);
+      log2(logLine);
     }
   });
   next();
@@ -10034,6 +13820,8 @@ app.use((req, res, next) => {
     const server = await registerRoutes(app);
     const ws = setupWebSockets(server);
     app.set("ws", ws);
+    global.WS_MANAGER = ws;
+    registerBroadcast(ws.broadcast);
     app.use((err, _req, res, _next) => {
       const status = err.status || err.statusCode || 500;
       const message = err.message || "Internal Server Error";
@@ -10041,13 +13829,14 @@ app.use((req, res, next) => {
       throw err;
     });
     if (storage.constructor.name === "DatabaseStorage") {
-      log("\u{1F331} Seeding database with default data...");
+      log2("\u{1F331} Seeding database with default data...");
       await seedDefaultData();
+      await ensureDefaultSettings();
     }
     if (app.get("env") === "development") {
-      await setupVite(app, server);
+      await setupVite2(app, server);
     } else {
-      serveStatic(app);
+      serveStatic2(app);
     }
     const port = parseInt(process.env.PORT || "5000", 10);
     server.listen({
@@ -10055,8 +13844,102 @@ app.use((req, res, next) => {
       host: "0.0.0.0",
       reusePort: true
     }, () => {
-      log(`serving on port ${port}`);
+      log2(`serving on port ${port}`);
     });
+    setInterval(async () => {
+      try {
+        const allOrders = await storage.getOrders();
+        const scheduledOrders = allOrders.filter((o) => o.status === "scheduled");
+        const db5 = storage.db;
+        let scheduledWasalni = [];
+        if (db5) {
+          const { wasalniRequests: wasalniRequests3 } = await Promise.resolve().then(() => (init_schema(), schema_exports));
+          scheduledWasalni = await db5.select().from(wasalniRequests3).where(eq9(wasalniRequests3.status, "scheduled"));
+        }
+        const now = /* @__PURE__ */ new Date();
+        const thirtyMinutesFromNow = new Date(now.getTime() + 30 * 60 * 1e3);
+        for (const order of scheduledOrders) {
+          if (!order.scheduledDate || !order.scheduledTimeSlot) continue;
+          try {
+            const timeStr = order.scheduledTimeSlot.replace(/[^\d:]/g, "").trim();
+            const [hours, minutes] = timeStr.split(":").map(Number);
+            if (isNaN(hours) || isNaN(minutes)) continue;
+            const scheduledDateTime = new Date(order.scheduledDate);
+            scheduledDateTime.setHours(hours, minutes, 0, 0);
+            if (scheduledDateTime <= thirtyMinutesFromNow) {
+              await storage.updateOrder(order.id, { status: "pending", updatedAt: /* @__PURE__ */ new Date() });
+              await storage.createNotification({
+                type: "scheduled_order_ready",
+                title: "\u{1F4C5} \u0637\u0644\u0628 \u0645\u062C\u062F\u0648\u0644 \u062C\u0627\u0647\u0632",
+                message: `\u0627\u0644\u0637\u0644\u0628 \u0627\u0644\u0645\u062C\u062F\u0648\u0644 \u0631\u0642\u0645 ${order.orderNumber} \u0645\u0646 ${order.customerName} \u0623\u0635\u0628\u062D \u062C\u0627\u0647\u0632\u0627\u064B \u0644\u0644\u062A\u0648\u0635\u064A\u0644. \u0645\u0648\u0639\u062F\u0647: ${order.scheduledDate} ${order.scheduledTimeSlot}`,
+                recipientType: "admin",
+                recipientId: null,
+                orderId: order.id,
+                isRead: false
+              });
+              await storage.createNotification({
+                type: "order_status_update",
+                title: "\u0637\u0644\u0628\u0643 \u0627\u0644\u0645\u062C\u062F\u0648\u0644 \u0642\u064A\u062F \u0627\u0644\u062A\u0646\u0641\u064A\u0630",
+                message: `\u0628\u062F\u0623 \u062A\u062C\u0647\u064A\u0632 \u0637\u0644\u0628\u0643 \u0627\u0644\u0645\u062C\u062F\u0648\u0644 \u0631\u0642\u0645 ${order.orderNumber} - \u0633\u064A\u0635\u0644\u0643 \u0642\u0631\u064A\u0628\u0627\u064B`,
+                recipientType: "customer",
+                recipientId: order.customerId || order.customerPhone,
+                orderId: order.id,
+                isRead: false
+              });
+              await storage.createOrderTracking({
+                orderId: order.id,
+                status: "pending",
+                message: `\u062A\u0645 \u062A\u0641\u0639\u064A\u0644 \u0627\u0644\u0637\u0644\u0628 \u0627\u0644\u0645\u062C\u062F\u0648\u0644 \u062A\u0644\u0642\u0627\u0626\u064A\u0627\u064B - \u0645\u0648\u0639\u062F \u0627\u0644\u062A\u0648\u0635\u064A\u0644: ${order.scheduledDate} ${order.scheduledTimeSlot}`,
+                createdBy: "system",
+                createdByType: "system"
+              });
+              const wsServer = app.get("ws");
+              if (wsServer) wsServer.broadcast("order_update", { orderId: order.id, status: "pending", type: "scheduled_activated" });
+              log2(`\u2705 \u062A\u0645 \u062A\u0641\u0639\u064A\u0644 \u0627\u0644\u0637\u0644\u0628 \u0627\u0644\u0645\u062C\u062F\u0648\u0644: ${order.orderNumber}`);
+            }
+          } catch (e) {
+            console.error(`\u062E\u0637\u0623 \u0641\u064A \u062A\u0641\u0639\u064A\u0644 \u0627\u0644\u0637\u0644\u0628 \u0627\u0644\u0645\u062C\u062F\u0648\u0644 ${order.id}:`, e);
+          }
+        }
+        for (const request of scheduledWasalni) {
+          if (!request.scheduledDate || !request.scheduledTime) continue;
+          try {
+            const [hours, minutes] = request.scheduledTime.split(":").map(Number);
+            const scheduledDateTime = new Date(request.scheduledDate);
+            scheduledDateTime.setHours(hours, minutes, 0, 0);
+            if (scheduledDateTime <= thirtyMinutesFromNow) {
+              await db5.update(wasalniRequests).set({ status: "pending", updatedAt: /* @__PURE__ */ new Date() }).where(eq9(wasalniRequests.id, request.id));
+              await storage.createNotification({
+                type: "new_wasalni_request",
+                title: "\u{1F4C5} \u0637\u0644\u0628 \u0648\u0635\u0644 \u0644\u064A \u0645\u062C\u062F\u0648\u0644 \u062C\u0627\u0647\u0632",
+                message: `\u0637\u0644\u0628 \u0648\u0635\u0644 \u0644\u064A \u0627\u0644\u0645\u062C\u062F\u0648\u0644 \u0631\u0642\u0645 ${request.requestNumber} \u0623\u0635\u0628\u062D \u062C\u0627\u0647\u0632\u0627\u064B. \u0645\u0648\u0639\u062F\u0647: ${request.scheduledDate} ${request.scheduledTime}`,
+                recipientType: "admin",
+                recipientId: null,
+                orderId: null,
+                isRead: false
+              });
+              await storage.createNotification({
+                type: "wasalni_status_update",
+                title: "\u0637\u0644\u0628 \u0648\u0635\u0644 \u0644\u064A \u0642\u064A\u062F \u0627\u0644\u062A\u0646\u0641\u064A\u0630",
+                message: `\u0628\u062F\u0623 \u0627\u0644\u0639\u0645\u0644 \u0639\u0644\u0649 \u0637\u0644\u0628 \u0648\u0635\u0644 \u0644\u064A \u0631\u0642\u0645 ${request.requestNumber} - \u0633\u064A\u0635\u0644\u0643 \u0642\u0631\u064A\u0628\u0627\u064B`,
+                recipientType: "customer",
+                recipientId: request.customerId || request.customerPhone,
+                orderId: null,
+                isRead: false
+              });
+              const wsServer = app.get("ws");
+              if (wsServer) wsServer.broadcast("order_update", { type: "wasalni_activated", requestId: request.id });
+              log2(`\u2705 \u062A\u0645 \u062A\u0641\u0639\u064A\u0644 \u0637\u0644\u0628 \u0648\u0635\u0644 \u0644\u064A \u0627\u0644\u0645\u062C\u062F\u0648\u0644: ${request.requestNumber}`);
+            }
+          } catch (e) {
+            console.error(`\u062E\u0637\u0623 \u0641\u064A \u062A\u0641\u0639\u064A\u0644 \u0637\u0644\u0628 \u0648\u0635\u0644 \u0644\u064A ${request.id}:`, e);
+          }
+        }
+      } catch (e) {
+        console.error("\u062E\u0637\u0623 \u0641\u064A \u0645\u0624\u0642\u062A \u0627\u0644\u0637\u0644\u0628\u0627\u062A \u0627\u0644\u0645\u062C\u062F\u0648\u0644\u0629:", e);
+      }
+    }, 60 * 1e3);
+    log2("\u23F0 \u062A\u0645 \u062A\u0634\u063A\u064A\u0644 \u0645\u0624\u0642\u062A \u0627\u0644\u0637\u0644\u0628\u0627\u062A \u0627\u0644\u0645\u062C\u062F\u0648\u0644\u0629");
   } catch (err) {
     console.error("Failed to start server:", err);
     process.exit(1);
