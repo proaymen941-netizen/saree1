@@ -13,8 +13,6 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
 
     /* Linting */
     "strict": true,
@@ -27,11 +25,7 @@
     "paths": {
       "@/*": ["./src/*"],
       "@shared/*": ["../shared/*"]
-    },
-    
-    /* Type definitions */
-    "types": ["vite/client", "node"]
+    }
   },
   "include": ["src", "../shared"],
-  "exclude": ["node_modules", "dist", "build"]
 }
