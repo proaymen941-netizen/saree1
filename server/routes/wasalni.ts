@@ -16,7 +16,11 @@ router.get("/", async (req, res) => {
     let results = await db.select().from(wasalniRequests).orderBy(desc(wasalniRequests.createdAt));
 
     if (status) results = results.filter((r: any) => r.status === status);
-    if (phone) results = results.filter((r: any) => r.customerPhone === phone);
+    if (phone) {
+      const normalize = (s: any) => (s ? String(s).trim().replace(/\s+/g, '') : '');
+      const target = normalize(phone);
+      results = results.filter((r: any) => normalize(r.customerPhone) === target);
+    }
     if (customerId) results = results.filter((r: any) => r.customerId === customerId);
 
     res.json(results);
@@ -110,32 +114,66 @@ router.post("/", async (req, res) => {
       status: "pending",
     }).returning();
 
+    // ========================================================================
+    // الإشعارات والـ WebSocket لا يجب أن تُفشل إنشاء الطلب
+    // كل عملية جانبية يتم لفّها بـ try/catch مستقل لضمان رد 201 الصحيح للعميل
+    // ========================================================================
+    const cleanPhone = String(customerPhone).trim().replace(/\s+/g, '');
+    const customerRecipientId = customerId || cleanPhone;
+
     // Create notification for admin
-    await storage.createNotification({
-      type: "new_wasalni_request",
-      title: "طلب وصل لي جديد",
-      message: `طلب وصل لي جديد رقم ${requestNumber} من ${customerName} - من: ${fromAddress} إلى: ${toAddress}`,
-      recipientType: "admin",
-      recipientId: null,
-      orderId: null,
-      isRead: false,
-    });
+    try {
+      await storage.createNotification({
+        type: "new_wasalni_request",
+        title: "طلب وصل لي جديد",
+        message: `طلب وصل لي جديد رقم ${requestNumber} من ${customerName} - من: ${fromAddress} إلى: ${toAddress}`,
+        recipientType: "admin",
+        recipientId: null,
+        orderId: null,
+        isRead: false,
+      });
+    } catch (notifyErr) {
+      console.error("⚠️ خطأ في إنشاء إشعار المدير لطلب وصل لي (تم تجاهله):", notifyErr);
+    }
 
-    // Create notification for customer
-    await storage.createNotification({
-      type: "wasalni_received",
-      title: "تم استلام طلب وصل لي",
-      message: `تم استلام طلبك رقم ${requestNumber} وهو قيد المراجعة`,
-      recipientType: "customer",
-      recipientId: customerId || customerPhone,
-      orderId: newRequest.id, // ربط الطلب بالتتبع
-      isRead: false,
-    });
+    // Create notification for customer (مرة بمعرّف الحساب إن وجد، ومرة بالهاتف لضمان الوصول)
+    try {
+      await storage.createNotification({
+        type: "wasalni_received",
+        title: "تم استلام طلب وصل لي",
+        message: `تم استلام طلبك رقم ${requestNumber} وهو قيد المراجعة`,
+        recipientType: "customer",
+        recipientId: customerRecipientId,
+        orderId: newRequest.id,
+        isRead: false,
+      });
+      // إذا كان المستخدم مسجل دخول وكان لديه customerId مختلف عن رقم الهاتف،
+      // أنشئ إشعاراً ثانياً مرتبطاً بالهاتف لضمان وصوله للأجهزة الأخرى
+      if (customerId && cleanPhone && customerId !== cleanPhone) {
+        await storage.createNotification({
+          type: "wasalni_received",
+          title: "تم استلام طلب وصل لي",
+          message: `تم استلام طلبك رقم ${requestNumber} وهو قيد المراجعة`,
+          recipientType: "customer",
+          recipientId: cleanPhone,
+          orderId: newRequest.id,
+          isRead: false,
+        });
+      }
+    } catch (notifyErr) {
+      console.error("⚠️ خطأ في إنشاء إشعار العميل لطلب وصل لي (تم تجاهله):", notifyErr);
+    }
 
-    // بث التحديث عبر WebSocket للإدارة
-    const ws = (req.app.get('ws') as any);
-    if (ws) {
-      ws.broadcast('new_wasalni_request', { requestId: newRequest.id, requestNumber });
+    // بث التحديث عبر WebSocket للإدارة وللعميل لتحديث صفحة الطلبات فوراً
+    try {
+      const ws = (req.app.get('ws') as any);
+      if (ws) {
+        ws.broadcast('new_wasalni_request', { requestId: newRequest.id, requestNumber });
+        // إعلام شاشة طلباتي للعميل بأن هناك طلب جديد
+        ws.broadcast('order_update', { orderId: newRequest.id, status: 'pending', type: 'wasalni' });
+      }
+    } catch (wsErr) {
+      console.error("⚠️ خطأ في بث WebSocket لطلب وصل لي (تم تجاهله):", wsErr);
     }
 
     res.status(201).json({ success: true, request: newRequest });
@@ -179,9 +217,13 @@ router.put("/:id", async (req, res) => {
     // Notify customer on status change
     if (status) {
       // بث التحديث عبر WebSocket
-      const ws = (req.app.get('ws') as any);
-      if (ws) {
-        ws.broadcast('order_update', { orderId: updated.id, status, type: 'wasalni' });
+      try {
+        const ws = (req.app.get('ws') as any);
+        if (ws) {
+          ws.broadcast('order_update', { orderId: updated.id, status, type: 'wasalni' });
+        }
+      } catch (wsErr) {
+        console.error("⚠️ فشل بث WebSocket لتحديث وصل لي (تم تجاهله):", wsErr);
       }
 
       const statusMessages: Record<string, string> = {
@@ -191,15 +233,23 @@ router.put("/:id", async (req, res) => {
         cancelled: `تم إلغاء طلب وصل لي. ${cancelReason ? `السبب: ${cancelReason}` : ''}`,
       };
       if (statusMessages[status]) {
-        await storage.createNotification({
-          type: "wasalni_status_update",
-          title: "تحديث طلب وصل لي",
-          message: `${statusMessages[status]} - رقم الطلب: ${updated.requestNumber}`,
-          recipientType: "customer",
-          recipientId: updated.customerId || updated.customerPhone,
-          orderId: updated.id, // ربط الطلب بالتتبع
-          isRead: false,
-        });
+        const cleanPhone = updated.customerPhone ? String(updated.customerPhone).trim().replace(/\s+/g, '') : null;
+        const recipients = Array.from(new Set([updated.customerId, cleanPhone].filter(Boolean))) as string[];
+        for (const rid of recipients) {
+          try {
+            await storage.createNotification({
+              type: "wasalni_status_update",
+              title: "تحديث طلب وصل لي",
+              message: `${statusMessages[status]} - رقم الطلب: ${updated.requestNumber}`,
+              recipientType: "customer",
+              recipientId: rid,
+              orderId: updated.id,
+              isRead: false,
+            });
+          } catch (notifyErr) {
+            console.error("⚠️ فشل إنشاء إشعار العميل لتحديث وصل لي (تم تجاهله):", notifyErr);
+          }
+        }
       }
     }
 
@@ -252,50 +302,67 @@ router.post("/:id/assign-driver", async (req, res) => {
       console.error("خطأ في تحديث حالة السائق:", driverErr);
     }
 
-    // Broadcast via WebSocket
-    const ws = (req.app.get('ws') as any);
-    if (ws) {
-      // إشعار للعميل بتحديث الحالة
-      ws.broadcast('order_update', { 
-        orderId: updated.id, 
-        status: 'confirmed', 
-        type: 'wasalni',
-        requestNumber: request.requestNumber
-      });
-
-      // إشعار مباشر للسائق
-      if (ws.sendToDriver) {
-        ws.sendToDriver(driverId, 'new_order_assigned', { 
-          orderId: updated.id, 
+    // Broadcast via WebSocket - لفّ كل بث في try/catch لتفادي إفشال التعيين
+    try {
+      const ws = (req.app.get('ws') as any);
+      if (ws) {
+        ws.broadcast('order_update', {
+          orderId: updated.id,
           status: 'confirmed',
-          message: `تم تعيين طلب وصل لي جديد لك رقم ${request.requestNumber}`,
           type: 'wasalni',
-          orderData: updated
+          requestNumber: request.requestNumber
         });
+        if (typeof ws.sendToDriver === 'function') {
+          ws.sendToDriver(driverId, 'new_order_assigned', {
+            orderId: updated.id,
+            status: 'confirmed',
+            message: `تم تعيين طلب وصل لي جديد لك رقم ${request.requestNumber}`,
+            type: 'wasalni',
+            orderData: updated
+          });
+        }
       }
+    } catch (wsErr) {
+      console.error("⚠️ فشل بث WebSocket لتعيين السائق (تم تجاهله):", wsErr);
     }
 
-    // Create notification for customer
-    await storage.createNotification({
-      type: "wasalni_driver_assigned",
-      title: "تم تعيين سائق لطلبك",
-      message: `تم تعيين سائق لطلب وصل لي رقم ${request.requestNumber}. سيتواصل معك السائق قريباً.`,
-      recipientType: "customer",
-      recipientId: request.customerId || request.customerPhone,
-      orderId: updated.id, // ربط الطلب بالتتبع
-      isRead: false,
-    });
+    // Create notification for customer (لكلا المعرّف والهاتف لضمان الوصول)
+    try {
+      const cleanPhone = request.customerPhone ? String(request.customerPhone).trim().replace(/\s+/g, '') : null;
+      const recipients = Array.from(new Set([request.customerId, cleanPhone].filter(Boolean))) as string[];
+      for (const rid of recipients) {
+        try {
+          await storage.createNotification({
+            type: "wasalni_driver_assigned",
+            title: "تم تعيين سائق لطلبك",
+            message: `تم تعيين سائق لطلب وصل لي رقم ${request.requestNumber}. سيتواصل معك السائق قريباً.`,
+            recipientType: "customer",
+            recipientId: rid,
+            orderId: updated.id,
+            isRead: false,
+          });
+        } catch (err) {
+          console.error("⚠️ فشل إنشاء إشعار العميل لتعيين السائق:", err);
+        }
+      }
+    } catch (notifyErr) {
+      console.error("⚠️ خطأ في إشعار العميل بتعيين السائق (تم تجاهله):", notifyErr);
+    }
 
     // Create notification for driver
-    await storage.createNotification({
-      type: "new_wasalni_assignment",
-      title: "طلب وصل لي جديد مُعين لك",
-      message: `تم تعيين طلب وصل لي جديد لك رقم ${request.requestNumber}. من: ${request.fromAddress} إلى: ${request.toAddress}`,
-      recipientType: "driver",
-      recipientId: driverId,
-      orderId: updated.id, // ربط الطلب بالتتبع
-      isRead: false,
-    });
+    try {
+      await storage.createNotification({
+        type: "new_wasalni_assignment",
+        title: "طلب وصل لي جديد مُعين لك",
+        message: `تم تعيين طلب وصل لي جديد لك رقم ${request.requestNumber}. من: ${request.fromAddress} إلى: ${request.toAddress}`,
+        recipientType: "driver",
+        recipientId: driverId,
+        orderId: updated.id,
+        isRead: false,
+      });
+    } catch (notifyErr) {
+      console.error("⚠️ خطأ في إشعار السائق بالتعيين (تم تجاهله):", notifyErr);
+    }
 
     res.json({ success: true, request: updated });
   } catch (error) {

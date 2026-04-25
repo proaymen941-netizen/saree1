@@ -630,9 +630,13 @@ router.put("/wasalni/:id/status", requireDriverAuth, async (req: AuthenticatedRe
       .returning();
 
     // بث التحديث عبر WebSocket
-    const ws = req.app.get('ws');
-    if (ws) {
-      ws.broadcast('order_update', { orderId: id, status, type: 'wasalni', driverId });
+    try {
+      const ws = req.app.get('ws');
+      if (ws) {
+        ws.broadcast('order_update', { orderId: id, status, type: 'wasalni', driverId });
+      }
+    } catch (wsErr) {
+      console.error("⚠️ فشل بث WebSocket لتحديث وصل لي من السائق (تم تجاهله):", wsErr);
     }
 
     // إشعار للعميل
@@ -642,31 +646,49 @@ router.put("/wasalni/:id/status", requireDriverAuth, async (req: AuthenticatedRe
       cancelled: 'تم إلغاء طلب وصل لي من قِبل السائق',
     };
 
-    if (request.customerId || request.customerPhone) {
+    try {
+      const cleanPhone = request.customerPhone ? String(request.customerPhone).trim().replace(/\s+/g, '') : null;
+      const recipients = Array.from(new Set([request.customerId, cleanPhone].filter(Boolean))) as string[];
+      for (const rid of recipients) {
+        try {
+          await storage.createNotification({
+            type: 'wasalni_status_update',
+            title: 'تحديث طلب وصل لي',
+            message: `${statusMessages[status] || 'تم تحديث حالة الطلب'} - رقم الطلب: ${request.requestNumber}`,
+            recipientType: 'customer',
+            recipientId: rid,
+            orderId: id,
+            isRead: false,
+          });
+        } catch (e) {
+          console.error("⚠️ فشل إشعار العميل بتحديث وصل لي (تم تجاهله):", e);
+        }
+      }
+    } catch (notifyErr) {
+      console.error("⚠️ خطأ في إشعارات العميل لتحديث وصل لي (تم تجاهله):", notifyErr);
+    }
+
+    try {
       await storage.createNotification({
         type: 'wasalni_status_update',
-        title: 'تحديث طلب وصل لي',
-        message: `${statusMessages[status] || 'تم تحديث حالة الطلب'} - رقم الطلب: ${request.requestNumber}`,
-        recipientType: 'customer',
-        recipientId: request.customerId || request.customerPhone,
+        title: 'تحديث وصل لي من السائق',
+        message: `الطلب ${request.requestNumber}: ${statusMessages[status] || status}`,
+        recipientType: 'admin',
+        recipientId: null,
         orderId: id,
         isRead: false,
       });
+    } catch (notifyErr) {
+      console.error("⚠️ فشل إشعار المدير بتحديث وصل لي (تم تجاهله):", notifyErr);
     }
-
-    await storage.createNotification({
-      type: 'wasalni_status_update',
-      title: 'تحديث وصل لي من السائق',
-      message: `الطلب ${request.requestNumber}: ${statusMessages[status] || status}`,
-      recipientType: 'admin',
-      recipientId: null,
-      orderId: id,
-      isRead: false,
-    });
 
     // إذا تم التسليم، أعد السائق للحالة المتاحة
     if (status === 'delivered' || status === 'cancelled') {
-      await storage.updateDriver(driverId, { isAvailable: true });
+      try {
+        await storage.updateDriver(driverId, { isAvailable: true });
+      } catch (updErr) {
+        console.error("⚠️ فشل تحديث حالة السائق بعد إنهاء وصل لي (تم تجاهله):", updErr);
+      }
     }
 
     res.json({ success: true, request: updated });
