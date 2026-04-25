@@ -80,10 +80,20 @@ export function CustomerNotificationsPanel() {
     const connect = () => {
       ws = new WebSocket(wsUrl);
       ws.onopen = () => {
-        ws?.send(JSON.stringify({
-          type: 'auth',
-          payload: { userId: customerId || phone, userType: 'customer' }
-        }));
+        // إرسال auth بكلا المعرّفين (customerId وphone) لضمان وصول الإشعارات
+        // بصرف النظر عن المعرّف الذي خزنه الخادم في recipientId
+        if (customerId) {
+          ws?.send(JSON.stringify({
+            type: 'auth',
+            payload: { userId: customerId, userType: 'customer' }
+          }));
+        }
+        if (phone && phone !== customerId) {
+          ws?.send(JSON.stringify({
+            type: 'auth',
+            payload: { userId: phone, userType: 'customer' }
+          }));
+        }
       };
       ws.onmessage = (event) => {
         try {
