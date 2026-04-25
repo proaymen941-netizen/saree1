@@ -111,8 +111,9 @@ export default function OrdersPage() {
       if (wasalniRes.ok) {
         try {
           const wasalniData: any[] = await wasalniRes.json();
+          // الخادم يقوم بالفعل بفلترة الطلبات حسب الهاتف بطريقة مُطبَّعة
+          // (إزالة المسافات + trim)، لذلك لا حاجة لفلترة صارمة هنا قد تخفي طلبات صحيحة
           wasalniOrders = (wasalniData || [])
-            .filter((w) => w.customerPhone === customerPhone)
             .map((w) => ({
               id: w.id,
               orderNumber: w.requestNumber,
@@ -166,10 +167,21 @@ export default function OrdersPage() {
         ws = new WebSocket(`${protocol}//${window.location.host}/ws`);
 
         ws.onopen = () => {
-          ws?.send(JSON.stringify({
-            type: 'auth',
-            payload: { userId: customerPhone, userType: 'customer' },
-          }));
+          // إرسال auth بكلا المعرّفين (customerId والهاتف) لضمان وصول إشعارات
+          // الطلبات بصرف النظر عن المعرّف الذي خزّنه الخادم في recipientId
+          const customerId = user?.id;
+          if (customerId) {
+            ws?.send(JSON.stringify({
+              type: 'auth',
+              payload: { userId: customerId, userType: 'customer' },
+            }));
+          }
+          if (customerPhone && customerPhone !== customerId) {
+            ws?.send(JSON.stringify({
+              type: 'auth',
+              payload: { userId: customerPhone, userType: 'customer' },
+            }));
+          }
         };
 
         ws.onmessage = (event) => {

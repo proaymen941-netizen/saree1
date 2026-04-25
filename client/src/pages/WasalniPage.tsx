@@ -160,6 +160,10 @@ export default function WasalniPage() {
       setStep(7); // Move to Invoice step
       localStorage.setItem('customer_name', form.customerName);
       localStorage.setItem('customer_phone', form.customerPhone);
+      // تحديث صفحة طلباتي وإشعارات العميل فوراً ليظهر طلب وصل لي الجديد
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/wasalni'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/notifications/customer'] });
       toast({
         title: "✅ تم إرسال طلب وصل لي",
         description: `رقم الطلب: ${data.request.requestNumber}`,
