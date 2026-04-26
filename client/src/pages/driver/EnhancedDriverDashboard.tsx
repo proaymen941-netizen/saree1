@@ -90,6 +90,7 @@ export default function EnhancedDriverDashboard({ driverId, onLogout }: Enhanced
   const [currentLocation, setCurrentLocation] = useState<[number, number] | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [socket, setSocket] = useState<WebSocket | null>(null);
+  const driverWsRef = React.useRef<WebSocket | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { getSetting: getSettingValue } = useUiSettings();
@@ -98,100 +99,95 @@ export default function EnhancedDriverDashboard({ driverId, onLogout }: Enhanced
 
   const driverToken = localStorage.getItem('driver_token');
 
-  // WebSocket Connection with reconnection logic
+  // Driver WebSocket — connection dedicated to this driver (independent of customer WS_MANAGER)
+  const activeTabRef = React.useRef(activeTab);
+  useEffect(() => { activeTabRef.current = activeTab; }, [activeTab]);
+
   useEffect(() => {
     if (!driverId) return;
 
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const wsUrl = `${protocol}//${window.location.host}/ws`;
     let ws: WebSocket | null = null;
-    let attachInterval: ReturnType<typeof setInterval> | null = null;
-    let attached = false;
+    let reconnectTimeout: ReturnType<typeof setTimeout> | null = null;
+    let alive = true;
 
-    const handleMessage = (event: MessageEvent) => {
-      try {
-        const message = JSON.parse(event.data);
-        console.log('WS Message received in Driver Dashboard:', message.type);
-        
-        if (message.type === 'order_update' || message.type === 'new_order_assigned' || message.type === 'order_status_changed' || message.type === 'review_received' || message.type === 'NEW_NOTIFICATION' || message.type === 'notifications_updated' || message.type === 'settings_changed') {
-          // Invalidate all driver related queries
-          queryClient.invalidateQueries({ queryKey: [`/api/drivers/app/dashboard`] });
-          queryClient.invalidateQueries({ queryKey: ['/api/drivers/orders/available', driverId] });
-          queryClient.invalidateQueries({ queryKey: ['/api/drivers/orders', 'active', driverId] });
-          queryClient.invalidateQueries({ queryKey: ['/api/drivers/wasalni', 'available', driverId] });
-          queryClient.invalidateQueries({ queryKey: ['/api/drivers/wasalni', 'active', driverId] });
-          queryClient.invalidateQueries({ queryKey: ['/api/notifications/customer'] });
-          queryClient.invalidateQueries({ queryKey: ['/api/ui-settings'] });
-          
-          if (message.type === 'review_received') {
-            toast({ 
-              title: '⭐ تقييم جديد!', 
-              description: `لقد حصلت على تقييم جديد: ${message.payload?.rating} نجوم`,
-              variant: 'default'
-            });
-          } else if (message.type === 'new_order_assigned') {
-            toast({ 
-              title: '📦 طلب جديد مُعين لك', 
-              description: message.payload?.message || 'يرجى مراجعة الطلب في صفحة الطلبات المتاحة',
-              variant: 'default'
-            });
-            if (activeTab === 'dashboard') {
-              setActiveTab('available');
-            }
-          } else if (message.type === 'order_status_changed') {
-            toast({ 
-              title: 'تحديث حالة الطلب', 
-              description: `تغيرت حالة الطلب #${message.payload?.orderId?.slice(-6)} إلى ${message.payload?.status}` 
-            });
-          }
-        }
-      } catch (err) {
-        console.error('Failed to parse WS message:', err);
-      }
-    };
+    const connect = () => {
+      if (!alive) return;
+      ws = new WebSocket(wsUrl);
+      driverWsRef.current = ws;
 
-    const attachToWs = () => {
-      const candidate: WebSocket | undefined = (window as any).WS_MANAGER;
-      if (!candidate) return false;
-
-      ws = candidate;
-      ws.addEventListener('message', handleMessage);
-      attached = true;
-
-      const sendAuth = () => {
+      ws.onopen = () => {
         try {
           ws?.send(JSON.stringify({
             type: 'auth',
             payload: { userId: driverId, userType: 'driver' }
           }));
+          console.log('Driver WS connected and authenticated');
         } catch (e) {
-          console.error('Driver WS auth send failed:', e);
+          console.error('Driver WS auth failed:', e);
         }
       };
 
-      if (ws.readyState === WebSocket.OPEN) {
-        sendAuth();
-      } else {
-        ws.addEventListener('open', sendAuth, { once: true });
-      }
-      return true;
+      ws.onmessage = (event: MessageEvent) => {
+        try {
+          const message = JSON.parse(event.data);
+          const relevantTypes = [
+            'order_update', 'new_order_assigned', 'order_status_changed',
+            'review_received', 'NEW_NOTIFICATION', 'notifications_updated', 'settings_changed'
+          ];
+          if (!relevantTypes.includes(message.type)) return;
+
+          queryClient.invalidateQueries({ queryKey: [`/api/drivers/app/dashboard`] });
+          queryClient.invalidateQueries({ queryKey: ['/api/drivers/orders/available', driverId] });
+          queryClient.invalidateQueries({ queryKey: ['/api/drivers/orders', 'active', driverId] });
+          queryClient.invalidateQueries({ queryKey: ['/api/drivers/wasalni', 'available', driverId] });
+          queryClient.invalidateQueries({ queryKey: ['/api/drivers/wasalni', 'active', driverId] });
+          queryClient.invalidateQueries({ queryKey: ['/api/ui-settings'] });
+
+          if (message.type === 'review_received') {
+            toast({
+              title: '⭐ تقييم جديد!',
+              description: `لقد حصلت على تقييم جديد: ${message.payload?.rating} نجوم`,
+            });
+          } else if (message.type === 'new_order_assigned') {
+            toast({
+              title: '📦 طلب جديد مُعين لك',
+              description: message.payload?.message || 'يرجى مراجعة الطلب في صفحة الطلبات المتاحة',
+            });
+            if (activeTabRef.current === 'dashboard') {
+              setActiveTab('available');
+            }
+          } else if (message.type === 'order_status_changed') {
+            toast({
+              title: 'تحديث حالة الطلب',
+              description: `تغيرت حالة الطلب #${message.payload?.orderId?.slice(-6)} إلى ${message.payload?.status}`,
+            });
+          }
+        } catch (err) {
+          console.error('Driver WS message parse error:', err);
+        }
+      };
+
+      ws.onclose = () => {
+        if (alive) {
+          reconnectTimeout = setTimeout(connect, 5000);
+        }
+      };
+
+      ws.onerror = () => {
+        ws?.close();
+      };
     };
 
-    // محاولة الربط فوراً، وإن لم يكن WS_MANAGER جاهزاً نحاول كل 500ms
-    if (!attachToWs()) {
-      attachInterval = setInterval(() => {
-        if (attachToWs() && attachInterval) {
-          clearInterval(attachInterval);
-          attachInterval = null;
-        }
-      }, 500);
-    }
+    connect();
 
     return () => {
-      if (attachInterval) clearInterval(attachInterval);
-      if (attached && ws) {
-        ws.removeEventListener('message', handleMessage);
-      }
+      alive = false;
+      if (reconnectTimeout) clearTimeout(reconnectTimeout);
+      ws?.close();
     };
-  }, [driverId, queryClient, toast, activeTab]);
+  }, [driverId, queryClient, toast]);
 
   // Fetch dashboard data
   const { data: dashboardData, isLoading } = useQuery({
@@ -321,15 +317,14 @@ export default function EnhancedDriverDashboard({ driverId, onLogout }: Enhanced
   // Get current location
   useEffect(() => {
     if (navigator.geolocation) {
-      const ws = (window as any).WS_MANAGER;
-      
       const watchId = navigator.geolocation.watchPosition(
         (position) => {
           const lat = position.coords.latitude;
           const lng = position.coords.longitude;
           setCurrentLocation([lat, lng]);
           
-          // Send location update to server via WebSocket
+          // Send location update to server via the driver's dedicated WebSocket
+          const ws = driverWsRef.current;
           if (ws && ws.readyState === WebSocket.OPEN) {
             ws.send(JSON.stringify({
               type: 'location_update',

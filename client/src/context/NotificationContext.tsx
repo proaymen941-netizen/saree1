@@ -61,16 +61,14 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
 
       ws.onopen = () => {
         console.log('🔔 Notification WebSocket connected');
-        // Authenticate the socket
         const phone = localStorage.getItem('customer_phone');
-        if (user || phone) {
-          ws?.send(JSON.stringify({
-            type: 'auth',
-            payload: { 
-              userId: user?.id || phone, 
-              userType: 'customer' 
-            }
-          }));
+        // مصادقة بالـ ID
+        if (user?.id) {
+          ws?.send(JSON.stringify({ type: 'auth', payload: { userId: user.id, userType: 'customer' } }));
+        }
+        // مصادقة بالهاتف أيضاً (لأن بعض الطلبات تُربط بالهاتف)
+        if (phone && phone !== user?.id) {
+          ws?.send(JSON.stringify({ type: 'auth', payload: { userId: phone, userType: 'customer' } }));
         }
       };
 
@@ -91,13 +89,22 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
               const audio = new Audio('/notification.mp3');
               audio.play();
             } catch (e) {}
-          } else if (data.type === 'order_status_changed') {
-            const { orderId, status, message } = data.payload;
-            // Show toast for order status change
+          } else if (data.type === 'order_status_changed' || data.type === 'order_update') {
+            const { orderId, status, message: msg, orderNumber } = data.payload || {};
+            const statusLabels: Record<string, string> = {
+              confirmed: 'تم تأكيد طلبك',
+              preparing: 'جاري تحضير طلبك',
+              ready: 'طلبك جاهز للاستلام',
+              picked_up: 'السائق استلم طلبك',
+              on_way: 'السائق في الطريق إليك',
+              delivered: 'تم تسليم طلبك بنجاح',
+              cancelled: 'تم إلغاء الطلب',
+            };
+            const label = status ? (statusLabels[status] || `تغيرت حالة الطلب إلى ${status}`) : undefined;
             showNotification({
-              type: 'info',
+              type: status === 'delivered' ? 'success' : status === 'cancelled' ? 'error' : 'info',
               title: 'تحديث حالة الطلب',
-              message: message || `تغيرت حالة طلبك رقم ${orderId} إلى ${status}`,
+              message: msg || label || `تحديث طلب ${orderNumber || orderId}`,
               duration: 10000
             });
             

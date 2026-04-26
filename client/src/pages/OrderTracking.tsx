@@ -5,8 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { DriverCommunication } from '@/components/DriverCommunication';
+import { useAuth } from '@/context/AuthContext';
+import { useToast } from '@/hooks/use-toast';
 
 interface OrderStatus {
   id: string;
@@ -38,6 +40,9 @@ export default function OrderTracking() {
   const { orderId } = useParams<{ orderId: string }>();
   const [, setLocation] = useLocation();
   const [driverLocation, setDriverLocation] = useState<{ lat: number, lng: number } | null>(null);
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   // Fetch real order data
   const { data: order, isLoading: isOrderLoading, error: orderError, refetch: refetchOrder } = useQuery<OrderDetails>({
@@ -53,43 +58,92 @@ export default function OrderTracking() {
     refetchInterval: 10000,
   });
 
+  // Cancel order mutation
+  const cancelMutation = useMutation({
+    mutationFn: async () => {
+      const res = await fetch(`/api/orders/${orderId}/cancel`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reason: 'إلغاء من قبل العميل', cancelledBy: 'customer' }),
+      });
+      if (!res.ok) throw new Error('فشل إلغاء الطلب');
+      return res.json();
+    },
+    onSuccess: () => {
+      toast({ title: 'تم إلغاء الطلب', description: 'تم إلغاء طلبك بنجاح' });
+      queryClient.invalidateQueries({ queryKey: [`/api/orders/${orderId}`] });
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+      refetchOrder();
+    },
+    onError: (err: any) => {
+      toast({ title: 'خطأ', description: err.message || 'تعذر إلغاء الطلب', variant: 'destructive' });
+    }
+  });
+
   // WebSocket Connection
   useEffect(() => {
     if (!orderId) return;
 
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const wsUrl = `${protocol}//${window.location.host}/ws`;
-    const ws = new WebSocket(wsUrl);
+    let ws: WebSocket | null = null;
+    let reconnectTimeout: ReturnType<typeof setTimeout> | null = null;
+    let cancelled = false;
 
-    ws.onopen = () => {
-      console.log('Connected to WebSocket for tracking');
-      ws.send(JSON.stringify({
-        type: 'track_order',
-        payload: { orderId }
-      }));
-    };
+    const connect = () => {
+      if (cancelled) return;
+      ws = new WebSocket(wsUrl);
 
-    ws.onmessage = (event) => {
-      try {
-        const message = JSON.parse(event.data);
-        if (message.type === 'driver_location' && order?.driverId === message.payload.driverId) {
-          setDriverLocation({
-            lat: message.payload.latitude,
-            lng: message.payload.longitude
-          });
-        } else if (message.type === 'order_update' && message.payload.orderId === orderId) {
-          refetchOrder();
-          refetchTracking();
+      ws.onopen = () => {
+        console.log('Connected to WebSocket for tracking');
+        // إرسال المصادقة أولاً
+        const customerPhone = user?.phone || localStorage.getItem('customer_phone');
+        if (user?.id) {
+          ws?.send(JSON.stringify({ type: 'auth', payload: { userId: user.id, userType: 'customer' } }));
         }
-      } catch (err) {
-        console.error('Failed to parse WS message:', err);
-      }
+        if (customerPhone && customerPhone !== user?.id) {
+          ws?.send(JSON.stringify({ type: 'auth', payload: { userId: customerPhone, userType: 'customer' } }));
+        }
+        // تتبع الطلب
+        ws?.send(JSON.stringify({ type: 'track_order', payload: { orderId } }));
+      };
+
+      ws.onmessage = (event) => {
+        try {
+          const message = JSON.parse(event.data);
+          if (message.type === 'driver_location' && order?.driverId === message.payload.driverId) {
+            setDriverLocation({
+              lat: message.payload.latitude,
+              lng: message.payload.longitude
+            });
+          } else if (
+            (message.type === 'order_update' || message.type === 'order_status_changed') &&
+            (message.payload.orderId === orderId || !message.payload.orderId)
+          ) {
+            refetchOrder();
+            refetchTracking();
+            queryClient.invalidateQueries({ queryKey: ['orders'] });
+          }
+        } catch (err) {
+          console.error('Failed to parse WS message:', err);
+        }
+      };
+
+      ws.onclose = () => {
+        if (!cancelled) reconnectTimeout = setTimeout(connect, 5000);
+      };
+
+      ws.onerror = () => { try { ws?.close(); } catch {} };
     };
+
+    connect();
 
     return () => {
-      ws.close();
+      cancelled = true;
+      if (reconnectTimeout) clearTimeout(reconnectTimeout);
+      try { ws?.close(); } catch {}
     };
-  }, [orderId, order?.driverId, refetchOrder, refetchTracking]);
+  }, [orderId, order?.driverId, refetchOrder, refetchTracking, user, queryClient]);
 
   const parsedItems = order ? (typeof order.items === 'string' ? JSON.parse(order.items) : order.items) : [];
 
@@ -333,13 +387,15 @@ export default function OrderTracking() {
             تواصل مع الدعم
           </Button>
           
-          {['pending', 'confirmed'].includes(order.status) && (
+          {['pending', 'confirmed', 'preparing', 'scheduled'].includes(order.status) && (
             <Button 
               variant="destructive" 
               className="w-full"
               data-testid="button-cancel-order"
+              onClick={() => cancelMutation.mutate()}
+              disabled={cancelMutation.isPending}
             >
-              إلغاء الطلب
+              {cancelMutation.isPending ? 'جاري الإلغاء...' : 'إلغاء الطلب'}
             </Button>
           )}
         </div>

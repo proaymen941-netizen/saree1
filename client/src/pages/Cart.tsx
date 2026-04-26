@@ -172,7 +172,7 @@ export default function Cart() {
       
       clearCart();
       if (data?.order?.id) {
-        setLocation(`/order-tracking/${data.order.id}`);
+        setLocation(`/orders/${data.order.id}`);
       } else {
         setLocation('/orders');
       }

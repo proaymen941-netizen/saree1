@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -52,32 +52,45 @@ export default function ProfilePage({ onLogout }: ProfilePageProps) {
 
   const driverToken = localStorage.getItem('driver_token');
 
+  const { data: serverProfile } = useQuery({
+    queryKey: ['/api/drivers/app/dashboard'],
+    queryFn: async () => {
+      const response = await fetch('/api/drivers/app/dashboard', {
+        headers: { 'Authorization': `Bearer ${driverToken}` }
+      });
+      if (!response.ok) return null;
+      return response.json();
+    },
+    retry: false,
+  });
+
   useEffect(() => {
-    const driverData = localStorage.getItem('driver_user');
-    if (driverData) {
+    const source = serverProfile?.driver || null;
+    const fallback = (() => {
       try {
-        const driver = JSON.parse(driverData);
-        setFormData({
-          id: driver.id,
-          name: driver.name || '',
-          email: driver.email || '',
-          phone: driver.phone || '',
-          vehicleType: driver.vehicleType || '',
-          vehicleNumber: driver.vehicleNumber || '',
-          isAvailable: driver.isAvailable || false,
-          allowProfileEdit: driver.allowProfileEdit !== false,
-          paymentMode: driver.paymentMode || 'commission',
-          commissionRate: driver.commissionRate || 70,
-          salaryAmount: parseFloat(driver.salaryAmount || '0'),
-          completedOrders: driver.completedOrders || 0,
-          averageRating: driver.averageRating || '0',
-          totalEarnings: driver.totalEarnings || driver.earnings || '0',
-        });
-      } catch (error) {
-        console.error('Error parsing driver data:', error);
-      }
-    }
-  }, []);
+        const raw = localStorage.getItem('driver_user');
+        return raw ? JSON.parse(raw) : null;
+      } catch { return null; }
+    })();
+    const driver = source || fallback;
+    if (!driver) return;
+    setFormData({
+      id: driver.id,
+      name: driver.name || '',
+      email: driver.email || '',
+      phone: driver.phone || '',
+      vehicleType: driver.vehicleType || '',
+      vehicleNumber: driver.vehicleNumber || '',
+      isAvailable: driver.isAvailable || false,
+      allowProfileEdit: driver.allowProfileEdit !== false,
+      paymentMode: driver.paymentMode || 'commission',
+      commissionRate: driver.commissionRate || 70,
+      salaryAmount: parseFloat(driver.salaryAmount || '0'),
+      completedOrders: driver.completedOrders || 0,
+      averageRating: driver.averageRating || '0',
+      totalEarnings: driver.totalEarnings || driver.earnings || '0',
+    });
+  }, [serverProfile]);
 
   const canEdit = formData.allowProfileEdit !== false;
 
