@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, Edit, Trash2, Percent, Save, X, Calendar, DollarSign, Store } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -62,11 +62,15 @@ export default function AdminOffers() {
         discountPercent: data.discountPercent ? parseInt(data.discountPercent) : null,
         discountAmount: data.discountAmount ? parseFloat(data.discountAmount) : null,
         minimumOrder: parseFloat(data.minimumOrder),
-        validUntil: data.validUntil ? new Date(data.validUntil) : null,
+        validUntil: data.validUntil ? new Date(data.validUntil).toISOString() : null,
         restaurantId: data.restaurantId || null,
         categoryId: data.categoryId || null,
       };
       const response = await apiRequest('POST', '/api/admin/special-offers', submitData);
+      if (!response.ok) {
+        const errorBody = await response.json().catch(() => ({}));
+        throw new Error(errorBody.error || errorBody.details?.join?.(', ') || 'فشل إنشاء العرض');
+      }
       return response.json();
     },
     onSuccess: () => {
@@ -78,6 +82,13 @@ export default function AdminOffers() {
       resetForm();
       setIsDialogOpen(false);
     },
+    onError: (err: any) => {
+      toast({
+        title: "خطأ في إضافة العرض",
+        description: err?.message || 'حدث خطأ غير متوقع، يرجى المحاولة مرة أخرى',
+        variant: 'destructive',
+      });
+    }
   });
 
   const updateOfferMutation = useMutation({
@@ -87,11 +98,15 @@ export default function AdminOffers() {
         discountPercent: data.discountPercent ? parseInt(data.discountPercent) : null,
         discountAmount: data.discountAmount ? parseFloat(data.discountAmount) : null,
         minimumOrder: parseFloat(data.minimumOrder),
-        validUntil: data.validUntil ? new Date(data.validUntil) : null,
+        validUntil: data.validUntil ? new Date(data.validUntil).toISOString() : null,
         restaurantId: data.restaurantId || null,
         categoryId: data.categoryId || null,
       };
       const response = await apiRequest('PUT', `/api/admin/special-offers/${id}`, submitData);
+      if (!response.ok) {
+        const errorBody = await response.json().catch(() => ({}));
+        throw new Error(errorBody.error || errorBody.details?.join?.(', ') || 'فشل تحديث العرض');
+      }
       return response.json();
     },
     onSuccess: () => {
@@ -104,11 +119,22 @@ export default function AdminOffers() {
       setEditingOffer(null);
       setIsDialogOpen(false);
     },
+    onError: (err: any) => {
+      toast({
+        title: "خطأ في تحديث العرض",
+        description: err?.message || 'حدث خطأ غير متوقع، يرجى المحاولة مرة أخرى',
+        variant: 'destructive',
+      });
+    }
   });
 
   const deleteOfferMutation = useMutation({
     mutationFn: async (id: string) => {
       const response = await apiRequest('DELETE', `/api/admin/special-offers/${id}`);
+      if (!response.ok) {
+        const errorBody = await response.json().catch(() => ({}));
+        throw new Error(errorBody.error || 'فشل حذف العرض');
+      }
       return response.json();
     },
     onSuccess: () => {
@@ -118,6 +144,13 @@ export default function AdminOffers() {
         description: "تم حذف العرض بنجاح",
       });
     },
+    onError: (err: any) => {
+      toast({
+        title: "خطأ في الحذف",
+        description: err?.message || 'حدث خطأ غير متوقع',
+        variant: 'destructive',
+      });
+    }
   });
 
   const resetForm = () => {
@@ -141,7 +174,7 @@ export default function AdminOffers() {
   };
 
   // Set defaults when data loads for the first time
-  useState(() => {
+  useEffect(() => {
     if (restaurants.length > 0 && categories.length > 0 && !editingOffer) {
       const tamtoomStore = restaurants.find(r => r.name.includes('واصل'));
       const offersCategory = categories.find(c => c.name.includes('عرض') || c.name.includes('العروض'));
@@ -153,7 +186,7 @@ export default function AdminOffers() {
         }));
       }
     }
-  });
+  }, [restaurants, categories, editingOffer]);
 
   const handleEdit = (offer: SpecialOffer) => {
     setEditingOffer(offer);
