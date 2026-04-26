@@ -39,7 +39,7 @@ export function CustomerNotificationsPanel() {
       return res.json();
     },
     enabled: !!(phone || customerId),
-    refetchInterval: 30000,
+    refetchInterval: 10000,
   });
 
   const markAllReadMutation = useMutation({
@@ -110,7 +110,7 @@ export function CustomerNotificationsPanel() {
         } catch (e) {}
       };
       ws.onclose = () => {
-        reconnectTimeout = setTimeout(connect, 5000);
+        reconnectTimeout = setTimeout(connect, 2000);
       };
       ws.onerror = () => ws?.close();
     };

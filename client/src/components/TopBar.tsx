@@ -7,7 +7,6 @@ import {
   User, 
   Search,
   Menu as MenuIcon,
-  Clock,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,97 +17,36 @@ import { useUiSettings } from '@/context/UiSettingsContext';
 import { CustomerNotificationsPanel } from './CustomerNotificationsPanel';
 import waselLogo from '@assets/wasel-logo.png';
 
-// شريط حالة عمل التطبيق (مفتوح/مغلق + ساعات العمل) - استبدل زر الموقع
-const WorkingHoursIndicator: React.FC = () => {
+// حساب حالة المتجر (مفتوح/مغلق) بناءً على الإعدادات والوقت
+function useStoreOpen(): boolean {
   const { getSetting } = useUiSettings();
   const storeStatus = getSetting('store_status') || 'auto';
   const openingTime = getSetting('opening_time') || '08:00';
   const closingTime = getSetting('closing_time') || '23:00';
 
-  // حساب الحالة الفعلية
-  const computeIsOpen = (): boolean => {
+  const compute = (): boolean => {
     if (storeStatus === 'open') return true;
     if (storeStatus === 'closed') return false;
-    // تلقائي - حسب ساعات العمل
     const now = new Date();
-    const currentMinutes = now.getHours() * 60 + now.getMinutes();
-    const toMin = (t: string) => {
-      const [h, m] = t.split(':').map(Number);
-      return (h || 0) * 60 + (m || 0);
-    };
+    const cur = now.getHours() * 60 + now.getMinutes();
+    const toMin = (t: string) => { const [h, m] = t.split(':').map(Number); return (h || 0) * 60 + (m || 0); };
     const open = toMin(openingTime);
     const close = toMin(closingTime);
-    if (close > open) return currentMinutes >= open && currentMinutes < close;
-    // عبور منتصف الليل
-    return currentMinutes >= open || currentMinutes < close;
+    if (close > open) return cur >= open && cur < close;
+    return cur >= open || cur < close;
   };
 
-  const [isOpen, setIsOpen] = React.useState(computeIsOpen);
+  const [isOpen, setIsOpen] = React.useState(compute);
 
   React.useEffect(() => {
-    setIsOpen(computeIsOpen());
-    const t = setInterval(() => setIsOpen(computeIsOpen()), 60000);
+    setIsOpen(compute());
+    const t = setInterval(() => setIsOpen(compute()), 30000);
     return () => clearInterval(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [storeStatus, openingTime, closingTime]);
 
-  // تنسيق 12 ساعة مع ص/م بالعربية
-  const format12 = (t: string): string => {
-    if (!t || !t.includes(':')) return t;
-    const [hStr, mStr] = t.split(':');
-    let h = parseInt(hStr, 10);
-    const m = (mStr || '00').padStart(2, '0');
-    if (isNaN(h)) return t;
-    const suffix = h >= 12 ? 'م' : 'ص';
-    h = h % 12;
-    if (h === 0) h = 12;
-    return `${h}:${m} ${suffix}`;
-  };
-
-  return (
-    <div className="relative px-3 pb-2.5">
-      <div
-        className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-xl backdrop-blur-sm border transition-colors ${
-          isOpen
-            ? 'bg-green-500/10 border-green-400/30'
-            : 'bg-red-500/10 border-red-400/30'
-        }`}
-        data-testid="indicator-working-hours"
-      >
-        <div className="relative">
-          <span
-            className={`absolute inset-0 rounded-full ${
-              isOpen ? 'bg-green-400 animate-ping' : 'bg-red-400'
-            } opacity-60`}
-          />
-          <span
-            className={`relative block w-2.5 h-2.5 rounded-full ${
-              isOpen ? 'bg-green-400' : 'bg-red-400'
-            }`}
-          />
-        </div>
-        <Clock className={`h-3.5 w-3.5 ${isOpen ? 'text-green-300' : 'text-red-300'}`} />
-        <div className="flex-1 text-right">
-          <div className="text-[9px] font-bold text-white/60 leading-none">
-            {isOpen ? 'التطبيق مفتوح الآن' : 'التطبيق مغلق حالياً'}
-          </div>
-          <div className="text-xs font-bold text-white truncate leading-tight mt-0.5">
-            ساعات العمل: {format12(openingTime)} - {format12(closingTime)}
-          </div>
-        </div>
-        <span
-          className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
-            isOpen
-              ? 'bg-green-400/20 text-green-300 border border-green-400/30'
-              : 'bg-red-400/20 text-red-300 border border-red-400/30'
-          }`}
-        >
-          {isOpen ? 'OPEN' : 'CLOSED'}
-        </span>
-      </div>
-    </div>
-  );
-};
+  return isOpen;
+}
 
 export const TopBar: React.FC = () => {
   const [, setLocation] = useLocation();
@@ -119,6 +57,7 @@ export const TopBar: React.FC = () => {
   const { getSetting, loading: settingsLoading } = useUiSettings();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const isOpen = useStoreOpen();
 
   const logoUrl = getSetting('header_logo_url') || getSetting('logo_url') || waselLogo;
   const appName = getSetting('app_name') || 'واصل';
@@ -170,7 +109,15 @@ export const TopBar: React.FC = () => {
             </div>
             <div className="flex flex-col leading-none">
               <span className="text-2xl font-black text-white tracking-tight">{appName}</span>
-              <span className="text-[10px] font-bold text-[#F5A623] tracking-[0.3em] mt-1">WASEL</span>
+              <div className="flex items-center gap-1.5 mt-1">
+                <span className="relative flex h-2 w-2">
+                  {isOpen && <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />}
+                  <span className={`relative inline-flex rounded-full h-2 w-2 ${isOpen ? 'bg-green-400' : 'bg-red-400'}`} />
+                </span>
+                <span className={`text-[10px] font-bold tracking-[0.2em] ${isOpen ? 'text-green-400' : 'text-red-400'}`}>
+                  {isOpen ? 'مفتوح' : 'مغلق'}
+                </span>
+              </div>
             </div>
           </div>
 
@@ -240,7 +187,7 @@ export const TopBar: React.FC = () => {
             <CustomerNotificationsPanel />
           </div>
 
-          {/* Center: Brand pill with logo + name */}
+          {/* Center: Brand pill with logo + name + status */}
           <div 
             className="flex-1 flex items-center justify-center cursor-pointer"
             onClick={() => setLocation('/')}
@@ -253,7 +200,15 @@ export const TopBar: React.FC = () => {
               </div>
               <div className="flex flex-col leading-none">
                 <span className="text-white font-black text-base">{appName}</span>
-                <span className="text-[8px] font-bold text-[#F5A623] tracking-[0.25em] mt-0.5">WASEL</span>
+                <div className="flex items-center gap-1 mt-0.5">
+                  <span className="relative flex h-1.5 w-1.5">
+                    {isOpen && <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />}
+                    <span className={`relative inline-flex rounded-full h-1.5 w-1.5 ${isOpen ? 'bg-green-400' : 'bg-red-400'}`} />
+                  </span>
+                  <span className={`text-[9px] font-bold tracking-wide ${isOpen ? 'text-green-400' : 'text-red-400'}`}>
+                    {isOpen ? 'مفتوح' : 'مغلق'}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
@@ -281,9 +236,6 @@ export const TopBar: React.FC = () => {
             </button>
           </div>
         </div>
-
-        {/* Working Hours Indicator */}
-        <WorkingHoursIndicator />
 
         {/* Mobile Search Bar - Expandable */}
         {isSearchOpen && (
