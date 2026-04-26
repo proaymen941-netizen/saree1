@@ -1,11 +1,16 @@
 import express from 'express';
 import bcrypt from 'bcryptjs';
-import { randomUUID } from 'crypto';
+import jwt from 'jsonwebtoken';
 import { dbStorage } from '../db';
 import { adminUsers, drivers, users, insertUserSchema } from '@shared/schema';
 import { eq, or, sql } from 'drizzle-orm';
 
 const router = express.Router();
+const JWT_SECRET = process.env.JWT_SECRET || 'saree1-secret-key-2026';
+
+const generateToken = (id: string, userType: 'customer' | 'driver' | 'admin') => {
+  return jwt.sign({ id, userType }, JWT_SECRET, { expiresIn: '24h' });
+};
 
 // فحص حالة الإعداد الأولي - هل توجد حسابات في قاعدة البيانات؟
 router.get('/setup-status', async (req, res) => {
@@ -120,7 +125,7 @@ router.post('/login', async (req, res) => {
       await dbStorage.db.update(users).set({ password: hashedPwd }).where(eq(users.id, user.id));
     });
 
-    const token = user.id;
+    const token = generateToken(user.id, 'customer');
     console.log('🎉 تم تسجيل الدخول بنجاح للعميل:', user.name);
     
     res.json({
@@ -158,20 +163,52 @@ router.post('/validate', async (req, res) => {
     }
 
     const token = authHeader.split(' ')[1];
-    
-    // البحث عن المستخدم باستخدام المعرف
-    const userResult = await dbStorage.db
-      .select()
-      .from(users)
-      .where(eq(users.id, token))
-      .limit(1);
 
-    if (userResult.length === 0) {
-      // التحقق من السائقين أيضاً
+    // التحقق من التوكن وفك تشفيره
+    let decoded: any;
+    try {
+      decoded = jwt.verify(token, JWT_SECRET);
+    } catch (err) {
+      return res.status(401).json({
+        success: false,
+        message: 'جلسة منتهية أو غير صالحة'
+      });
+    }
+
+    const userId = decoded.id;
+    const userType = decoded.userType;
+
+    // البحث عن المستخدم باستخدام المعرف ونوع المستخدم من التوكن
+    if (userType === 'customer') {
+      const userResult = await dbStorage.db
+        .select()
+        .from(users)
+        .where(eq(users.id, userId))
+        .limit(1);
+      
+      if (userResult.length > 0) {
+        const user = userResult[0];
+        if (!user.isActive) {
+          return res.status(401).json({ success: false, message: 'الحساب غير مفعل' });
+        }
+        return res.json({
+          success: true,
+          user: {
+            id: user.id,
+            name: user.name,
+            username: user.username,
+            email: user.email,
+            phone: user.phone,
+            userType: 'customer',
+            isActive: user.isActive
+          }
+        });
+      }
+    } else if (userType === 'driver') {
       const driverResult = await dbStorage.db
         .select()
         .from(drivers)
-        .where(eq(drivers.id, token))
+        .where(eq(drivers.id, userId))
         .limit(1);
       
       if (driverResult.length > 0) {
@@ -186,12 +223,11 @@ router.post('/validate', async (req, res) => {
           }
         });
       }
-
-      // التحقق من المديرين أيضاً
+    } else if (userType === 'admin') {
       const adminResult = await dbStorage.db
         .select()
         .from(adminUsers)
-        .where(eq(adminUsers.id, token))
+        .where(eq(adminUsers.id, userId))
         .limit(1);
       
       if (adminResult.length > 0) {
@@ -206,30 +242,11 @@ router.post('/validate', async (req, res) => {
           }
         });
       }
-
-      return res.status(401).json({
-        success: false,
-        message: 'جلسة غير صالحة'
-      });
     }
 
-    const user = userResult[0];
-
-    if (!user.isActive) {
-      return res.status(401).json({ success: false, message: 'الحساب غير مفعل' });
-    }
-
-    res.json({
-      success: true,
-      user: {
-        id: user.id,
-        name: user.name,
-        username: user.username,
-        email: user.email,
-        phone: user.phone,
-        userType: 'customer',
-        isActive: user.isActive
-      }
+    return res.status(401).json({
+      success: false,
+      message: 'مستخدم غير موجود'
     });
   } catch (error) {
     console.error('خطأ في التحقق من الرمز:', error);
@@ -244,7 +261,15 @@ router.post('/validate', async (req, res) => {
 router.post('/register', async (req, res) => {
   try {
     const validatedData = insertUserSchema.parse(req.body);
-    
+
+    // التحقق من الحد الأدنى لطول كلمة المرور
+    if (!validatedData.password || validatedData.password.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: 'كلمة المرور يجب أن تكون 6 أحرف على الأقل'
+      });
+    }
+
     // التحقق من وجود المستخدم مسبقاً
     const existingUser = await dbStorage.db
       .select()
@@ -273,7 +298,7 @@ router.post('/register', async (req, res) => {
       .values({ ...validatedData, password: hashedPassword })
       .returning();
 
-    const token = newUser.id;
+    const token = generateToken(newUser.id, 'customer');
 
     res.status(201).json({
       success: true,

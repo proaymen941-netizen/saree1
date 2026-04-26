@@ -20,6 +20,7 @@ import flutterRouter from "./routes/flutter";
 import wasalniRouter from "./routes/wasalni";
 import imageUploadRouter from "./imageUpload";
 import { ensureUploadsDir, UPLOADS_DIR } from "./localStorage";
+import { requireCustomerAuth, requireOwnership } from "./utils/auth-middleware";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 import { 
@@ -76,7 +77,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   registerAdvancedRoutes(app);
 
   // Users
-  app.get("/api/users/:id", async (req, res) => {
+  app.get("/api/users/:id", requireCustomerAuth, requireOwnership(), async (req, res) => {
     try {
       const { id } = req.params;
       const user = await storage.getUser(id);
@@ -89,13 +90,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/users/username/:username", async (req, res) => {
+  app.get("/api/users/username/:username", requireCustomerAuth, async (req, res) => {
     try {
       const { username } = req.params;
       const user = await storage.getUserByUsername(username);
       if (!user) {
         return res.status(404).json({ message: "المستخدم غير موجود" });
       }
+      
+      // ملكية البيانات أو مدير
+      if ((req as any).userType !== 'admin' && (req as any).userId !== user.id) {
+        return res.status(403).json({ message: "غير مصرح لك بالوصول لهذه البيانات" });
+      }
+      
       res.json(user);
     } catch (error) {
       res.status(500).json({ message: "خطأ في جلب بيانات المستخدم" });
@@ -112,7 +119,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/users/:id", async (req, res) => {
+  app.put("/api/users/:id", requireCustomerAuth, requireOwnership(), async (req, res) => {
     try {
       const { id } = req.params;
       const validatedData = insertUserSchema.partial().parse(req.body);

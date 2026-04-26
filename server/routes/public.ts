@@ -1,7 +1,10 @@
 import express from "express";
 import { storage } from "../storage.js";
+import { dbStorage } from "../db";
 import * as schema from "../../shared/schema.js";
 import { eq, desc, and, or, like, sql } from "drizzle-orm";
+
+const db = dbStorage.db;
 
 const router = express.Router();
 
@@ -269,7 +272,7 @@ router.get("/orders/:id/track", async (req, res) => {
 router.get("/settings", async (req, res) => {
   try {
     const settings = await db.query.systemSettings.findMany({
-      where: eq(schema.systemSettings.isPublic, true)
+      where: eq(schema.systemSettings.isActive, true)
     });
     
     // تحويل الإعدادات إلى كائن

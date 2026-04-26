@@ -2373,6 +2373,65 @@ async getNotifications(recipientType?: string, recipientId?: string, unread?: bo
   }
 
   // Detailed Reports
+  async getAdminDashboardStats(): Promise<any> {
+    try {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const [
+        [restaurantsCount],
+        [ordersCount],
+        [driversCount],
+        [usersCount],
+        [todayOrdersCount],
+        [pendingOrdersCount],
+        [activeDriversCount],
+        [totalRevenueResult],
+        [todayRevenueResult],
+      ] = await Promise.all([
+        this.db.select({ count: sql<number>`count(*)::int` }).from(restaurants),
+        this.db.select({ count: sql<number>`count(*)::int` }).from(orders),
+        this.db.select({ count: sql<number>`count(*)::int` }).from(drivers),
+        this.db.select({ count: sql<number>`count(*)::int` }).from(users),
+        this.db.select({ count: sql<number>`count(*)::int` }).from(orders).where(gte(orders.createdAt, today)),
+        this.db.select({ count: sql<number>`count(*)::int` }).from(orders).where(eq(orders.status, 'pending')),
+        this.db.select({ count: sql<number>`count(*)::int` }).from(drivers).where(eq(drivers.isActive, true)),
+        this.db.select({ total: sql<number>`sum(${orders.totalAmount})::numeric` }).from(orders).where(eq(orders.status, 'delivered')),
+        this.db.select({ total: sql<number>`sum(${orders.totalAmount})::numeric` }).from(orders).where(and(eq(orders.status, 'delivered'), gte(orders.createdAt, today))),
+      ]);
+
+      const recentOrders = await this.db.select({
+        id: orders.id,
+        orderNumber: orders.orderNumber,
+        customerName: orders.customerName,
+        status: orders.status,
+        totalAmount: orders.totalAmount,
+        createdAt: orders.createdAt,
+      })
+      .from(orders)
+      .orderBy(desc(orders.createdAt))
+      .limit(10);
+
+      return {
+        stats: {
+          totalRestaurants: restaurantsCount?.count || 0,
+          totalOrders: ordersCount?.count || 0,
+          totalDrivers: driversCount?.count || 0,
+          totalCustomers: usersCount?.count || 0,
+          todayOrders: todayOrdersCount?.count || 0,
+          pendingOrders: pendingOrdersCount?.count || 0,
+          activeDrivers: activeDriversCount?.count || 0,
+          totalRevenue: parseFloat(totalRevenueResult?.total?.toString() || "0"),
+          todayRevenue: parseFloat(todayRevenueResult?.total?.toString() || "0"),
+        },
+        recentOrders
+      };
+    } catch (error) {
+      console.error("Error fetching dashboard stats:", error);
+      throw error;
+    }
+  }
+
   async getDetailedReport(filters: any): Promise<any> {
     const { type, startDate, endDate } = filters || {};
     const start = startDate ? new Date(startDate) : new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);

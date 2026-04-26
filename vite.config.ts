@@ -39,9 +39,12 @@ export default defineConfig(async () => {
       port: 5000,
       strictPort: false,
       allowedHosts: true,
-      hmr: {
-        clientPort: 443,
-      },
+      hmr: process.env.REPL_ID
+        ? {
+            clientPort: 443,
+            protocol: 'wss',
+          }
+        : true,
       fs: {
         strict: false,
       },

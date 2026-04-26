@@ -4,6 +4,7 @@ import { calculateDeliveryFee } from "../services/deliveryFeeService";
 import { formatCurrency } from "../../shared/utils";
 import { canOrderFromRestaurant } from "../../utils/restaurantHours";
 import { randomUUID } from "crypto";
+import { requireAdminAuth } from "../utils/auth-middleware";
 
 const router = express.Router();
 
@@ -510,8 +511,8 @@ router.put("/:id/assign-driver", async (req, res) => {
   }
 });
 
-// تعديل أسعار الطلب (من قبل المدير)
-router.put("/:id/prices", async (req, res) => {
+// تعديل أسعار الطلب (من قبل المدير) - محمي
+router.put("/:id/prices", requireAdminAuth, async (req, res) => {
   try {
     const { id } = req.params;
     const { items, deliveryFee, subtotal, totalAmount, priceAdjustmentNote } = req.body;
@@ -540,6 +541,35 @@ router.put("/:id/prices", async (req, res) => {
         driverId: order.driverId,
         orderId: id,
       });
+    }
+
+    // إنشاء إشعار وقيد تتبع للعميل عند تعديل أسعار الطلب
+    try {
+      const adjMessage = priceAdjustmentNote
+        ? `تم تعديل أسعار الطلب: ${priceAdjustmentNote}`
+        : 'تم تعديل أسعار الطلب من قِبل الإدارة';
+
+      if (order.customerId || order.customerPhone) {
+        await storage.createNotification({
+          type: 'order_price_updated',
+          title: 'تعديل أسعار الطلب',
+          message: `طلبك رقم ${order.orderNumber}: ${adjMessage}`,
+          recipientType: 'customer',
+          recipientId: order.customerId || order.customerPhone,
+          orderId: id,
+          isRead: false,
+        });
+      }
+
+      await storage.createOrderTracking({
+        orderId: id,
+        status: order.status,
+        message: adjMessage,
+        createdBy: 'admin',
+        createdByType: 'admin',
+      });
+    } catch (notifyErr) {
+      console.error('خطأ في إنشاء إشعار/تتبع تعديل الأسعار:', notifyErr);
     }
 
     res.json({ success: true, order: updatedOrder });

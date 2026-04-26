@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs';
-import { randomUUID } from 'crypto';
+import jwt from 'jsonwebtoken';
 import { storage } from './storage';
 import { 
   type InsertAdminUser, 
@@ -8,39 +8,12 @@ import {
   type AdminUser
 } from '@shared/schema';
 
-// نوع بيانات الجلسة
-interface SessionData {
-  adminId: string;
-  userType: string;
-  expiresAt: Date;
-}
+const JWT_SECRET = process.env.JWT_SECRET || 'saree1-secret-key-2026';
 
-// نوع إدخال الجلسة
-interface InsertAdminSession {
-  adminId: string;
-  token: string;
-  userType: string;
-  expiresAt: Date;
-}
-
-// مخزن الجلسات في الذاكرة
-const sessionStore = new Map<string, SessionData>();
-
-// دوال إدارة الجلسات
-function createAdminSession(data: InsertAdminSession): void {
-  sessionStore.set(data.token, {
-    adminId: data.adminId,
-    userType: data.userType,
-    expiresAt: data.expiresAt
-  });
-}
-
-function getAdminSession(token: string): SessionData | null {
-  return sessionStore.get(token) || null;
-}
-
-function deleteAdminSession(token: string): boolean {
-  return sessionStore.delete(token);
+// نوع بيانات التوكن
+interface TokenPayload {
+  id: string;
+  userType: 'customer' | 'driver' | 'admin';
 }
 
 // نوع المستخدم الموحد للمصادقة
@@ -213,19 +186,12 @@ export class UnifiedAuthService {
         };
       }
 
-      // إنشاء الجلسة
-      const token = randomUUID();
-      const expiresAt = new Date();
-      expiresAt.setHours(expiresAt.getHours() + 24); // 24 ساعة
-
-      const sessionData: InsertAdminSession = {
-        adminId: user.id,
-        token,
-        userType: user.userType,
-        expiresAt
-      };
-
-      createAdminSession(sessionData);
+      // إنشاء توكن JWT
+      const token = jwt.sign(
+        { id: user.id, userType: user.userType } as TokenPayload,
+        JWT_SECRET,
+        { expiresIn: '24h' }
+      );
 
       console.log('🎉 تم تسجيل الدخول بنجاح للمستخدم:', user.name);
       
@@ -245,26 +211,22 @@ export class UnifiedAuthService {
     }
   }
 
-  // التحقق من صحة الجلسة
+  // التحقق من صحة الجلسة (JWT)
   async validateSession(token: string): Promise<{ valid: boolean; user?: AuthUser }> {
     try {
-      const session = await storage.getAdminSession(token);
-      if (!session) {
+      // التحقق من التوكن وفك تشفيره
+      const decoded = jwt.verify(token, JWT_SECRET) as TokenPayload;
+      
+      if (!decoded || !decoded.id) {
         return { valid: false };
       }
 
-      // التحقق من انتهاء صلاحية الجلسة
-      if (new Date() > session.expiresAt) {
-        await storage.deleteAdminSession(token);
-        return { valid: false };
-      }
-
-      // الحصول على بيانات المستخدم حسب النوع
+      // الحصول على بيانات المستخدم حسب النوع من التوكن
       let user: AuthUser | null = null;
       
-      switch (session.userType) {
+      switch (decoded.userType) {
         case 'customer':
-          const customer = await storage.getUserById(session.adminId!);
+          const customer = await storage.getUserById(decoded.id);
           if (customer) {
             user = {
               id: customer.id,
@@ -279,7 +241,7 @@ export class UnifiedAuthService {
           break;
           
         case 'driver':
-          const driver = await storage.getDriverById(session.adminId!);
+          const driver = await storage.getDriverById(decoded.id);
           if (driver) {
             user = {
               id: driver.id,
@@ -294,7 +256,7 @@ export class UnifiedAuthService {
           break;
           
         case 'admin':
-          const admin = await storage.getAdminById(session.adminId!);
+          const admin = await storage.getAdminById(decoded.id);
           if (admin) {
             user = {
               id: admin.id,
@@ -321,9 +283,11 @@ export class UnifiedAuthService {
   }
 
   // تسجيل الخروج
-  async logout(token: string): Promise<boolean> {
+  async logout(_token: string): Promise<boolean> {
     try {
-      return await storage.deleteAdminSession(token);
+      // مع JWT، يتم تسجيل الخروج عادةً في جانب العميل بحذف التوكن.
+      // يمكن إضافة قائمة سوداء (Blacklist) للتوكنات هنا مستقبلاً لزيادة الأمان.
+      return true;
     } catch (error) {
       console.error('خطأ في تسجيل الخروج:', error);
       return false;

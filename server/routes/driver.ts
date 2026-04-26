@@ -3,17 +3,17 @@ import { storage } from "../storage";
 import { z } from "zod";
 import { insertDriverSchema } from "@shared/schema";
 import { coerceRequestData } from "../utils/coercion";
-import { requireDriverAuth, AuthenticatedRequest } from "../utils/auth-middleware";
+import { requireDriverAuth, requireAdminAuth, AuthenticatedRequest } from "../utils/auth-middleware";
 import { AdvancedDatabaseStorage } from "../db-advanced";
 
 const router = express.Router();
 
 // ================================================================
-// المسارات العامة (للإدارة - لا تتطلب توكن سائق)
+// المسارات العامة (للإدارة - تتطلب صلاحيات مدير)
 // ================================================================
 
 // جلب جميع السائقين
-router.get("/", async (req, res) => {
+router.get("/", requireAdminAuth, async (req, res) => {
   try {
     const { available } = req.query;
     let drivers;
@@ -29,7 +29,7 @@ router.get("/", async (req, res) => {
 });
 
 // إنشاء سائق جديد (من لوحة التحكم)
-router.post("/", async (req, res) => {
+router.post("/", requireAdminAuth, async (req, res) => {
   try {
     const validatedData = insertDriverSchema.parse(req.body);
     const driver = await storage.createDriver(validatedData);
@@ -228,6 +228,32 @@ router.post("/orders/:id/accept", requireDriverAuth, async (req: AuthenticatedRe
         driverId,
         orderId: id,
       });
+    }
+
+    // إنشاء قيد تتبع وإشعار للعميل عند قبول السائق للطلب
+    try {
+      const acceptMessage = `قام السائق ${driver.name} بقبول طلبك`;
+      await storage.createOrderTracking({
+        orderId: id,
+        status: 'ready',
+        message: acceptMessage,
+        createdBy: driverId,
+        createdByType: 'driver',
+      });
+
+      if (order.customerId || order.customerPhone) {
+        await storage.createNotification({
+          type: 'order_accepted',
+          title: 'تم قبول طلبك',
+          message: `طلبك رقم ${order.orderNumber}: ${acceptMessage}`,
+          recipientType: 'customer',
+          recipientId: order.customerId || order.customerPhone,
+          orderId: id,
+          isRead: false,
+        });
+      }
+    } catch (trackErr) {
+      console.error('خطأ في إنشاء التتبع/الإشعار عند قبول الطلب:', trackErr);
     }
 
     res.json({ success: true, order: updatedOrder });
