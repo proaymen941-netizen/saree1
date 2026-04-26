@@ -1677,6 +1677,10 @@ router.post("/special-offers", async (req, res) => {
       restaurantId: coercedData.restaurantId,
       menuItemId: coercedData.menuItemId,
       categoryId: coercedData.categoryId,
+      sectionId: coercedData.sectionId,
+      showBadge: coercedData.showBadge !== undefined ? coercedData.showBadge : true,
+      badgeText1: coercedData.badgeText1 || "طازج يومياً",
+      badgeText2: coercedData.badgeText2 || "عروض حصرية",
       
       // حقول التوقيت
       createdAt: new Date()
@@ -1705,6 +1709,28 @@ router.post("/special-offers", async (req, res) => {
       }
     } catch (catError) {
       console.error('Error ensuring Offers category exists:', catError);
+    }
+
+    // إذا اختار المسؤول إنشاء قسم "العروض" تلقائياً للمتجر
+    if (offerData.restaurantId && (coercedData.autoCreateOffersSection || (!offerData.sectionId && coercedData.autoCreateOffersSection !== false))) {
+      try {
+        const existingSections = await storage.getRestaurantSections(offerData.restaurantId);
+        let offersSection = existingSections.find((s: any) => s.name === 'العروض' || s.name === 'Offers');
+        if (!offersSection && coercedData.autoCreateOffersSection) {
+          offersSection = await storage.createRestaurantSection({
+            restaurantId: offerData.restaurantId,
+            name: 'العروض',
+            description: 'العروض الخاصة لهذا المتجر',
+            sortOrder: -1,
+            isActive: true,
+          } as any);
+        }
+        if (!offerData.sectionId && offersSection) {
+          offerData.sectionId = offersSection.id;
+        }
+      } catch (secErr) {
+        console.error('Error ensuring offers section for store:', secErr);
+      }
     }
 
     const validatedData = insertSpecialOfferSchema.parse(offerData);

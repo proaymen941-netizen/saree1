@@ -165,7 +165,7 @@ router.post("/", async (req, res) => {
     let restaurantEarnings = 0;
     
     if (restaurant) {
-      const restaurantCommissionRate = parseFloat(restaurant.commissionRate?.toString() || '10'); // افتراضي 10%
+      const restaurantCommissionRate = parseFloat(restaurant.commissionRate?.toString() || '15'); // افتراضي 15%
       restaurantCommissionAmount = (subtotalNum * restaurantCommissionRate) / 100;
       restaurantEarnings = subtotalNum - restaurantCommissionAmount;
     } else {
@@ -396,7 +396,7 @@ router.put("/:id/assign-driver", async (req, res) => {
     
     if (restaurantId) {
       restaurant = await storage.getRestaurant(restaurantId);
-      const restaurantCommissionRate = parseFloat(restaurant?.commissionRate?.toString() || '10');
+      const restaurantCommissionRate = parseFloat(restaurant?.commissionRate?.toString() || '15');
       restaurantCommissionAmount = (subtotalNum * restaurantCommissionRate) / 100;
     } else {
       restaurantCommissionAmount = subtotalNum;

@@ -496,7 +496,10 @@ router.get("/:restaurantId/statement", async (req, res) => {
     if (!restaurant) return res.status(404).json({ error: "المتجر غير موجود" });
 
     const advStorage = getAdvStorage();
-    const wallet = await advStorage.getRestaurantWallet(restaurantId);
+    let wallet = await advStorage.getRestaurantWallet(restaurantId);
+    if (!wallet) {
+      wallet = await advStorage.createRestaurantWallet({ restaurantId, balance: "0", isActive: true });
+    }
     const commissionRate = parseFloat(restaurant.commissionRate?.toString() || '15');
 
     // جلب جميع طلبات المتجر
@@ -518,15 +521,22 @@ router.get("/:restaurantId/statement", async (req, res) => {
     const deliveredOrders = restaurantOrders.filter(o => o.status === 'delivered');
     const cancelledOrders = restaurantOrders.filter(o => o.status === 'cancelled');
 
-    // بناء سطور كشف الحساب
+    // بناء سطور كشف الحساب — نستخدم القيم المُخزّنة في الطلب لضمان الدقة
     const statementLines = deliveredOrders.map(o => {
       const subtotal = parseFloat(o.subtotal?.toString() || '0');
       const deliveryFee = parseFloat(o.deliveryFee?.toString() || '0');
       const totalAmount = parseFloat(o.totalAmount?.toString() || o.total?.toString() || '0');
-      const restaurantEarnings = parseFloat(o.restaurantEarnings?.toString() || '0');
-      // إعادة حساب العمولة من الـ subtotal
-      const commission = parseFloat(o.companyEarnings?.toString() || ((subtotal * commissionRate) / 100).toFixed(2));
-      const net = restaurantEarnings > 0 ? restaurantEarnings : (subtotal - (subtotal * commissionRate / 100));
+      const storedRestaurantEarnings = parseFloat(o.restaurantEarnings?.toString() || '0');
+      // العمولة الفعلية = subtotal - ما حصل عليه المتجر (بعد خصم العمولة)
+      const commissionAmount = storedRestaurantEarnings > 0
+        ? parseFloat((subtotal - storedRestaurantEarnings).toFixed(2))
+        : parseFloat(((subtotal * commissionRate) / 100).toFixed(2));
+      const restaurantNet = storedRestaurantEarnings > 0
+        ? storedRestaurantEarnings
+        : parseFloat((subtotal - commissionAmount).toFixed(2));
+      const effectiveRate = subtotal > 0
+        ? parseFloat(((commissionAmount / subtotal) * 100).toFixed(2))
+        : commissionRate;
 
       return {
         orderId: o.id,
@@ -534,12 +544,12 @@ router.get("/:restaurantId/statement", async (req, res) => {
         date: o.createdAt,
         customerName: o.customerName || o.customerPhone || 'عميل',
         status: o.status,
-        subtotal: subtotal,
-        deliveryFee: deliveryFee,
-        totalAmount: totalAmount,
-        commissionRate: commissionRate,
-        commissionAmount: parseFloat(((subtotal * commissionRate) / 100).toFixed(2)),
-        restaurantNet: parseFloat(net.toFixed(2)),
+        subtotal,
+        deliveryFee,
+        totalAmount,
+        commissionRate: effectiveRate,
+        commissionAmount,
+        restaurantNet: parseFloat(restaurantNet.toFixed(2)),
         deliveryFeeShare: deliveryFee
       };
     });
