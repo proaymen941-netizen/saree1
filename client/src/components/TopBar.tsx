@@ -7,8 +7,7 @@ import {
   User, 
   Search,
   Menu as MenuIcon,
-  MapPin,
-  ChevronDown,
+  Clock,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,6 +17,98 @@ import { useLanguage } from '../context/LanguageContext';
 import { useUiSettings } from '@/context/UiSettingsContext';
 import { CustomerNotificationsPanel } from './CustomerNotificationsPanel';
 import waselLogo from '@assets/wasel-logo.png';
+
+// شريط حالة عمل التطبيق (مفتوح/مغلق + ساعات العمل) - استبدل زر الموقع
+const WorkingHoursIndicator: React.FC = () => {
+  const { getSetting } = useUiSettings();
+  const storeStatus = getSetting('store_status') || 'auto';
+  const openingTime = getSetting('opening_time') || '08:00';
+  const closingTime = getSetting('closing_time') || '23:00';
+
+  // حساب الحالة الفعلية
+  const computeIsOpen = (): boolean => {
+    if (storeStatus === 'open') return true;
+    if (storeStatus === 'closed') return false;
+    // تلقائي - حسب ساعات العمل
+    const now = new Date();
+    const currentMinutes = now.getHours() * 60 + now.getMinutes();
+    const toMin = (t: string) => {
+      const [h, m] = t.split(':').map(Number);
+      return (h || 0) * 60 + (m || 0);
+    };
+    const open = toMin(openingTime);
+    const close = toMin(closingTime);
+    if (close > open) return currentMinutes >= open && currentMinutes < close;
+    // عبور منتصف الليل
+    return currentMinutes >= open || currentMinutes < close;
+  };
+
+  const [isOpen, setIsOpen] = React.useState(computeIsOpen);
+
+  React.useEffect(() => {
+    setIsOpen(computeIsOpen());
+    const t = setInterval(() => setIsOpen(computeIsOpen()), 60000);
+    return () => clearInterval(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [storeStatus, openingTime, closingTime]);
+
+  // تنسيق 12 ساعة مع ص/م بالعربية
+  const format12 = (t: string): string => {
+    if (!t || !t.includes(':')) return t;
+    const [hStr, mStr] = t.split(':');
+    let h = parseInt(hStr, 10);
+    const m = (mStr || '00').padStart(2, '0');
+    if (isNaN(h)) return t;
+    const suffix = h >= 12 ? 'م' : 'ص';
+    h = h % 12;
+    if (h === 0) h = 12;
+    return `${h}:${m} ${suffix}`;
+  };
+
+  return (
+    <div className="relative px-3 pb-2.5">
+      <div
+        className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-xl backdrop-blur-sm border transition-colors ${
+          isOpen
+            ? 'bg-green-500/10 border-green-400/30'
+            : 'bg-red-500/10 border-red-400/30'
+        }`}
+        data-testid="indicator-working-hours"
+      >
+        <div className="relative">
+          <span
+            className={`absolute inset-0 rounded-full ${
+              isOpen ? 'bg-green-400 animate-ping' : 'bg-red-400'
+            } opacity-60`}
+          />
+          <span
+            className={`relative block w-2.5 h-2.5 rounded-full ${
+              isOpen ? 'bg-green-400' : 'bg-red-400'
+            }`}
+          />
+        </div>
+        <Clock className={`h-3.5 w-3.5 ${isOpen ? 'text-green-300' : 'text-red-300'}`} />
+        <div className="flex-1 text-right">
+          <div className="text-[9px] font-bold text-white/60 leading-none">
+            {isOpen ? 'التطبيق مفتوح الآن' : 'التطبيق مغلق حالياً'}
+          </div>
+          <div className="text-xs font-bold text-white truncate leading-tight mt-0.5">
+            ساعات العمل: {format12(openingTime)} - {format12(closingTime)}
+          </div>
+        </div>
+        <span
+          className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
+            isOpen
+              ? 'bg-green-400/20 text-green-300 border border-green-400/30'
+              : 'bg-red-400/20 text-red-300 border border-red-400/30'
+          }`}
+        >
+          {isOpen ? 'OPEN' : 'CLOSED'}
+        </span>
+      </div>
+    </div>
+  );
+};
 
 export const TopBar: React.FC = () => {
   const [, setLocation] = useLocation();
@@ -191,25 +282,8 @@ export const TopBar: React.FC = () => {
           </div>
         </div>
 
-        {/* Location strip */}
-        <div className="relative px-3 pb-2.5">
-          <button
-            onClick={() => setLocation('/profile')}
-            className="w-full flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 backdrop-blur-sm transition-colors"
-            data-testid="button-location-strip"
-          >
-            <div className="w-6 h-6 rounded-full bg-[#F5A623]/20 flex items-center justify-center">
-              <MapPin className="h-3.5 w-3.5 text-[#F5A623]" />
-            </div>
-            <div className="flex-1 text-right">
-              <div className="text-[9px] font-bold text-white/60 leading-none">التوصيل إلى</div>
-              <div className="text-xs font-bold text-white truncate leading-tight mt-0.5">
-                {user ? 'موقعك الحالي' : 'حدد موقعك للبدء'}
-              </div>
-            </div>
-            <ChevronDown className="h-3.5 w-3.5 text-white/60" />
-          </button>
-        </div>
+        {/* Working Hours Indicator */}
+        <WorkingHoursIndicator />
 
         {/* Mobile Search Bar - Expandable */}
         {isSearchOpen && (

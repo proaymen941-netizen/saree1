@@ -414,7 +414,6 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         { icon: Layers, label: 'أقسام المتجر', path: '/admin/restaurant-sections', permission: 'manage_menu' },
         { icon: Clock, label: 'ساعات العمل', path: '/admin/business-hours', permission: 'manage_menu' },
         { icon: Receipt, label: 'حسابات المتاجر', path: '/admin/restaurant-accounts', permission: 'manage_menu' },
-        { icon: FileBarChart, label: 'تقارير المتاجر', path: '/admin/restaurant-reports', permission: 'view_reports' },
       ].filter(item => hasPermission(item.permission))
     },
     {
@@ -444,8 +443,6 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       label: 'التقارير والمالية',
       items: [
         { icon: TrendingUp, label: 'الإيرادات والتوزيع', path: '/admin/financial-reports', permission: 'view_reports' },
-        { icon: BarChart3, label: 'التقارير التفصيلية', path: '/admin/detailed-reports', permission: 'view_reports' },
-        { icon: FileBarChart, label: 'التقارير المتقدمة', path: '/admin/advanced-reports', permission: 'view_reports' },
         { icon: Star, label: 'التقييمات', path: '/admin/ratings', permission: 'view_reports' },
       ].filter(item => hasPermission(item.permission))
     },
