@@ -665,8 +665,23 @@ router.put("/orders/:id/status", async (req: any, res) => {
         orderId: id, 
         status,
         orderNumber: updatedOrder.orderNumber,
+        driverId: updatedOrder.driverId,
         type: 'regular'
       });
+
+      // إرسال إشعار مباشر للعميل بحسب معرفه وهاتفه
+      const orderPayload = { orderId: id, status, orderNumber: updatedOrder.orderNumber };
+      if (updatedOrder.customerId) {
+        ws.sendToUser(updatedOrder.customerId, 'order_update', orderPayload);
+      }
+      if (updatedOrder.customerPhone && updatedOrder.customerPhone !== updatedOrder.customerId) {
+        ws.sendToUser(updatedOrder.customerPhone, 'order_update', orderPayload);
+      }
+
+      // إشعار السائق عند التعيين
+      if (driverId && updatedOrder.driverId) {
+        ws.sendToDriver(updatedOrder.driverId, 'new_order_assigned', { orderId: id, orderNumber: updatedOrder.orderNumber });
+      }
     }
 
     // إنشاء رسالة الحالة للتتبع والإشعارات

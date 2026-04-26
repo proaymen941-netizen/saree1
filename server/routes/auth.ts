@@ -214,6 +214,11 @@ router.post('/validate', async (req, res) => {
     }
 
     const user = userResult[0];
+
+    if (!user.isActive) {
+      return res.status(401).json({ success: false, message: 'الحساب غير مفعل' });
+    }
+
     res.json({
       success: true,
       user: {
@@ -222,7 +227,8 @@ router.post('/validate', async (req, res) => {
         username: user.username,
         email: user.email,
         phone: user.phone,
-        userType: 'customer'
+        userType: 'customer',
+        isActive: user.isActive
       }
     });
   } catch (error) {

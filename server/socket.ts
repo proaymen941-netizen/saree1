@@ -157,7 +157,8 @@ async function handleMessage(
           ws,
           userId,
           userType,
-          connectionKey
+          connectionKey,
+          isAlive: true
         });
         
         const connections = userConnections.get(connectionKey) || [];

@@ -15,7 +15,7 @@ import { LoginPage } from "./pages/LoginPage";
 import AdminLoginPage from "./pages/admin/AdminLoginPage";
 import DriverLoginPage from "./pages/driver/DriverLoginPage";
 import AdminApp from "./pages/AdminApp";
-import { DriverDashboard } from "./pages/DriverDashboard";
+import DriverApp from "./pages/driver/DriverApp";
 import { useState, useEffect } from "react";
 import Home from "./pages/Home";
 import Restaurant from "./pages/Restaurant";
@@ -30,6 +30,9 @@ import Privacy from "./pages/Privacy";
 import SearchPage from "./pages/SearchPage";
 import CustomerAuthPage from "./pages/CustomerAuthPage";
 import NotFound from "@/pages/not-found";
+import Favorites from "./pages/Favorites";
+import WasalniPage from "./pages/WasalniPage";
+import CategoryPage from "./pages/CategoryPage";
 
 // شاشة التحميل
 function LoadingScreen() {
@@ -124,11 +127,7 @@ function DriverGuard() {
     window.location.href = '/driver-login';
     return null;
   }
-  return <DriverDashboard onLogout={() => {
-    localStorage.removeItem('driver_token');
-    localStorage.removeItem('driver_user');
-    window.location.href = '/driver-login';
-  }} />;
+  return <DriverApp />;
 }
 
 function MainApp() {
@@ -182,6 +181,7 @@ function Router() {
   const { isFeatureEnabled } = useUiSettings();
   const showOrdersPage = isFeatureEnabled('show_orders_page');
   const showTrackOrdersPage = isFeatureEnabled('show_track_orders_page');
+  const showWasalniService = isFeatureEnabled('show_wasalni_service');
 
   return (
     <Switch>
@@ -192,9 +192,12 @@ function Router() {
       <Route path="/cart" component={Cart} />
       <Route path="/profile" component={Profile} />
       <Route path="/addresses" component={Location} />
+      <Route path="/favorites" component={Favorites} />
+      <Route path="/category/:name" component={CategoryPage} />
       {showOrdersPage && <Route path="/orders" component={OrdersPage} />}
       <Route path="/orders/:orderId" component={OrderTracking} />
       {showTrackOrdersPage && <Route path="/track-orders" component={TrackOrdersPage} />}
+      {showWasalniService && <Route path="/wasalni" component={WasalniPage} />}
       <Route path="/settings" component={Settings} />
       <Route path="/privacy" component={Privacy} />
       <Route path="/admin-login" component={AdminLoginPage} />

@@ -25,9 +25,37 @@ A comprehensive food delivery system supporting three user roles: Customers, Dri
 - `/shared` - Shared code (Drizzle schema, types)
 - `/drizzle` - Migration files
 
-## Recent Fixes Applied
+## Driver App Audit Fixes (Session 2)
+- **EnhancedDriverDashboard.tsx**: CRITICAL fix — replaced broken `WS_MANAGER` polling with a dedicated WebSocket connection for the driver app (independent of customer WS). Driver now correctly authenticates and receives real-time notifications
+- **EnhancedDriverDashboard.tsx**: Removed `activeTab` from WebSocket `useEffect` dependency array (was causing WS reconnect on every tab switch). Used `activeTabRef` pattern instead to avoid stale closures
+- **EnhancedDriverDashboard.tsx**: Added `driverWsRef` to share WS reference with geolocation effect (for location update sends)
+- **ProfilePage.tsx**: Now fetches fresh profile data from `/api/drivers/app/dashboard` server endpoint (was only reading stale localStorage data set at login time)
+- **CustomerAuthPage.tsx**: Implemented real Google Sign-In using Google Identity Services (GIS) SDK. When `VITE_GOOGLE_CLIENT_ID` env var is set, renders Google's official button and decodes real JWT to get `sub`, `email`, `name`. Falls back to clear error if unconfigured. Apple login keeps existing flow.
+
+## Google Sign-In Setup (To Activate)
+1. Create a project in Google Cloud Console and enable "Google Identity" API
+2. Create OAuth 2.0 credentials (Web application type)
+3. Add your Replit app URL to authorized origins
+4. Set `VITE_GOOGLE_CLIENT_ID` environment variable with your client ID
+5. The Google Sign-In button in `/auth` will automatically activate
+
+## Recent Fixes Applied (Comprehensive Audit)
 - Fixed `eq import` error in `server/index.ts` scheduled orders timer
 - Fixed admin/driver login routing in `AuthContext.tsx` and `LoginPage.tsx`
+- **Cart.tsx**: Fixed post-order redirect from broken `/order-tracking/:id` → correct `/orders/:id`
+- **App.tsx**: Added missing routes: `/favorites` (Favorites), `/wasalni` (WasalniPage), `/category/:name` (CategoryPage)
+- **OrderTracking.tsx**: Added WebSocket auth messages (userId + customerPhone), added auto-reconnect, added working cancel order button via `PATCH /api/orders/:id/cancel`
+- **CustomerAuthPage.tsx**: Fixed social login using wrong localStorage key (`token` → `auth_token`)
+- **auth.ts**: Added `isActive` field to `/api/auth/validate` response; added isActive check to block inactive users
+- **admin.ts**: Added targeted `sendToUser` + `sendToDriver` calls in `PUT /api/admin/orders/:id/status` in addition to broadcast, ensuring customer gets direct WS notification when driver is assigned
+- **NotificationContext.tsx**: Now listens for both `order_update` AND `order_status_changed` WS types; sends auth for both user.id and customer_phone; added Arabic status labels for notifications
+- **socket.ts**: Fixed missing `isAlive` field in client entries on auth
+
+## Key Auth Pattern
+- Customer auth token stored as `auth_token` in localStorage = user UUID
+- Admin: `admin_token`, Driver: `driver_token`
+- Customer phone stored in `customer_phone` localStorage key
+- WS auth sends both userId (UUID) and phone to cover all targeting patterns
 
 ## Driver Earnings Bug Fix (Critical)
 **Bug**: Driver wallet balance was being doubled on order completion (e.g., 3000 earned → 6000 added).
