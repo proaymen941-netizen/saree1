@@ -151,7 +151,7 @@ export default function OrdersPage() {
       );
       return merged;
     },
-    refetchInterval: 30000,
+    refetchInterval: 8000,
     retry: 1
   });
 
@@ -204,7 +204,7 @@ export default function OrdersPage() {
 
         ws.onclose = () => {
           if (!cancelled) {
-            reconnectTimeout = setTimeout(connect, 5000);
+            reconnectTimeout = setTimeout(connect, 2000);
           }
         };
         ws.onerror = () => {

@@ -207,7 +207,7 @@ export default function EnhancedDriverDashboard({ driverId, onLogout }: Enhanced
       }
       return response.json();
     },
-    refetchInterval: 30000,
+    refetchInterval: 10000,
     enabled: !!driverToken
   });
 

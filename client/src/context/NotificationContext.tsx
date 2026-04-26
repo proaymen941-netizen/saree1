@@ -122,8 +122,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
       };
 
       ws.onclose = () => {
-        console.log('🔔 Notification WebSocket disconnected, reconnecting...');
-        reconnectTimeout = setTimeout(connect, 5000);
+        reconnectTimeout = setTimeout(connect, 2000);
       };
 
       ws.onerror = () => ws?.close();
