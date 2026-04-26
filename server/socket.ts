@@ -132,6 +132,47 @@ export function setupWebSockets(server: Server) {
           client.send(message);
         }
       });
+    },
+    /**
+     * Send an order update ONLY to relevant parties:
+     * the order's customer (by id and/or phone), the assigned driver,
+     * the admin dashboard, and any clients explicitly tracking the order.
+     * This avoids the noisy global broadcast that was hitting all customers.
+     */
+    notifyOrder: (
+      type: string,
+      payload: any,
+      recipients: { customerId?: string | null; customerPhone?: string | null; driverId?: string | null; orderId?: string | null; includeAdmin?: boolean } = {}
+    ) => {
+      const message = JSON.stringify({ type, payload });
+      const sent = new Set<WebSocket>();
+
+      const sendToKey = (key?: string | null) => {
+        if (!key) return;
+        const conns = userConnections.get(key) || [];
+        conns.forEach((client) => {
+          if (client.readyState === WebSocket.OPEN && !sent.has(client)) {
+            client.send(message);
+            sent.add(client);
+          }
+        });
+      };
+
+      sendToKey(recipients.customerId);
+      sendToKey(recipients.customerPhone);
+      if (recipients.driverId) sendToKey(`driver_${recipients.driverId}`);
+      if (recipients.includeAdmin !== false) sendToKey('admin_dashboard');
+
+      const orderId = recipients.orderId || (payload && payload.orderId);
+      if (orderId) {
+        const trackers = orderTrackers.get(orderId) || [];
+        trackers.forEach((client) => {
+          if (client.readyState === WebSocket.OPEN && !sent.has(client)) {
+            client.send(message);
+            sent.add(client);
+          }
+        });
+      }
     }
   };
 }

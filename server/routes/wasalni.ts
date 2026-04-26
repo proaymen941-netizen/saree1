@@ -168,9 +168,18 @@ router.post("/", async (req, res) => {
     try {
       const ws = (req.app.get('ws') as any);
       if (ws) {
-        ws.broadcast('new_wasalni_request', { requestId: newRequest.id, requestNumber });
-        // إعلام شاشة طلباتي للعميل بأن هناك طلب جديد
-        ws.broadcast('order_update', { orderId: newRequest.id, status: 'pending', type: 'wasalni' });
+        // إشعار الإدارة فقط بطلب جديد (وليس كل العملاء)
+        if (typeof ws.sendToAdmin === 'function') {
+          ws.sendToAdmin('new_wasalni_request', { requestId: newRequest.id, requestNumber });
+        }
+        // إعلام شاشة طلباتي للعميل بأن هناك طلب جديد - مستهدف فقط
+        if (typeof ws.notifyOrder === 'function') {
+          ws.notifyOrder('order_update', { orderId: newRequest.id, status: 'pending', type: 'wasalni' }, {
+            customerId: newRequest.customerId,
+            customerPhone: newRequest.customerPhone,
+            orderId: newRequest.id,
+          });
+        }
       }
     } catch (wsErr) {
       console.error("⚠️ خطأ في بث WebSocket لطلب وصل لي (تم تجاهله):", wsErr);
@@ -219,8 +228,13 @@ router.put("/:id", async (req, res) => {
       // بث التحديث عبر WebSocket
       try {
         const ws = (req.app.get('ws') as any);
-        if (ws) {
-          ws.broadcast('order_update', { orderId: updated.id, status, type: 'wasalni' });
+        if (ws && typeof ws.notifyOrder === 'function') {
+          ws.notifyOrder('order_update', { orderId: updated.id, status, type: 'wasalni' }, {
+            customerId: updated.customerId,
+            customerPhone: updated.customerPhone,
+            driverId: updated.driverId,
+            orderId: updated.id,
+          });
         }
       } catch (wsErr) {
         console.error("⚠️ فشل بث WebSocket لتحديث وصل لي (تم تجاهله):", wsErr);
@@ -306,12 +320,19 @@ router.post("/:id/assign-driver", async (req, res) => {
     try {
       const ws = (req.app.get('ws') as any);
       if (ws) {
-        ws.broadcast('order_update', {
-          orderId: updated.id,
-          status: 'confirmed',
-          type: 'wasalni',
-          requestNumber: request.requestNumber
-        });
+        if (typeof ws.notifyOrder === 'function') {
+          ws.notifyOrder('order_update', {
+            orderId: updated.id,
+            status: 'confirmed',
+            type: 'wasalni',
+            requestNumber: request.requestNumber
+          }, {
+            customerId: updated.customerId,
+            customerPhone: updated.customerPhone,
+            driverId,
+            orderId: updated.id,
+          });
+        }
         if (typeof ws.sendToDriver === 'function') {
           ws.sendToDriver(driverId, 'new_order_assigned', {
             orderId: updated.id,

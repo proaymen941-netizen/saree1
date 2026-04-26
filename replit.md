@@ -113,3 +113,10 @@ A comprehensive food delivery system supporting three user roles: Customers, Dri
 - Target: autoscale
 - Build: `npm run build`
 - Run: `node dist/index.js`
+
+## Latest Session Fixes (April 2026)
+- **Targeted notifications (server/socket.ts)**: New `notifyOrder(type, payload, recipients)` helper sends WebSocket events only to the specific customer (by id and phone), assigned driver, admin dashboard, and active order trackers. Replaced all global `ws.broadcast('order_update', ...)` calls in `server/routes/orders.ts`, `server/routes/wasalni.ts`, `server/routes/driver.ts`, and one in `server/routes/admin.ts` with `ws.notifyOrder(...)` so each customer only receives their own order updates.
+- **TopBar working hours indicator**: Replaced the "deliver to current location" mobile button with a `WorkingHoursIndicator` (`client/src/components/TopBar.tsx`) that reads `store_status`, `opening_time`, `closing_time` from `useUiSettings`, computes open/closed automatically (supports midnight crossover), and shows time in 12-hour format with Arabic ص/م suffix. Auto-refreshes every minute.
+- **AdminOffers.tsx**: Converted misused `useState(() => {...})` to `useEffect`. Added `onError` toasts and proper `response.ok` checks to all three mutations (create / update / delete). Switched `validUntil` to ISO string for safer JSON serialization. Verified end-to-end with `POST /api/admin/special-offers` returning 201 with auto-linked "العروض" category.
+- **Admin sidebar cleanup (AdminLayout.tsx)**: Removed three menu items whose routes had no page (would render NotFound): "تقارير المتاجر" (`/admin/restaurant-reports`), "التقارير التفصيلية" (`/admin/detailed-reports`), "التقارير المتقدمة" (`/admin/advanced-reports`).
+- **Google Sign-In secret**: Requested `VITE_GOOGLE_CLIENT_ID` from the user (the GIS button code in `CustomerAuthPage.tsx` was already complete from a previous session and activates as soon as the env var is set).

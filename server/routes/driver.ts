@@ -221,7 +221,14 @@ router.post("/orders/:id/accept", requireDriverAuth, async (req: AuthenticatedRe
     });
 
     const ws = req.app.get('ws');
-    if (ws) ws.broadcast('order_update', { orderId: id, status: 'ready', driverId });
+    if (ws && typeof ws.notifyOrder === 'function') {
+      ws.notifyOrder('order_update', { orderId: id, status: 'ready', driverId }, {
+        customerId: order.customerId,
+        customerPhone: order.customerPhone,
+        driverId,
+        orderId: id,
+      });
+    }
 
     res.json({ success: true, order: updatedOrder });
   } catch (error) {
@@ -305,7 +312,14 @@ router.put("/orders/:id/status", requireDriverAuth, async (req: AuthenticatedReq
     }
 
     const ws = req.app.get('ws');
-    if (ws) ws.broadcast('order_update', { orderId: id, status, driverId });
+    if (ws && typeof ws.notifyOrder === 'function') {
+      ws.notifyOrder('order_update', { orderId: id, status, driverId }, {
+        customerId: order.customerId,
+        customerPhone: order.customerPhone,
+        driverId,
+        orderId: id,
+      });
+    }
 
     res.json({ success: true, order: updatedOrder });
   } catch (error) {
@@ -632,8 +646,13 @@ router.put("/wasalni/:id/status", requireDriverAuth, async (req: AuthenticatedRe
     // بث التحديث عبر WebSocket
     try {
       const ws = req.app.get('ws');
-      if (ws) {
-        ws.broadcast('order_update', { orderId: id, status, type: 'wasalni', driverId });
+      if (ws && typeof ws.notifyOrder === 'function') {
+        ws.notifyOrder('order_update', { orderId: id, status, type: 'wasalni', driverId }, {
+          customerId: request.customerId,
+          customerPhone: request.customerPhone,
+          driverId,
+          orderId: id,
+        });
       }
     } catch (wsErr) {
       console.error("⚠️ فشل بث WebSocket لتحديث وصل لي من السائق (تم تجاهله):", wsErr);

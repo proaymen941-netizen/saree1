@@ -658,27 +658,26 @@ router.put("/orders/:id/status", async (req: any, res) => {
       return res.status(404).json({ error: "الطلب غير موجود" });
     }
     
-    // بث التحديث عبر WebSocket
+    // بث التحديث عبر WebSocket - مستهدف فقط لأطراف الطلب
     const ws = req.app.get('ws');
     if (ws) {
-      ws.broadcast('order_update', { 
+      const payload = { 
         orderId: id, 
         status,
         orderNumber: updatedOrder.orderNumber,
         driverId: updatedOrder.driverId,
         type: 'regular'
-      });
-
-      // إرسال إشعار مباشر للعميل بحسب معرفه وهاتفه
-      const orderPayload = { orderId: id, status, orderNumber: updatedOrder.orderNumber };
-      if (updatedOrder.customerId) {
-        ws.sendToUser(updatedOrder.customerId, 'order_update', orderPayload);
+      };
+      if (typeof ws.notifyOrder === 'function') {
+        ws.notifyOrder('order_update', payload, {
+          customerId: updatedOrder.customerId,
+          customerPhone: updatedOrder.customerPhone,
+          driverId: updatedOrder.driverId,
+          orderId: id,
+        });
       }
-      if (updatedOrder.customerPhone && updatedOrder.customerPhone !== updatedOrder.customerId) {
-        ws.sendToUser(updatedOrder.customerPhone, 'order_update', orderPayload);
-      }
 
-      // إشعار السائق عند التعيين
+      // إشعار السائق عند التعيين بطلب جديد
       if (driverId && updatedOrder.driverId) {
         ws.sendToDriver(updatedOrder.driverId, 'new_order_assigned', { orderId: id, orderNumber: updatedOrder.orderNumber });
       }

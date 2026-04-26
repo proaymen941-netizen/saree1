@@ -416,14 +416,19 @@ router.put("/:id/assign-driver", async (req, res) => {
     // Broadcast update via WebSocket
     const ws = req.app.get('ws');
     if (ws) {
-      // إشعار للعميل بتحديث الحالة وتعيين السائق
-      ws.broadcast('order_update', { 
+      // إشعار للعميل بتحديث الحالة وتعيين السائق - مستهدف فقط للأطراف ذات الصلة
+      ws.notifyOrder('order_update', { 
         orderId: id, 
         status: 'assigned',
         driverId,
         driverName: driver?.name,
         type: 'regular',
         orderNumber: order.orderNumber
+      }, {
+        customerId: order.customerId,
+        customerPhone: order.customerPhone,
+        driverId,
+        orderId: id,
       });
 
       // إشعار مباشر للسائق مع بيانات الطلب
@@ -529,7 +534,12 @@ router.put("/:id/prices", async (req, res) => {
 
     const ws = req.app.get('ws');
     if (ws) {
-      ws.broadcast('order_update', { orderId: id, priceUpdated: true });
+      ws.notifyOrder('order_update', { orderId: id, priceUpdated: true }, {
+        customerId: order.customerId,
+        customerPhone: order.customerPhone,
+        driverId: order.driverId,
+        orderId: id,
+      });
     }
 
     res.json({ success: true, order: updatedOrder });
@@ -571,14 +581,19 @@ router.put("/:id", async (req, res) => {
       updatedOrder = await storage.updateOrder(id, updateData);
     }
 
-    // Broadcast update via WebSocket
+    // Broadcast update via WebSocket - مستهدف فقط لأطراف الطلب
     const ws = req.app.get('ws');
     if (ws) {
-      ws.broadcast('order_update', { 
+      ws.notifyOrder('order_update', { 
         orderId: id, 
         status,
         orderNumber: order.orderNumber,
         type: 'regular'
+      }, {
+        customerId: order.customerId,
+        customerPhone: order.customerPhone,
+        driverId: order.driverId,
+        orderId: id,
       });
     }
 
@@ -881,14 +896,19 @@ router.patch("/:orderId/cancel", async (req, res) => {
       await storage.updateDriver(order.driverId, { isAvailable: true });
     }
 
-    // Notify customer via WebSocket
+    // Notify customer via WebSocket - مستهدف
     const ws = req.app.get('ws');
     if (ws) {
-      ws.broadcast('order_update', { 
+      ws.notifyOrder('order_update', { 
         orderId: orderId, 
         status: 'cancelled', 
         orderNumber: order.orderNumber,
         type: 'regular'
+      }, {
+        customerId: order.customerId,
+        customerPhone: order.customerPhone,
+        driverId: order.driverId,
+        orderId,
       });
     }
 
