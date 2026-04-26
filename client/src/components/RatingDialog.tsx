@@ -6,6 +6,7 @@ import { Star, Truck, Utensils } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useMutation } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
+import { useAuth } from '@/context/AuthContext';
 
 interface RatingDialogProps {
   isOpen: boolean;
@@ -13,18 +14,21 @@ interface RatingDialogProps {
   orderId: string;
   restaurantName: string;
   driverName?: string;
+  customerId?: string;
 }
 
-export default function RatingDialog({ isOpen, onClose, orderId, restaurantName, driverName }: RatingDialogProps) {
+export default function RatingDialog({ isOpen, onClose, orderId, restaurantName, driverName, customerId }: RatingDialogProps) {
   const [restaurantRating, setRestaurantRating] = useState(0);
   const [restaurantComment, setRestaurantComment] = useState('');
   const [driverRating, setDriverRating] = useState(0);
   const [driverComment, setDriverComment] = useState('');
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const mutation = useMutation({
     mutationFn: async () => {
       const res = await apiRequest('POST', `/api/customer/orders/${orderId}/review`, {
+        customerId: customerId || user?.id,
         rating: restaurantRating,
         comment: restaurantComment,
         driverRating: driverRating > 0 ? driverRating : undefined,
