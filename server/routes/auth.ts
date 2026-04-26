@@ -465,7 +465,7 @@ router.post('/admin/login', async (req, res) => {
       await dbStorage.db.update(adminUsers).set({ password: hashedPwd }).where(eq(adminUsers.id, admin.id));
     });
 
-    const token = admin.id;
+    const token = generateToken(admin.id, 'admin');
     console.log('🎉 تم تسجيل الدخول بنجاح للمدير:', admin.name);
     
     let permissions: string[] = [];
@@ -549,7 +549,7 @@ router.post('/driver/login', async (req, res) => {
       await dbStorage.db.update(drivers).set({ password: hashedPwd }).where(eq(drivers.id, driver.id));
     });
 
-    const token = driver.id;
+    const token = generateToken(driver.id, 'driver');
     console.log('🎉 تم تسجيل الدخول بنجاح للسائق:', driver.name);
     
     res.json({

@@ -946,6 +946,10 @@ router.get("/employees", async (req, res) => {
 router.post("/employees", async (req, res) => {
   try {
     const coercedData = coerceRequestData(req.body);
+    // ضمان قيم افتراضية للحقول المطلوبة في قاعدة البيانات
+    if (coercedData.salary === undefined || coercedData.salary === null || coercedData.salary === '') {
+      coercedData.salary = '0';
+    }
     const validatedData = insertEmployeeSchema.parse(coercedData);
     const newEmployee = await storage.createEmployee(validatedData);
     res.status(201).json(newEmployee);
@@ -1736,11 +1740,19 @@ router.delete("/special-offers/:id", async (req, res) => {
 // إدارة الإشعارات
 router.post("/notifications", async (req: any, res) => {
   try {
-    const notificationData = {
-      ...req.body,
-      createdBy: req.admin?.id || null
+    const body = req.body || {};
+    const notificationData: any = {
+      type: body.type || 'info',
+      title: body.title,
+      message: body.message,
+      // قبول إما recipientType أو targetType من الواجهة
+      recipientType: body.recipientType || body.targetType || 'all',
+      recipientId: body.recipientId || body.targetId || null,
+      orderId: body.orderId || null,
+      isRead: false,
+      createdBy: req.admin?.id || null,
     };
-    
+
     const [newNotification] = await db.insert(schema.notifications)
       .values(notificationData)
       .returning();
@@ -2124,7 +2136,13 @@ router.get("/coupons", async (req, res) => {
 
 router.post("/coupons", async (req, res) => {
   try {
-    const coupon = await storage.createCoupon(req.body);
+    const body = { ...req.body };
+    // Map common alternative field names to schema columns
+    if (!body.nameAr && !body.name_ar) body.nameAr = body.name || body.code || 'كوبون';
+    if (!body.type && body.discountType) body.type = body.discountType;
+    if (body.value === undefined && body.discountValue !== undefined) body.value = body.discountValue;
+    if (body.minOrderValue === undefined && body.minOrderAmount !== undefined) body.minOrderValue = body.minOrderAmount;
+    const coupon = await storage.createCoupon(body);
     res.status(201).json(coupon);
   } catch (error: any) {
     console.error("خطأ في إضافة الكوبون:", error);
@@ -2190,11 +2208,14 @@ router.get("/payment-methods", async (req, res) => {
 
 router.post("/payment-methods", async (req, res) => {
   try {
-    const method = await storage.createPaymentMethod(req.body);
+    const body = { ...req.body };
+    if (!body.nameAr && !body.name_ar) body.nameAr = body.name || 'طريقة دفع';
+    if (!body.provider) body.provider = body.type || 'cash';
+    const method = await storage.createPaymentMethod(body);
     res.status(201).json(method);
-  } catch (error) {
+  } catch (error: any) {
     console.error("خطأ في إضافة طريقة الدفع:", error);
-    res.status(500).json({ error: "خطأ في الخادم" });
+    res.status(500).json({ error: "خطأ في الخادم: " + (error?.message || '') });
   }
 });
 

@@ -63,14 +63,17 @@ router.get("/app/dashboard", requireDriverAuth, async (req: AuthenticatedRequest
       return res.status(404).json({ error: "السائق غير موجود" });
     }
 
-    const allOrders = await storage.getOrders();
-    const driverOrders = allOrders.filter(order => order.driverId === driverId);
-
-    const driverBalance = await storage.getDriverBalance(driverId);
-    const driverCommissions = await storage.getDriverCommissions(driverId);
-
     const advStorage = new AdvancedDatabaseStorage(storage.db);
-    const driverReviews = await advStorage.getDriverReviews(driverId);
+
+    // تنفيذ كل الاستعلامات بالتوازي لتسريع الاستجابة
+    const [allOrders, driverBalance, driverCommissions, driverReviews] = await Promise.all([
+      storage.getOrders(),
+      storage.getDriverBalance(driverId),
+      storage.getDriverCommissions(driverId),
+      advStorage.getDriverReviews(driverId),
+    ]);
+
+    const driverOrders = allOrders.filter(order => order.driverId === driverId);
 
     const todayStr = new Date().toDateString();
 
@@ -409,13 +412,16 @@ router.get("/stats", requireDriverAuth, async (req: AuthenticatedRequest, res) =
     const driver = await storage.getDriver(driverId);
     if (!driver) return res.status(404).json({ error: "السائق غير موجود" });
 
-    const driverBalance = await storage.getDriverBalance(driverId);
-    const driverCommissions = await storage.getDriverCommissions(driverId);
-
     const advStorage = new AdvancedDatabaseStorage(storage.db);
-    const driverReviews = await advStorage.getDriverReviews(driverId);
 
-    const allOrders = await storage.getOrders();
+    // تنفيذ الاستعلامات بالتوازي
+    const [driverBalance, driverCommissions, driverReviews, allOrders] = await Promise.all([
+      storage.getDriverBalance(driverId),
+      storage.getDriverCommissions(driverId),
+      advStorage.getDriverReviews(driverId),
+      storage.getOrders(),
+    ]);
+
     const driverOrders = allOrders.filter(order => order.driverId === driverId);
     const deliveredOrders = driverOrders.filter(order => order.status === "delivered");
 
