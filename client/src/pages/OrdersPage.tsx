@@ -38,6 +38,7 @@ interface Order {
   driverEarnings: string;
   customerId?: string;
   parsedItems?: OrderItem[];
+  _isWasalni?: boolean;
 }
 
 interface OrderItem {
@@ -133,6 +134,7 @@ export default function OrdersPage() {
               createdAt: w.createdAt,
               updatedAt: w.updatedAt,
               driverEarnings: '0',
+              _isWasalni: true,
               parsedItems: [
                 { name: `من: ${w.fromAddress}`, quantity: 1, price: 0 },
                 { name: `إلى: ${w.toAddress}`, quantity: 1, price: 0 },
@@ -223,8 +225,9 @@ export default function OrdersPage() {
 
   // طلب الإلغاء
   const cancelOrderMutation = useMutation({
-    mutationFn: async ({ orderId, reason }: { orderId: string; reason: string }) => {
-      const response = await fetch(`/api/orders/${orderId}`, {
+    mutationFn: async ({ orderId, reason, isWasalni }: { orderId: string; reason: string; isWasalni?: boolean }) => {
+      const url = isWasalni ? `/api/wasalni/${orderId}` : `/api/orders/${orderId}`;
+      const response = await fetch(url, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: 'cancelled', cancelReason: reason, updatedBy: customerPhone, updatedByType: 'customer' }),
@@ -339,7 +342,7 @@ export default function OrdersPage() {
       toast({ title: "الرجاء اختيار سبب الإلغاء", variant: "destructive" });
       return;
     }
-    cancelOrderMutation.mutate({ orderId: cancellingOrder.id, reason: finalReason });
+    cancelOrderMutation.mutate({ orderId: cancellingOrder.id, reason: finalReason, isWasalni: cancellingOrder._isWasalni });
   };
 
   const tabs = [
@@ -563,6 +566,7 @@ export default function OrdersPage() {
             orderId={selectedOrder.id}
             restaurantName={selectedOrder.restaurantName || "المطعم"}
             driverName={selectedOrder.driverName}
+            customerId={selectedOrder.customerId || user?.id}
           />
         )}
       </div>
