@@ -17,37 +17,6 @@ import { useUiSettings } from '@/context/UiSettingsContext';
 import { CustomerNotificationsPanel } from './CustomerNotificationsPanel';
 import waselLogo from '@assets/wasel-logo.png';
 
-// حساب حالة المتجر (مفتوح/مغلق) بناءً على الإعدادات والوقت
-function useStoreOpen(): boolean {
-  const { getSetting } = useUiSettings();
-  const storeStatus = getSetting('store_status') || 'auto';
-  const openingTime = getSetting('opening_time') || '08:00';
-  const closingTime = getSetting('closing_time') || '23:00';
-
-  const compute = (): boolean => {
-    if (storeStatus === 'open') return true;
-    if (storeStatus === 'closed') return false;
-    const now = new Date();
-    const cur = now.getHours() * 60 + now.getMinutes();
-    const toMin = (t: string) => { const [h, m] = t.split(':').map(Number); return (h || 0) * 60 + (m || 0); };
-    const open = toMin(openingTime);
-    const close = toMin(closingTime);
-    if (close > open) return cur >= open && cur < close;
-    return cur >= open || cur < close;
-  };
-
-  const [isOpen, setIsOpen] = React.useState(compute);
-
-  React.useEffect(() => {
-    setIsOpen(compute());
-    const t = setInterval(() => setIsOpen(compute()), 30000);
-    return () => clearInterval(t);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [storeStatus, openingTime, closingTime]);
-
-  return isOpen;
-}
-
 export const TopBar: React.FC = () => {
   const [, setLocation] = useLocation();
   const { state } = useCart();
@@ -57,10 +26,10 @@ export const TopBar: React.FC = () => {
   const { getSetting, loading: settingsLoading } = useUiSettings();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const isOpen = useStoreOpen();
 
   const logoUrl = getSetting('header_logo_url') || getSetting('logo_url') || waselLogo;
   const appName = getSetting('app_name') || 'واصل';
+  const appNameEn = getSetting('app_name_en') || 'WASEL';
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -109,15 +78,7 @@ export const TopBar: React.FC = () => {
             </div>
             <div className="flex flex-col leading-none">
               <span className="text-2xl font-black text-white tracking-tight">{appName}</span>
-              <div className="flex items-center gap-1.5 mt-1">
-                <span className="relative flex h-2 w-2">
-                  {isOpen && <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />}
-                  <span className={`relative inline-flex rounded-full h-2 w-2 ${isOpen ? 'bg-green-400' : 'bg-red-400'}`} />
-                </span>
-                <span className={`text-[10px] font-bold tracking-[0.2em] ${isOpen ? 'text-green-400' : 'text-red-400'}`}>
-                  {isOpen ? 'مفتوح' : 'مغلق'}
-                </span>
-              </div>
+              <span className="text-[10px] font-bold text-[#F5A623] tracking-[0.35em] mt-1">{appNameEn}</span>
             </div>
           </div>
 
@@ -200,15 +161,7 @@ export const TopBar: React.FC = () => {
               </div>
               <div className="flex flex-col leading-none">
                 <span className="text-white font-black text-base">{appName}</span>
-                <div className="flex items-center gap-1 mt-0.5">
-                  <span className="relative flex h-1.5 w-1.5">
-                    {isOpen && <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />}
-                    <span className={`relative inline-flex rounded-full h-1.5 w-1.5 ${isOpen ? 'bg-green-400' : 'bg-red-400'}`} />
-                  </span>
-                  <span className={`text-[9px] font-bold tracking-wide ${isOpen ? 'text-green-400' : 'text-red-400'}`}>
-                    {isOpen ? 'مفتوح' : 'مغلق'}
-                  </span>
-                </div>
+                <span className="text-[9px] font-bold text-[#F5A623] tracking-[0.3em] mt-0.5">{appNameEn}</span>
               </div>
             </div>
           </div>
