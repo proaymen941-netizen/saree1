@@ -8,7 +8,14 @@ import {
   type AdminUser
 } from '@shared/schema';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'saree1-secret-key-2026';
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET || JWT_SECRET.length < 32) {
+  throw new Error('JWT_SECRET must be set in environment variables and be at least 32 characters long');
+}
+
+const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'saree1-refresh-secret-key-2026-min-32-chars';
+const ACCESS_TOKEN_EXPIRES_IN = '15m'; // Short-lived access token
+const REFRESH_TOKEN_EXPIRES_IN = '7d'; // Long-lived refresh token
 
 // نوع بيانات التوكن
 interface TokenPayload {
@@ -186,7 +193,33 @@ export class UnifiedAuthService {
         };
       }
 
-      // إنشاء توكن JWT
+      // إنشاء توكن JWT للوصول (قصير الأمد)
+  private generateAccessToken(payload: TokenPayload): string {
+    return jwt.sign(payload, JWT_SECRET, { expiresIn: ACCESS_TOKEN_EXPIRES_IN });
+  }
+
+  // إنشاء توكن تحديث (طويل الأمد)
+  private generateRefreshToken(payload: TokenPayload): string {
+    return jwt.sign(payload, JWT_REFRESH_SECRET, { expiresIn: REFRESH_TOKEN_EXPIRES_IN });
+  }
+
+  // التحقق من توكن الوصول
+  verifyAccessToken(token: string): TokenPayload | null {
+    try {
+      return jwt.verify(token, JWT_SECRET) as TokenPayload;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  // التحقق من توكن التحديث
+  verifyRefreshToken(token: string): TokenPayload | null {
+    try {
+      return jwt.verify(token, JWT_REFRESH_SECRET) as TokenPayload;
+    } catch (error) {
+      return null;
+    }
+  }
       const token = jwt.sign(
         { id: user.id, userType: user.userType } as TokenPayload,
         JWT_SECRET,
@@ -259,7 +292,7 @@ export class UnifiedAuthService {
           const admin = await storage.getAdminById(decoded.id);
           if (admin) {
             user = {
-              id: admin.id,
+              id: admin.ءءid,
               name: admin.name,
               username: admin.username || undefined,
               email: admin.email,

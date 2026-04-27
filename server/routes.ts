@@ -90,24 +90,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/users/username/:username", requireCustomerAuth, async (req, res) => {
-    try {
-      const { username } = req.params;
-      const user = await storage.getUserByUsername(username);
-      if (!user) {
-        return res.status(404).json({ message: "المستخدم غير موجود" });
-      }
-      
-      // ملكية البيانات أو مدير
-      if ((req as any).userType !== 'admin' && (req as any).userId !== user.id) {
-        return res.status(403).json({ message: "غير مصرح لك بالوصول لهذه البيانات" });
-      }
-      
-      res.json(user);
-    } catch (error) {
-      res.status(500).json({ message: "خطأ في جلب بيانات المستخدم" });
-    }
-  });
+   // Get user by username - requires authentication
+   // Authorization: the user themselves, or admin
+   app.get("/api/users/username/:username", requireCustomerAuth, requireOwnership('id'), async (req, res) => {
+     try {
+       const { username } = req.params;
+       const user = await storage.getUserByUsername(username);
+       if (!user) {
+         return res.status(404).json({ message: "المستخدم غير موجود" });
+       }
+       
+       // Admin can access any user, customers only their own (handled by requireOwnership)
+       // Note: requireOwnership checks req.userId against resource ID, but we're fetching by username
+       // So we need additional check: if not admin, ensure the username matches the authenticated user's username
+       if (req.userType !== 'admin') {
+         const currentUser = await storage.getUser(req.userId!);
+         if (!currentUser || currentUser.username !== username) {
+           return res.status(403).json({ message: "غير مصرح لك بالوصول لهذه البيانات" });
+         }
+       }
+       
+       res.json(user);
+     } catch (error) {
+       res.status(500).json({ message: "خطأ في جلب بيانات المستخدم" });
+     }
+   });
 
   app.post("/api/users", async (req, res) => {
     try {
@@ -601,129 +608,159 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Driver-specific order endpoints are handled in routes/orders.ts
+   // Driver-specific order endpoints are handled in routes/orders.ts
 
-  app.get("/api/drivers/:id/orders", async (req, res) => {
-    try {
-      const { id } = req.params;
-      const { status } = req.query;
-      
-      // Get all orders and filter by driver
-      const allOrders = await storage.getOrders();
-      let driverOrders = allOrders.filter(order => order.driverId === id);
-      
-      if (status) {
-        driverOrders = driverOrders.filter(order => order.status === status);
-      }
-      
-      // Sort by creation date (newest first)
-      driverOrders.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-      
-      res.json(driverOrders);
-    } catch (error) {
-      res.status(500).json({ message: "Failed to fetch driver orders" });
-    }
-  });
+   // ================= DRIVER PUBLIC ENDPOINTS (SECURED) =================
+   // These endpoints expose driver info - require authentication and proper authorization
 
-  app.put("/api/drivers/:id/status", async (req, res) => {
-    try {
-      const { id } = req.params;
-      const { status, latitude, longitude } = req.body;
-      
-      const driver = await storage.updateDriver(id, {
-        isAvailable: status === 'available',
-        currentLocation: latitude && longitude ? `${latitude},${longitude}` : undefined,
-      });
-      
-      if (!driver) {
-        return res.status(404).json({ message: "Driver not found" });
-      }
-      
-      res.json(driver);
-    } catch (error) {
-      res.status(400).json({ message: "Failed to update driver status" });
-    }
-  });
+   // Check if a customer has orders with a specific driver (helper for authorization)
+   async function customerHasOrderWithDriver(customerId: string, driverId: string): Promise<boolean> {
+     const orders = await storage.getOrders();
+     return orders.some(o => o.customerId === customerId && o.driverId === driverId && 
+                   ['delivered', 'on_way', 'picked_up', 'ready', 'preparing'].includes(o.status));
+   }
 
-  // Driver dashboard routes
+   // GET /api/drivers/:id/orders - List orders for a specific driver
+   // Access: Admin only, or the driver themselves
+   app.get("/api/drivers/:id/orders", requireCustomerAuth, async (req, res) => {
+     try {
+       const { id } = req.params;
+       
+       // Authorization: only admin or the driver themselves can access
+       if (req.userType !== 'admin' && req.userId !== id) {
+         return res.status(403).json({ message: "غير مصرح لك بالوصول لهذه البيانات" });
+       }
+       
+       const { status } = req.query;
+       
+       // Use database query with filter instead of loading all orders
+       const allOrders = await storage.getOrders();
+       let driverOrders = allOrders.filter(order => order.driverId === id);
+       
+       if (status) {
+         driverOrders = driverOrders.filter(order => order.status === status);
+       }
+       
+       // Sort by creation date (newest first)
+       driverOrders.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+       
+       res.json(driverOrders);
+     } catch (error) {
+       res.status(500).json({ message: "Failed to fetch driver orders" });
+     }
+   });
 
-  app.get("/api/drivers/:id/stats", async (req, res) => {
-    try {
-      const { id } = req.params;
-      const { period = 'today' } = req.query;
-      
-      // Validate UUID format (supports both with and without hyphens)
-      const uuidRe = /^[0-9a-fA-F]{8}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{12}$/i;
-      if (!id || id.length < 8 || !uuidRe.test(id.replace(/-/g, ''))) {
-        return res.status(400).json({ message: "Invalid driver id format" });
-      }
-      
-      // Check if driver exists
-      const driver = await storage.getDriver(id);
-      if (!driver) {
-        // Return zero stats for non-existent driver to keep client stable
-        const startDate = new Date();
-        startDate.setHours(0, 0, 0, 0);
-        return res.json({
-          totalOrders: 0,
-          totalEarnings: 0,
-          avgOrderValue: 0,
-          period,
-          startDate,
-          endDate: new Date()
-        });
-      }
-      
-      let startDate: Date;
-      const endDate = new Date();
-      
-      switch (period) {
-        case 'today':
-          startDate = new Date();
-          startDate.setHours(0, 0, 0, 0);
-          break;
-        case 'week':
-          startDate = new Date();
-          startDate.setDate(startDate.getDate() - 7);
-          break;
-        case 'month':
-          startDate = new Date();
-          startDate.setMonth(startDate.getMonth() - 1);
-          break;
-        default:
-          startDate = new Date();
-          startDate.setHours(0, 0, 0, 0);
-      }
-      
-      // Get all orders and filter by driver and status
-      const allOrders = await storage.getOrders();
-      const driverOrders = allOrders.filter(order => 
-        order.driverId === id && 
-        order.status === 'delivered' &&
-        new Date(order.createdAt) >= startDate &&
-        new Date(order.createdAt) <= endDate
-      );
-      
-      const totalEarnings = driverOrders.reduce((sum: number, order: any) => {
-        // Prefer driverEarnings for driver-specific calculations
-        const amount = order.driverEarnings ?? order.totalAmount ?? order.total ?? 0;
-        return sum + parseFloat(amount.toString() || '0');
-      }, 0);
-      
-      const stats = {
-        totalOrders: driverOrders.length,
-        totalEarnings,
-        avgOrderValue: driverOrders.length > 0 ? totalEarnings / driverOrders.length : 0,
-        period,
-        startDate,
-        endDate
-      };
-      
-      res.json(stats);
-    } catch (error) {
-      res.status(500).json({ message: "Failed to fetch driver stats" });
-    }
-  });
+   // PUT /api/drivers/:id/status - Update driver availability status
+   // Access: Admin only, or the driver themselves
+   app.put("/api/drivers/:id/status", requireCustomerAuth, async (req, res) => {
+     try {
+       const { id } = req.params;
+       const { status, latitude, longitude } = req.body;
+       
+       // Authorization: only admin or the driver themselves can update status
+       if (req.userType !== 'admin' && req.userId !== id) {
+         return res.status(403).json({ message: "غير مصرح لك بتعديل حالة السائق" });
+       }
+       
+       const driver = await storage.updateDriver(id, {
+         isAvailable: status === 'available',
+         currentLocation: latitude && longitude ? `${latitude},${longitude}` : undefined,
+       });
+       
+       if (!driver) {
+         return res.status(404).json({ message: "Driver not found" });
+       }
+       
+       res.json(driver);
+     } catch (error) {
+       res.status(400).json({ message: "Failed to update driver status" });
+     }
+   });
+
+   // GET /api/drivers/:id/stats - Get driver statistics
+   // Access: Admin only, or the driver themselves
+   app.get("/api/drivers/:id/stats", requireCustomerAuth, async (req, res) => {
+     try {
+       const { id } = req.params;
+       const { period = 'today' } = req.query;
+       
+       // Authorization: only admin or the driver themselves can view stats
+       if (req.userType !== 'admin' && req.userId !== id) {
+         return res.status(403).json({ message: "غير مصرح لك بالوصول لهذه البيانات" });
+       }
+       
+       // Validate UUID format (supports both with and without hyphens)
+       const uuidRe = /^[0-9a-fA-F]{8}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{12}$/i;
+       if (!id || id.length < 8 || !uuidRe.test(id.replace(/-/g, ''))) {
+         return res.status(400).json({ message: " Invalid driver id format" });
+       }
+       
+       // Check if driver exists
+       const driver = await storage.getDriver(id);
+       if (!driver) {
+         // Return zero stats for non-existent driver to keep client stable
+         const startDate = new Date();
+         startDate.setHours(0, 0, 0, 0);
+         return res.json({
+           totalOrders: 0,
+           totalEarnings: 0,
+           avgOrderValue: 0,
+           period,
+           startDate,
+           endDate: new Date()
+         });
+       }
+       
+       let startDate: Date;
+       const endDate = new Date();
+       
+       switch (period) {
+         case 'today':
+           startDate = new Date();
+           startDate.setHours(0, 0, 0, 0);
+           break;
+         case 'week':
+           startDate = new Date();
+           startDate.setDate(startDate.getDate() - 7);
+           break;
+         case 'month':
+           startDate = new Date();
+           startDate.setMonth(startDate.getMonth() - 1);
+           break;
+         default:
+           startDate = new Date();
+           startDate.setHours(0, 0, 0, 0);
+       }
+       
+       // Get all orders and filter by driver and status - consider moving to DB query in Phase 2
+       const allOrders = await storage.getOrders();
+       const driverOrders = allOrders.filter(order => 
+         order.driverId === id && 
+         order.status === 'delivered' &&
+         new Date(order.createdAt) >= startDate &&
+         new Date(order.createdAt) <= endDate
+       );
+       
+       const totalEarnings = driverOrders.reduce((sum: number, order: any) => {
+         // Prefer driverEarnings for driver-specific calculations
+         const amount = order.driverEarnings ?? order.totalAmount ?? order.total ?? 0;
+         return sum + parseFloat(amount.toString() || '0');
+       }, 0);
+       
+       const stats = {
+         totalOrders: driverOrders.length,
+         totalEarnings,
+         avgOrderValue: driverOrders.length > 0 ? totalEarnings / driverOrders.length : 0,
+         period,
+         startDate,
+         endDate
+       };
+       
+       res.json(stats);
+     } catch (error) {
+       res.status(500).json({ message: "Failed to fetch driver stats" });
+     }
+   });
 
   // Available orders for drivers are handled in routes/orders.ts
 

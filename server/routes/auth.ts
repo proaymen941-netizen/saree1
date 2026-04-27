@@ -382,7 +382,7 @@ router.post('/social-login', async (req, res) => {
       });
     }
 
-    const token = user.id;
+    const token = generateToken(user.id, 'customer');
     res.json({
       success: true,
       token,
@@ -582,6 +582,79 @@ router.post('/logout', async (req, res) => {
     });
   } catch (error) {
     console.error('خطأ في تسجيل الخروج:', error);
+    res.status(500).json({
+      success: false,
+      message: 'حدث خطأ في الخادم'
+    });
+  }
+});
+
+// 🔄 Refresh Token Endpoint - Issue a new token (extend session)
+router.post('/refresh', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({
+        success: false,
+        message: 'Authorization token required'
+      });
+    }
+
+    const token = authHeader.split(' ')[1];
+
+    let decoded: any;
+    try {
+      decoded = jwt.verify(token, JWT_SECRET);
+    } catch (err: any) {
+      if (err.name === 'TokenExpiredError') {
+        return res.status(401).json({
+          success: false,
+          message: 'Token expired',
+          code: 'TOKEN_EXPIRED'
+        });
+      }
+      return res.status(403).json({
+        success: false,
+        message: 'Invalid token'
+      });
+    }
+
+    // Verify user still exists and is active in database
+    const userId = decoded.id;
+    const userType = decoded.userType;
+
+    let userExists = false;
+    if (userType === 'customer') {
+      const userResult = await dbStorage.db.select().from(users).where(eq(users.id, userId)).limit(1);
+      userExists = userResult.length > 0 && userResult[0].isActive;
+    } else if (userType === 'driver') {
+      const driverResult = await dbStorage.db.select().from(drivers).where(eq(drivers.id, userId)).limit(1);
+      userExists = driverResult.length > 0 && driverResult[0].isActive;
+    } else if (userType === 'admin') {
+      const adminResult = await dbStorage.db.select().from(adminUsers).where(eq(adminUsers.id, userId)).limit(1);
+      userExists = adminResult.length > 0 && adminResult[0].isActive;
+    }
+
+    if (!userExists) {
+      return res.status(401).json({
+        success: false,
+        message: 'User account no longer active',
+        code: 'ACCOUNT_INACTIVE'
+      });
+    }
+
+    // Issue a new token with fresh 24h expiry
+    const newToken = generateToken(userId, userType);
+
+    res.json({
+      success: true,
+      token: newToken,
+      expiresIn: '24h',
+      message: 'Token refreshed successfully'
+    });
+
+  } catch (error) {
+    console.error('خطأ في تحديث التوكن:', error);
     res.status(500).json({
       success: false,
       message: 'حدث خطأ في الخادم'

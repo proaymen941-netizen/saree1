@@ -753,46 +753,61 @@ router.put("/wasalni/:id/status", requireDriverAuth, async (req: AuthenticatedRe
 // مسارات الـ Wildcard للإدارة (يجب أن تكون في النهاية دائماً)
 // ================================================================
 
-// جلب سائق محدد بالمعرف
-router.get("/:id", async (req, res) => {
+// جلب سائق محدد بالمعرف (محمي - يتطلب توكن سائق أو مدير)
+router.get("/:id", requireDriverAuth, async (req: AuthenticatedRequest, res) => {
   try {
     const { id } = req.params;
     const driver = await storage.getDriver(id);
     if (!driver) {
-      return res.status(404).json({ message: "Driver not found" });
+      return res.status(404).json({ error: "Driver not found" });
+    }
+    // السائق يمكنه فقط رؤية بياناته الخاصة
+    if (req.driverId !== id && req.userType !== 'admin') {
+      return res.status(403).json({ error: "Access denied - can only view own data" });
     }
     res.json(driver);
   } catch (error) {
-    res.status(500).json({ message: "Failed to fetch driver" });
+    res.status(500).json({ error: "Failed to fetch driver" });
   }
 });
 
-// تحديث بيانات سائق (من لوحة التحكم)
-router.put("/:id", async (req, res) => {
+// تحديث بيانات سائق (من لوحة التحكم أو السائق نفسه)
+router.put("/:id", requireDriverAuth, async (req: AuthenticatedRequest, res) => {
   try {
     const { id } = req.params;
-    const validatedData = insertDriverSchema.partial().parse(req.body);
+    // السائق يمكنه فقط تعديل بياناته الخاصة
+    if (req.driverId !== id && req.userType !== 'admin') {
+      return res.status(403).json({ error: "Access denied - can only modify own data" });
+    }
+    const coercedData = coerceRequestData(req.body);
+    const validatedData = insertDriverSchema.partial().parse(coercedData);
     const driver = await storage.updateDriver(id, validatedData);
     if (!driver) {
-      return res.status(404).json({ message: "Driver not found" });
+      return res.status(404).json({ error: "Driver not found" });
     }
     res.json(driver);
   } catch (error) {
-    res.status(400).json({ message: "Invalid driver data" });
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({ 
+        error: "بيانات تحديث السائق غير صحيحة", 
+        details: error.errors 
+      });
+    }
+    res.status(500).json({ error: "Failed to update driver" });
   }
 });
 
-// حذف سائق
-router.delete("/:id", async (req, res) => {
+// حذف سائق (من قبل المدير فقط)
+router.delete("/:id", requireAdminAuth, async (req: AuthenticatedRequest, res) => {
   try {
     const { id } = req.params;
     const success = await storage.deleteDriver(id);
     if (!success) {
-      return res.status(404).json({ message: "Driver not found" });
+      return res.status(404).json({ error: "Driver not found" });
     }
     res.status(204).send();
   } catch (error) {
-    res.status(500).json({ message: "Failed to delete driver" });
+    res.status(500).json({ error: "Failed to delete driver" });
   }
 });
 

@@ -3,6 +3,8 @@ dotenv.config({ override: false }); // Don't override existing env vars (Replit 
 import express, { type Request, Response, NextFunction } from "express";
 import { eq } from "drizzle-orm";
 import compression from "compression";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
 import { registerRoutes } from "./routes";
 import { setupWebSockets } from "./socket";
 import { registerBroadcast } from "./broadcast";
@@ -11,6 +13,41 @@ import { seedDefaultData, ensureDefaultSettings } from "./seed";
 import { storage } from "./storage";
 
 const app = express();
+
+// Security Headers (Helmet) - protects against common web vulnerabilities
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "maps.googleapis.com", "*.google.com"],
+      styleSrc: ["'self'", "'unsafe-inline'", "fonts.googleapis.com"],
+      fontSrc: ["'self'", "fonts.gstatic.com"],
+      imgSrc: ["'self'", "data:", "https://images.unsplash.com", "*.google.com", "*.gstatic.com"],
+      connectSrc: ["'self'", "ws:", "wss:"],
+      frameSrc: ["'self'", "www.google.com", "maps.googleapis.com"],
+    },
+  },
+  hsts: {
+    maxAge: 31536000,
+    includeSubDomains: true,
+    preload: true
+  }
+}));
+
+// Rate limiting for auth endpoints to prevent brute force attacks
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // limit each IP to 5 requests per windowMs
+  message: { error: "Too many login attempts, please try again after 15 minutes" },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Apply rate limiting only to auth endpoints
+app.use("/api/auth/login", authLimiter);
+app.use("/api/auth/register", authLimiter);
+app.use("/api/auth/admin/login", authLimiter);
+app.use("/api/auth/driver/login", authLimiter);
 
 // Enable gzip compression for all responses - major performance improvement
 app.use(compression({
