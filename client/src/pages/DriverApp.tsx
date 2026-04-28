@@ -329,8 +329,11 @@ export default function DriverApp() {
   };
 
   const handleLogout = () => {
+    // إزالة كلا المفتاحين لتجنّب أي بقايا توكن قديمة
+    localStorage.removeItem('driver_token');
     localStorage.removeItem('driverToken');
     localStorage.removeItem('driverUser');
+    localStorage.removeItem('driverId');
     window.location.href = '/driver-login';
   };
 

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { 
   Shield, UserCheck, Eye, EyeOff, 
   RefreshCw, Users, Globe, Smartphone,
@@ -40,7 +40,9 @@ interface SecurityLog {
 
 export default function AdminSecurity() {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [showIps, setShowIps] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const { data: securitySettings } = useQuery<SecuritySettings>({
     queryKey: ['/api/admin/security/settings'],
@@ -50,6 +52,21 @@ export default function AdminSecurity() {
     queryKey: ['/api/admin/security/logs'],
   });
 
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['/api/admin/security/settings'] }),
+        queryClient.invalidateQueries({ queryKey: ['/api/admin/security/logs'] }),
+      ]);
+      toast({ title: 'تم تحديث إعدادات الأمان' });
+    } catch {
+      toast({ title: 'تعذّر التحديث', variant: 'destructive' });
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
   return (
     <div className="p-6 space-y-6 bg-gray-50/50 min-h-screen rtl">
       <div className="flex justify-between items-center">
@@ -57,9 +74,9 @@ export default function AdminSecurity() {
           <h1 className="text-3xl font-bold text-gray-900">الأمن والخصوصية</h1>
           <p className="text-gray-500 mt-1">إدارة إعدادات الأمان ومراقبة سجلات الوصول</p>
         </div>
-        <Button variant="outline" className="gap-2">
-          <Shield className="w-4 h-4" />
-          تحديث إعدادات الأمان
+        <Button variant="outline" className="gap-2" onClick={handleRefresh} disabled={isRefreshing} data-testid="button-refresh-security">
+          <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+          {isRefreshing ? 'جاري التحديث...' : 'تحديث إعدادات الأمان'}
         </Button>
       </div>
 

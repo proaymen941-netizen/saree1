@@ -196,14 +196,15 @@ export default function AdminFinancialReports() {
     profit: report.netProfit
   })) || [];
 
-  const categoryData = [
-    { name: 'مطاعم', value: 400 },
-    { name: 'متاجر', value: 300 },
-    { name: 'بقالات', value: 300 },
-    { name: 'صيدليات', value: 200 },
-  ];
-
   const latestReport = financialReports?.[0];
+
+  // توزيع الإيرادات الحقيقي حسب مصادر الدخل (من أحدث تقرير مالي)
+  const categoryData = latestReport ? [
+    { name: 'العمولات', value: Number(latestReport.commissionEarned) || 0 },
+    { name: 'رسوم التوصيل', value: Number(latestReport.deliveryFees) || 0 },
+    { name: 'رسوم المنصة', value: Number(latestReport.platformFees) || 0 },
+    { name: 'مدفوعات المطاعم', value: Number(latestReport.restaurantPayments) || 0 },
+  ].filter(c => c.value > 0) : [];
 
   return (
     <div className="p-6 space-y-6 bg-gray-50/50 min-h-screen rtl">
