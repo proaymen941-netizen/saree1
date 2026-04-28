@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useLocation } from 'wouter';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/context/AuthContext';
-import { useCart } from '@/contexts/CartContext';
+import { useCart } from '@/context/CartContext';
 import { ArrowRight, Package, Clock, CheckCircle, XCircle, Eye, Loader, Star, Phone, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
