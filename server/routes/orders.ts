@@ -4,7 +4,7 @@ import { calculateDeliveryFee } from "../services/deliveryFeeService";
 import { formatCurrency } from "../../shared/utils";
 import { canOrderFromRestaurant } from "../../utils/restaurantHours";
 import { randomUUID } from "crypto";
-import { requireAdminAuth } from "../utils/auth-middleware";
+import { requireAdminAuth, requireCustomerAuth, type AuthenticatedRequest } from "../utils/auth-middleware";
 
 const router = express.Router();
 
@@ -704,19 +704,31 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-// جلب الطلبات حسب العميل
-router.get("/customer/:phone", async (req, res) => {
+// جلب الطلبات حسب العميل - مصادقة + التحقق من تطابق الهاتف
+router.get("/customer/:phone", requireCustomerAuth, async (req: AuthenticatedRequest, res) => {
   try {
     const phone = req.params.phone.trim().replace(/\s+/g, '');
-    
+
     if (!phone) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         error: "رقم الهاتف مطلوب"
       });
     }
-    
+
+    // التحقق من ملكية الطلبات: المدير يمكنه الوصول، أما العميل فيجب أن يكون رقم هاتفه مطابقاً
+    if (req.userType !== 'admin') {
+      try {
+        const me = req.userId ? await storage.getUser(req.userId) : null;
+        const myPhone = (me?.phone || '').toString().trim().replace(/\s+/g, '');
+        if (!myPhone || myPhone !== phone) {
+          return res.status(403).json({ error: "غير مصرح لك بقراءة طلبات عميل آخر" });
+        }
+      } catch {
+        return res.status(403).json({ error: "غير مصرح لك بقراءة هذه البيانات" });
+      }
+    }
+
     const customerOrders = await storage.getOrdersByCustomer(phone);
-    
     res.json(customerOrders);
   } catch (error) {
     console.error("خطأ في جلب طلبات العميل:", error);

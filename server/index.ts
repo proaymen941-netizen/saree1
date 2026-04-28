@@ -1,5 +1,5 @@
-import dotenv from 'dotenv';
-dotenv.config({ override: false }); // Don't override existing env vars (Replit secrets take priority)
+// تحميل متغيرات البيئة قبل أي استيرادات أخرى (مهم بسبب رفع ES module imports)
+import 'dotenv/config';
 import express, { type Request, Response, NextFunction } from "express";
 import { eq } from "drizzle-orm";
 import compression from "compression";
@@ -15,16 +15,25 @@ import { storage } from "./storage";
 const app = express();
 
 // Security Headers (Helmet) - protects against common web vulnerabilities
+const isDev = process.env.NODE_ENV !== 'production';
+const devOrigins = isDev ? ["https://localhost", "http://localhost", "ws://localhost", "wss://localhost"] : [];
+
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "maps.googleapis.com", "*.google.com"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "maps.googleapis.com", "*.google.com"],
       styleSrc: ["'self'", "'unsafe-inline'", "fonts.googleapis.com"],
-      fontSrc: ["'self'", "fonts.gstatic.com"],
-      imgSrc: ["'self'", "data:", "https://images.unsplash.com", "*.google.com", "*.gstatic.com"],
-      connectSrc: ["'self'", "ws:", "wss:"],
+      fontSrc: ["'self'", "fonts.gstatic.com", "data:"],
+      imgSrc: ["'self'", "data:", "blob:", "https:", "*.google.com", "*.gstatic.com", "*.tile.openstreetmap.org"],
+      connectSrc: [
+        "'self'", "ws:", "wss:",
+        "https://nominatim.openstreetmap.org",
+        "https://*.tile.openstreetmap.org",
+        ...devOrigins,
+      ],
       frameSrc: ["'self'", "www.google.com", "maps.googleapis.com"],
+      workerSrc: ["'self'", "blob:"],
     },
   },
   hsts: {

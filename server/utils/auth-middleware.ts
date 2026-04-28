@@ -4,7 +4,14 @@ import { dbStorage } from '../db';
 import { drivers, adminUsers } from '@shared/schema';
 import { eq } from 'drizzle-orm';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'saree1-secret-key-2026';
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('JWT_SECRET environment variable is required in production');
+  }
+  console.warn('⚠️  JWT_SECRET غير مُعرّف — سيتم استخدام قيمة افتراضية للتطوير فقط');
+}
+const JWT_SECRET_VALUE: string = JWT_SECRET || 'dev-only-insecure-jwt-secret-do-not-use-in-prod';
 
 export interface AuthenticatedRequest extends Request {
   driverId?: string;
@@ -36,7 +43,7 @@ export async function requireAdminAuth(req: AuthenticatedRequest, res: Response,
 
     let decoded: TokenPayload;
     try {
-      decoded = jwt.verify(token, JWT_SECRET) as TokenPayload;
+      decoded = jwt.verify(token, JWT_SECRET_VALUE) as TokenPayload;
     } catch (err) {
       return res.status(401).json({
         success: false,
@@ -106,7 +113,7 @@ export async function requireDriverAuth(req: AuthenticatedRequest, res: Response
 
     let decoded: TokenPayload;
     try {
-      decoded = jwt.verify(token, JWT_SECRET) as TokenPayload;
+      decoded = jwt.verify(token, JWT_SECRET_VALUE) as TokenPayload;
     } catch (err) {
       return res.status(401).json({
         success: false,
@@ -174,7 +181,7 @@ export async function requireCustomerAuth(req: AuthenticatedRequest, res: Respon
 
     let decoded: TokenPayload;
     try {
-      decoded = jwt.verify(token, JWT_SECRET) as TokenPayload;
+      decoded = jwt.verify(token, JWT_SECRET_VALUE) as TokenPayload;
     } catch (err) {
       return res.status(401).json({
         success: false,

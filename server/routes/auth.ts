@@ -6,7 +6,11 @@ import { adminUsers, drivers, users, insertUserSchema } from '@shared/schema';
 import { eq, or, sql } from 'drizzle-orm';
 
 const router = express.Router();
-const JWT_SECRET = process.env.JWT_SECRET || 'saree1-secret-key-2026';
+const JWT_SECRET_RAW = process.env.JWT_SECRET;
+if (!JWT_SECRET_RAW && process.env.NODE_ENV === 'production') {
+  throw new Error('JWT_SECRET environment variable is required in production');
+}
+const JWT_SECRET: string = JWT_SECRET_RAW || 'dev-only-insecure-jwt-secret-do-not-use-in-prod';
 
 const generateToken = (id: string, userType: 'customer' | 'driver' | 'admin') => {
   return jwt.sign({ id, userType }, JWT_SECRET, { expiresIn: '24h' });

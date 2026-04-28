@@ -279,8 +279,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Special offer write operations are only available through /api/admin/special-offers
 
-  // Favorites Routes
-  app.get("/api/favorites/restaurants/:userId", async (req, res) => {
+  // Favorites Routes - تتطلب مصادقة العميل والتحقق من ملكية البيانات
+  app.get("/api/favorites/restaurants/:userId", requireCustomerAuth, requireOwnership('userId'), async (req, res) => {
     try {
       const { userId } = req.params;
       const favorites = await storage.getFavoriteRestaurants(userId);
@@ -290,7 +290,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/favorites/products/:userId", async (req, res) => {
+  app.get("/api/favorites/products/:userId", requireCustomerAuth, requireOwnership('userId'), async (req, res) => {
     try {
       const { userId } = req.params;
       const favorites = await storage.getFavoriteProducts(userId);
@@ -300,9 +300,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/favorites", async (req, res) => {
+  app.post("/api/favorites", requireCustomerAuth, async (req: any, res) => {
     try {
       const validatedData = insertFavoritesSchema.parse(req.body);
+      // التأكد أن العميل يضيف للمفضلة الخاصة به فقط (إلا إذا كان مديراً)
+      if (req.userType !== 'admin' && validatedData.userId !== req.userId) {
+        return res.status(403).json({ message: "غير مصرح لك بالتعديل على مفضلة عميل آخر" });
+      }
       const favorite = await storage.addToFavorites(validatedData);
       res.status(201).json(favorite);
     } catch (error) {
@@ -310,11 +314,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/favorites", async (req, res) => {
+  app.delete("/api/favorites", requireCustomerAuth, async (req: any, res) => {
     try {
       const { userId, restaurantId, menuItemId } = req.query;
       if (!userId) {
         return res.status(400).json({ message: "User ID is required" });
+      }
+      if (req.userType !== 'admin' && userId !== req.userId) {
+        return res.status(403).json({ message: "غير مصرح لك بالتعديل على مفضلة عميل آخر" });
       }
       const success = await storage.removeFromFavorites(userId as string, restaurantId as string, menuItemId as string);
       if (success) {
@@ -327,20 +334,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/favorites/check", async (req, res) => {
+  app.get("/api/favorites/check", requireCustomerAuth, async (req: any, res) => {
     try {
       const { userId, restaurantId, menuItemId } = req.query;
       if (!userId) {
         return res.status(400).json({ message: "User ID is required" });
       }
-      
+      if (req.userType !== 'admin' && userId !== req.userId) {
+        return res.status(403).json({ message: "غير مصرح لك بقراءة مفضلة عميل آخر" });
+      }
+
       let isFavorite = false;
       if (restaurantId) {
         isFavorite = await storage.isRestaurantFavorite(userId as string, restaurantId as string);
       } else if (menuItemId) {
         isFavorite = await storage.isProductFavorite(userId as string, menuItemId as string);
       }
-      
+
       res.json({ isFavorite });
     } catch (error) {
       res.status(500).json({ message: "Failed to check favorite" });
@@ -983,46 +993,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Favorites endpoints - مسارات المفضلة
-  app.get("/api/favorites/:userId", async (req, res) => {
-    try {
-      const { userId } = req.params;
-      const favorites = await storage.getFavoriteRestaurants(userId);
-      res.json(favorites);
-    } catch (error) {
-      console.error('Error fetching favorites:', error);
-      res.status(500).json({ message: 'Failed to fetch favorite restaurants' });
-    }
-  });
-
-  app.post("/api/favorites", async (req, res) => {
-    try {
-      const validatedData = insertFavoritesSchema.parse(req.body);
-      const newFavorite = await storage.addToFavorites(validatedData);
-      res.status(201).json(newFavorite);
-    } catch (error) {
-      console.error('Error adding to favorites:', error);
-      res.status(500).json({ message: 'Failed to add restaurant to favorites' });
-    }
-  });
-
-  app.delete("/api/favorites/:userId/:restaurantId", async (req, res) => {
-    try {
-      const { userId, restaurantId } = req.params;
-      const success = await storage.removeFromFavorites(userId, restaurantId);
-      
-      if (success) {
-        res.json({ message: 'Restaurant removed from favorites' });
-      } else {
-        res.status(404).json({ message: 'Favorite not found' });
-      }
-    } catch (error) {
-      console.error('Error removing from favorites:', error);
-      res.status(500).json({ message: 'Failed to remove restaurant from favorites' });
-    }
-  });
-
-  app.get("/api/favorites/check/:userId/:restaurantId", async (req, res) => {
+  // ملاحظة: مسارات /api/favorites/* المكررة تم حذفها — استخدم المسارات أعلاه التي تتطلب مصادقة
+  app.get("/api/favorites/check/:userId/:restaurantId", requireCustomerAuth, requireOwnership('userId'), async (req, res) => {
     try {
       const { userId, restaurantId } = req.params;
       const isFavorite = await storage.isRestaurantFavorite(userId, restaurantId);

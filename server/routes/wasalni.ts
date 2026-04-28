@@ -2,8 +2,22 @@ import express from "express";
 import { storage } from "../storage.js";
 import { wasalniRequests, insertWasalniRequestSchema } from "../../shared/schema.js";
 import { randomUUID } from "crypto";
+import jwt from "jsonwebtoken";
 
 const router = express.Router();
+
+// مصادقة اختيارية: إذا وجد التوكن نقرأه ونحقق منه. لا يفشل إن لم يوجد.
+const JWT_SECRET_RAW = process.env.JWT_SECRET;
+const JWT_SECRET_VALUE: string = JWT_SECRET_RAW || 'dev-only-insecure-jwt-secret-do-not-use-in-prod';
+function tryDecodeAuth(req: any) {
+  const h = req.headers.authorization;
+  if (!h || !h.startsWith('Bearer ')) return null;
+  try {
+    return jwt.verify(h.split(' ')[1], JWT_SECRET_VALUE) as { id: string; userType: string };
+  } catch {
+    return null;
+  }
+}
 
 // Get all wasalni requests (admin)
 router.get("/", async (req, res) => {
@@ -90,6 +104,17 @@ router.post("/", async (req, res) => {
 
     if (!customerName || !customerPhone || !fromAddress || !toAddress) {
       return res.status(400).json({ error: "البيانات الأساسية مطلوبة: الاسم، الهاتف، من عنوان، إلى عنوان" });
+    }
+
+    // التحقق من ملكية customerId إذا تم تمريره: لا يسمح بانتحال هوية عميل آخر
+    if (customerId) {
+      const auth = tryDecodeAuth(req);
+      if (!auth || auth.userType === 'driver') {
+        return res.status(401).json({ error: "يجب تسجيل الدخول لإنشاء طلب باسم حساب عميل" });
+      }
+      if (auth.userType !== 'admin' && auth.id !== customerId) {
+        return res.status(403).json({ error: "لا يمكنك إنشاء طلب باسم عميل آخر" });
+      }
     }
 
     const requestNumber = `WSL-${Date.now()}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
