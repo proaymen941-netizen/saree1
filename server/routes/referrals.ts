@@ -1,41 +1,32 @@
 import { Router } from "express";
-import postgres from "postgres";
-import { drizzle } from "drizzle-orm/postgres-js";
-import { referralCodes, referralUsages, loyaltyPoints, loyaltyTransactions, users } from "@shared/schema";
+import { db } from "../db";
+import { referralCodes, referralUsages, loyaltyPoints, loyaltyTransactions } from "@shared/schema";
 import { eq, desc } from "drizzle-orm";
 import { nanoid } from "nanoid";
 
 const router = Router();
 
-function getDatabase() {
-  const databaseUrl = process.env.DATABASE_URL!;
-  const client = postgres(databaseUrl, { max: 5 });
-  return drizzle(client);
-}
-
 const REFERRER_POINTS = 100;
 const REFERRED_POINTS = 50;
 
-// الحصول على رمز الإحالة للمستخدم أو إنشاؤه
 router.get("/user/:userId", async (req, res) => {
   try {
     const { userId } = req.params;
-    const ldb = getDatabase();
 
-    let [referralCode] = await ldb
+    let [referralCode] = await db
       .select()
       .from(referralCodes)
       .where(eq(referralCodes.userId, userId));
 
     if (!referralCode) {
       const code = nanoid(8).toUpperCase();
-      [referralCode] = await ldb
+      [referralCode] = await db
         .insert(referralCodes)
         .values({ userId, code, totalReferrals: 0, totalEarned: "0", isActive: true })
         .returning();
     }
 
-    const usages = await ldb
+    const usages = await db
       .select()
       .from(referralUsages)
       .where(eq(referralUsages.referrerId, userId))
@@ -53,15 +44,12 @@ router.get("/user/:userId", async (req, res) => {
   }
 });
 
-// استخدام رمز الإحالة عند التسجيل
 router.post("/use", async (req, res) => {
   try {
     const { code, newUserId } = req.body;
     if (!code || !newUserId) return res.status(400).json({ message: "البيانات مطلوبة" });
 
-    const ldb = getDatabase();
-
-    const [referralCode] = await ldb
+    const [referralCode] = await db
       .select()
       .from(referralCodes)
       .where(eq(referralCodes.code, code));
@@ -74,8 +62,7 @@ router.post("/use", async (req, res) => {
       return res.status(400).json({ message: "لا يمكنك استخدام رمز الإحالة الخاص بك" });
     }
 
-    // التحقق من عدم استخدام المستخدم لرمز إحالة من قبل
-    const existingUsage = await ldb
+    const existingUsage = await db
       .select()
       .from(referralUsages)
       .where(eq(referralUsages.referredUserId, newUserId));
@@ -84,8 +71,7 @@ router.post("/use", async (req, res) => {
       return res.status(400).json({ message: "تم استخدام رمز إحالة مسبقاً" });
     }
 
-    // تسجيل الاستخدام
-    await ldb.insert(referralUsages).values({
+    await db.insert(referralUsages).values({
       referralCodeId: referralCode.id,
       referrerId: referralCode.userId,
       referredUserId: newUserId,
@@ -93,8 +79,7 @@ router.post("/use", async (req, res) => {
       discountAwarded: "0",
     });
 
-    // تحديث إحصائيات رمز الإحالة
-    await ldb
+    await db
       .update(referralCodes)
       .set({
         totalReferrals: referralCode.totalReferrals + 1,
@@ -102,31 +87,29 @@ router.post("/use", async (req, res) => {
       })
       .where(eq(referralCodes.id, referralCode.id));
 
-    // منح النقاط للمُحيل
-    const [referrerPoints] = await ldb.select().from(loyaltyPoints).where(eq(loyaltyPoints.userId, referralCode.userId));
+    const [referrerPoints] = await db.select().from(loyaltyPoints).where(eq(loyaltyPoints.userId, referralCode.userId));
     if (referrerPoints) {
-      await ldb.update(loyaltyPoints).set({
+      await db.update(loyaltyPoints).set({
         totalPoints: referrerPoints.totalPoints + REFERRER_POINTS,
         availablePoints: referrerPoints.availablePoints + REFERRER_POINTS,
         updatedAt: new Date(),
       }).where(eq(loyaltyPoints.userId, referralCode.userId));
     } else {
-      await ldb.insert(loyaltyPoints).values({ userId: referralCode.userId, totalPoints: REFERRER_POINTS, redeemedPoints: 0, availablePoints: REFERRER_POINTS, tier: "bronze" });
+      await db.insert(loyaltyPoints).values({ userId: referralCode.userId, totalPoints: REFERRER_POINTS, redeemedPoints: 0, availablePoints: REFERRER_POINTS, tier: "bronze" });
     }
-    await ldb.insert(loyaltyTransactions).values({ userId: referralCode.userId, type: "bonus", points: REFERRER_POINTS, description: `مكافأة إحالة مستخدم جديد` });
+    await db.insert(loyaltyTransactions).values({ userId: referralCode.userId, type: "bonus", points: REFERRER_POINTS, description: "مكافأة إحالة مستخدم جديد" });
 
-    // منح النقاط للمُستجلب
-    const [newUserPoints] = await ldb.select().from(loyaltyPoints).where(eq(loyaltyPoints.userId, newUserId));
+    const [newUserPoints] = await db.select().from(loyaltyPoints).where(eq(loyaltyPoints.userId, newUserId));
     if (newUserPoints) {
-      await ldb.update(loyaltyPoints).set({
+      await db.update(loyaltyPoints).set({
         totalPoints: newUserPoints.totalPoints + REFERRED_POINTS,
         availablePoints: newUserPoints.availablePoints + REFERRED_POINTS,
         updatedAt: new Date(),
       }).where(eq(loyaltyPoints.userId, newUserId));
     } else {
-      await ldb.insert(loyaltyPoints).values({ userId: newUserId, totalPoints: REFERRED_POINTS, redeemedPoints: 0, availablePoints: REFERRED_POINTS, tier: "bronze" });
+      await db.insert(loyaltyPoints).values({ userId: newUserId, totalPoints: REFERRED_POINTS, redeemedPoints: 0, availablePoints: REFERRED_POINTS, tier: "bronze" });
     }
-    await ldb.insert(loyaltyTransactions).values({ userId: newUserId, type: "bonus", points: REFERRED_POINTS, description: `مكافأة الانضمام برمز الإحالة` });
+    await db.insert(loyaltyTransactions).values({ userId: newUserId, type: "bonus", points: REFERRED_POINTS, description: "مكافأة الانضمام برمز الإحالة" });
 
     res.json({ success: true, message: "تم تطبيق رمز الإحالة بنجاح", referrerPoints: REFERRER_POINTS, newUserPoints: REFERRED_POINTS });
   } catch (error: any) {

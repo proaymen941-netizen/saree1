@@ -125,7 +125,7 @@ router.get("/restaurants/:id/menu", async (req, res) => {
 
     res.json({
       restaurant,
-      menu: [],
+      menu: menuItems,
       allItems: menuItems
     });
   } catch (error) {

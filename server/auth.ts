@@ -30,6 +30,7 @@ export interface AuthUser {
   username?: string;
   email?: string;
   phone?: string;
+  address?: string;
   userType: 'customer' | 'driver' | 'admin';
   isActive: boolean;
 }
@@ -193,7 +194,32 @@ export class UnifiedAuthService {
         };
       }
 
-      // إنشاء توكن JWT للوصول (قصير الأمد)
+      // إنشاء توكن JWT
+      const token = jwt.sign(
+        { id: user.id, userType: user.userType } as TokenPayload,
+        JWT_SECRET,
+        { expiresIn: '24h' }
+      );
+
+      console.log('🎉 تم تسجيل الدخول بنجاح للمستخدم:', user.name);
+      
+      return { 
+        success: true, 
+        token, 
+        user,
+        message: 'تم تسجيل الدخول بنجاح' 
+      };
+
+    } catch (error) {
+      console.error('خطأ في تسجيل الدخول:', error);
+      return { 
+        success: false, 
+        message: 'حدث خطأ في الخادم' 
+      };
+    }
+  }
+
+  // إنشاء توكن JWT للوصول (قصير الأمد)
   private generateAccessToken(payload: TokenPayload): string {
     return jwt.sign(payload, JWT_SECRET, { expiresIn: ACCESS_TOKEN_EXPIRES_IN });
   }
@@ -220,29 +246,6 @@ export class UnifiedAuthService {
       return null;
     }
   }
-      const token = jwt.sign(
-        { id: user.id, userType: user.userType } as TokenPayload,
-        JWT_SECRET,
-        { expiresIn: '24h' }
-      );
-
-      console.log('🎉 تم تسجيل الدخول بنجاح للمستخدم:', user.name);
-      
-      return { 
-        success: true, 
-        token, 
-        user,
-        message: 'تم تسجيل الدخول بنجاح' 
-      };
-
-    } catch (error) {
-      console.error('خطأ في تسجيل الدخول:', error);
-      return { 
-        success: false, 
-        message: 'حدث خطأ في الخادم' 
-      };
-    }
-  }
 
   // التحقق من صحة الجلسة (JWT)
   async validateSession(token: string): Promise<{ valid: boolean; user?: AuthUser }> {
@@ -267,6 +270,7 @@ export class UnifiedAuthService {
               username: customer.username,
               email: customer.email || undefined,
               phone: customer.phone || undefined,
+              address: customer.address || undefined,
               userType: 'customer',
               isActive: customer.isActive
             };
@@ -292,7 +296,7 @@ export class UnifiedAuthService {
           const admin = await storage.getAdminById(decoded.id);
           if (admin) {
             user = {
-              id: admin.ءءid,
+              id: admin.id,
               name: admin.name,
               username: admin.username || undefined,
               email: admin.email,
