@@ -7,6 +7,7 @@ export interface AuthUser {
   username?: string;
   email?: string;
   phone?: string;
+  address?: string;
   userType: 'customer' | 'driver' | 'admin';
   isActive: boolean;
 }

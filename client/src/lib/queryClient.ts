@@ -44,13 +44,28 @@ if (typeof window !== 'undefined' && !(window as any).__authFetchPatched) {
     // Handle 401 Unauthorized globally
     if (response.status === 401) {
       console.warn('🚨 401 Unauthorized received for:', url);
-      
-      // Clear all tokens and redirect to login
-      Object.values(TOKEN_KEYS).forEach(key => localStorage.removeItem(key));
-      
-      // Only redirect if we're not already on a login page
-      if (typeof window !== 'undefined' && !url?.includes('/login')) {
-        window.location.href = '/login';
+
+      const isAdminUrl = url.includes('/api/admin/') || url.includes('/api/restaurant-accounts/') || url.includes('/api/flutter/');
+      const isDriverUrl = url.includes('/api/drivers/') && (
+        url.includes('/app/') || url.includes('/profile') || url.includes('/stats') || url.includes('/balance')
+      );
+
+      if (isAdminUrl) {
+        localStorage.removeItem(TOKEN_KEYS.admin);
+        if (typeof window !== 'undefined' && !window.location.pathname.includes('admin-login')) {
+          window.location.href = '/admin-login';
+        }
+      } else if (isDriverUrl) {
+        localStorage.removeItem(TOKEN_KEYS.driver);
+        if (typeof window !== 'undefined' && !window.location.pathname.includes('driver-login')) {
+          window.location.href = '/driver-login';
+        }
+      } else {
+        localStorage.removeItem(TOKEN_KEYS.customer);
+        const path = typeof window !== 'undefined' ? window.location.pathname : '';
+        if (typeof window !== 'undefined' && !path.includes('/auth') && !path.includes('/admin') && !path.includes('/driver')) {
+          window.location.href = '/auth';
+        }
       }
     }
 
