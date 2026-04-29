@@ -3,7 +3,6 @@ import { storage } from "../storage";
 import { insertUserSchema, insertUserAddressSchema, insertRatingSchema, type UserAddress } from "../../shared/schema";
 import { randomUUID } from "crypto";
 import { AdvancedDatabaseStorage } from "../db-advanced";
-import { requireCustomerAuth, requireOwnership, type AuthenticatedRequest } from "../utils/auth-middleware";
 
 const router = express.Router();
 
@@ -50,7 +49,7 @@ router.post("/auth", async (req, res) => {
 });
 
 // جلب ملف العميل (alias for compat with Profile.tsx)
-router.get("/:id", requireCustomerAuth, requireOwnership('id'), async (req, res) => {
+router.get("/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const customer = await storage.getUser(id);
@@ -64,7 +63,7 @@ router.get("/:id", requireCustomerAuth, requireOwnership('id'), async (req, res)
 });
 
 // جلب ملف العميل (original route)
-router.get("/:id/profile", requireCustomerAuth, requireOwnership('id'), async (req, res) => {
+router.get("/:id/profile", async (req, res) => {
   try {
     const { id } = req.params;
     
@@ -82,7 +81,7 @@ router.get("/:id/profile", requireCustomerAuth, requireOwnership('id'), async (r
 });
 
 // تحديث ملف العميل
-router.put("/:id/profile", requireCustomerAuth, requireOwnership('id'), async (req, res) => {
+router.put("/:id/profile", async (req, res) => {
   try {
     const { id } = req.params;
     const updateData = req.body;
@@ -101,7 +100,7 @@ router.put("/:id/profile", requireCustomerAuth, requireOwnership('id'), async (r
 });
 
 // جلب عناوين العميل
-router.get("/:id/addresses", requireCustomerAuth, requireOwnership('id'), async (req, res) => {
+router.get("/:id/addresses", async (req, res) => {
   try {
     const { id } = req.params;
     
@@ -122,7 +121,7 @@ router.get("/:id/addresses", requireCustomerAuth, requireOwnership('id'), async 
 });
 
 // إضافة عنوان جديد
-router.post("/:id/addresses", requireCustomerAuth, requireOwnership('id'), async (req, res) => {
+router.post("/:id/addresses", async (req, res) => {
   try {
     const { id } = req.params;
     const addressData = req.body;
@@ -150,7 +149,7 @@ router.post("/:id/addresses", requireCustomerAuth, requireOwnership('id'), async
 });
 
 // تحديث عنوان
-router.put("/:customerId/addresses/:addressId", requireCustomerAuth, requireOwnership('customerId'), async (req, res) => {
+router.put("/:customerId/addresses/:addressId", async (req, res) => {
   try {
     const { customerId, addressId } = req.params;
     const updateData = req.body;
@@ -176,7 +175,7 @@ router.put("/:customerId/addresses/:addressId", requireCustomerAuth, requireOwne
 });
 
 // حذف عنوان
-router.delete("/:customerId/addresses/:addressId", requireCustomerAuth, requireOwnership('customerId'), async (req, res) => {
+router.delete("/:customerId/addresses/:addressId", async (req, res) => {
   try {
     const { customerId, addressId } = req.params;
 
@@ -217,7 +216,7 @@ router.get("/orders/by-phone/:phone", async (req, res) => {
 });
 
 // جلب طلبات العميل
-router.get("/:id/orders", requireCustomerAuth, requireOwnership('id'), async (req, res) => {
+router.get("/:id/orders", async (req, res) => {
   try {
     const { id } = req.params;
     const { page = 1, limit = 10 } = req.query;

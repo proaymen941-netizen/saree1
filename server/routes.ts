@@ -20,7 +20,6 @@ import flutterRouter from "./routes/flutter";
 import wasalniRouter from "./routes/wasalni";
 import imageUploadRouter from "./imageUpload";
 import { ensureUploadsDir, UPLOADS_DIR } from "./localStorage";
-import { requireCustomerAuth, requireOwnership } from "./utils/auth-middleware";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 import { 
@@ -77,7 +76,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   registerAdvancedRoutes(app);
 
   // Users
-  app.get("/api/users/:id", requireCustomerAuth, requireOwnership(), async (req, res) => {
+  app.get("/api/users/:id", async (req, res) => {
     try {
       const { id } = req.params;
       const user = await storage.getUser(id);
@@ -90,31 +89,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-   // Get user by username - requires authentication
-   // Authorization: the user themselves, or admin
-   app.get("/api/users/username/:username", requireCustomerAuth, requireOwnership('id'), async (req, res) => {
-     try {
-       const { username } = req.params;
-       const user = await storage.getUserByUsername(username);
-       if (!user) {
-         return res.status(404).json({ message: "المستخدم غير موجود" });
-       }
-       
-       // Admin can access any user, customers only their own (handled by requireOwnership)
-       // Note: requireOwnership checks req.userId against resource ID, but we're fetching by username
-       // So we need additional check: if not admin, ensure the username matches the authenticated user's username
-       if (req.userType !== 'admin') {
-         const currentUser = await storage.getUser(req.userId!);
-         if (!currentUser || currentUser.username !== username) {
-           return res.status(403).json({ message: "غير مصرح لك بالوصول لهذه البيانات" });
-         }
-       }
-       
-       res.json(user);
-     } catch (error) {
-       res.status(500).json({ message: "خطأ في جلب بيانات المستخدم" });
-     }
-   });
+  app.get("/api/users/username/:username", async (req, res) => {
+    try {
+      const { username } = req.params;
+      const user = await storage.getUserByUsername(username);
+      if (!user) {
+        return res.status(404).json({ message: "المستخدم غير موجود" });
+      }
+      res.json(user);
+    } catch (error) {
+      res.status(500).json({ message: "خطأ في جلب بيانات المستخدم" });
+    }
+  });
 
   app.post("/api/users", async (req, res) => {
     try {
@@ -126,7 +112,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/users/:id", requireCustomerAuth, requireOwnership(), async (req, res) => {
+  app.put("/api/users/:id", async (req, res) => {
     try {
       const { id } = req.params;
       const validatedData = insertUserSchema.partial().parse(req.body);
@@ -279,8 +265,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Special offer write operations are only available through /api/admin/special-offers
 
-  // Favorites Routes - تتطلب مصادقة العميل والتحقق من ملكية البيانات
-  app.get("/api/favorites/restaurants/:userId", requireCustomerAuth, requireOwnership('userId'), async (req, res) => {
+  // Favorites Routes
+  app.get("/api/favorites/restaurants/:userId", async (req, res) => {
     try {
       const { userId } = req.params;
       const favorites = await storage.getFavoriteRestaurants(userId);
@@ -290,7 +276,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/favorites/products/:userId", requireCustomerAuth, requireOwnership('userId'), async (req, res) => {
+  app.get("/api/favorites/products/:userId", async (req, res) => {
     try {
       const { userId } = req.params;
       const favorites = await storage.getFavoriteProducts(userId);
@@ -300,13 +286,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/favorites", requireCustomerAuth, async (req: any, res) => {
+  app.post("/api/favorites", async (req, res) => {
     try {
       const validatedData = insertFavoritesSchema.parse(req.body);
-      // التأكد أن العميل يضيف للمفضلة الخاصة به فقط (إلا إذا كان مديراً)
-      if (req.userType !== 'admin' && validatedData.userId !== req.userId) {
-        return res.status(403).json({ message: "غير مصرح لك بالتعديل على مفضلة عميل آخر" });
-      }
       const favorite = await storage.addToFavorites(validatedData);
       res.status(201).json(favorite);
     } catch (error) {
@@ -314,14 +296,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/favorites", requireCustomerAuth, async (req: any, res) => {
+  app.delete("/api/favorites", async (req, res) => {
     try {
       const { userId, restaurantId, menuItemId } = req.query;
       if (!userId) {
         return res.status(400).json({ message: "User ID is required" });
-      }
-      if (req.userType !== 'admin' && userId !== req.userId) {
-        return res.status(403).json({ message: "غير مصرح لك بالتعديل على مفضلة عميل آخر" });
       }
       const success = await storage.removeFromFavorites(userId as string, restaurantId as string, menuItemId as string);
       if (success) {
@@ -334,23 +313,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/favorites/check", requireCustomerAuth, async (req: any, res) => {
+  app.get("/api/favorites/check", async (req, res) => {
     try {
       const { userId, restaurantId, menuItemId } = req.query;
       if (!userId) {
         return res.status(400).json({ message: "User ID is required" });
       }
-      if (req.userType !== 'admin' && userId !== req.userId) {
-        return res.status(403).json({ message: "غير مصرح لك بقراءة مفضلة عميل آخر" });
-      }
-
+      
       let isFavorite = false;
       if (restaurantId) {
         isFavorite = await storage.isRestaurantFavorite(userId as string, restaurantId as string);
       } else if (menuItemId) {
         isFavorite = await storage.isProductFavorite(userId as string, menuItemId as string);
       }
-
+      
       res.json({ isFavorite });
     } catch (error) {
       res.status(500).json({ message: "Failed to check favorite" });
@@ -618,159 +594,129 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-   // Driver-specific order endpoints are handled in routes/orders.ts
+  // Driver-specific order endpoints are handled in routes/orders.ts
 
-   // ================= DRIVER PUBLIC ENDPOINTS (SECURED) =================
-   // These endpoints expose driver info - require authentication and proper authorization
+  app.get("/api/drivers/:id/orders", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { status } = req.query;
+      
+      // Get all orders and filter by driver
+      const allOrders = await storage.getOrders();
+      let driverOrders = allOrders.filter(order => order.driverId === id);
+      
+      if (status) {
+        driverOrders = driverOrders.filter(order => order.status === status);
+      }
+      
+      // Sort by creation date (newest first)
+      driverOrders.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      
+      res.json(driverOrders);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch driver orders" });
+    }
+  });
 
-   // Check if a customer has orders with a specific driver (helper for authorization)
-   async function customerHasOrderWithDriver(customerId: string, driverId: string): Promise<boolean> {
-     const orders = await storage.getOrders();
-     return orders.some(o => o.customerId === customerId && o.driverId === driverId && 
-                   ['delivered', 'on_way', 'picked_up', 'ready', 'preparing'].includes(o.status));
-   }
+  app.put("/api/drivers/:id/status", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { status, latitude, longitude } = req.body;
+      
+      const driver = await storage.updateDriver(id, {
+        isAvailable: status === 'available',
+        currentLocation: latitude && longitude ? `${latitude},${longitude}` : undefined,
+      });
+      
+      if (!driver) {
+        return res.status(404).json({ message: "Driver not found" });
+      }
+      
+      res.json(driver);
+    } catch (error) {
+      res.status(400).json({ message: "Failed to update driver status" });
+    }
+  });
 
-   // GET /api/drivers/:id/orders - List orders for a specific driver
-   // Access: Admin only, or the driver themselves
-   app.get("/api/drivers/:id/orders", requireCustomerAuth, async (req, res) => {
-     try {
-       const { id } = req.params;
-       
-       // Authorization: only admin or the driver themselves can access
-       if (req.userType !== 'admin' && req.userId !== id) {
-         return res.status(403).json({ message: "غير مصرح لك بالوصول لهذه البيانات" });
-       }
-       
-       const { status } = req.query;
-       
-       // Use database query with filter instead of loading all orders
-       const allOrders = await storage.getOrders();
-       let driverOrders = allOrders.filter(order => order.driverId === id);
-       
-       if (status) {
-         driverOrders = driverOrders.filter(order => order.status === status);
-       }
-       
-       // Sort by creation date (newest first)
-       driverOrders.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-       
-       res.json(driverOrders);
-     } catch (error) {
-       res.status(500).json({ message: "Failed to fetch driver orders" });
-     }
-   });
+  // Driver dashboard routes
 
-   // PUT /api/drivers/:id/status - Update driver availability status
-   // Access: Admin only, or the driver themselves
-   app.put("/api/drivers/:id/status", requireCustomerAuth, async (req, res) => {
-     try {
-       const { id } = req.params;
-       const { status, latitude, longitude } = req.body;
-       
-       // Authorization: only admin or the driver themselves can update status
-       if (req.userType !== 'admin' && req.userId !== id) {
-         return res.status(403).json({ message: "غير مصرح لك بتعديل حالة السائق" });
-       }
-       
-       const driver = await storage.updateDriver(id, {
-         isAvailable: status === 'available',
-         currentLocation: latitude && longitude ? `${latitude},${longitude}` : undefined,
-       });
-       
-       if (!driver) {
-         return res.status(404).json({ message: "Driver not found" });
-       }
-       
-       res.json(driver);
-     } catch (error) {
-       res.status(400).json({ message: "Failed to update driver status" });
-     }
-   });
-
-   // GET /api/drivers/:id/stats - Get driver statistics
-   // Access: Admin only, or the driver themselves
-   app.get("/api/drivers/:id/stats", requireCustomerAuth, async (req, res) => {
-     try {
-       const { id } = req.params;
-       const { period = 'today' } = req.query;
-       
-       // Authorization: only admin or the driver themselves can view stats
-       if (req.userType !== 'admin' && req.userId !== id) {
-         return res.status(403).json({ message: "غير مصرح لك بالوصول لهذه البيانات" });
-       }
-       
-       // Validate UUID format (supports both with and without hyphens)
-       const uuidRe = /^[0-9a-fA-F]{8}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{12}$/i;
-       if (!id || id.length < 8 || !uuidRe.test(id.replace(/-/g, ''))) {
-         return res.status(400).json({ message: " Invalid driver id format" });
-       }
-       
-       // Check if driver exists
-       const driver = await storage.getDriver(id);
-       if (!driver) {
-         // Return zero stats for non-existent driver to keep client stable
-         const startDate = new Date();
-         startDate.setHours(0, 0, 0, 0);
-         return res.json({
-           totalOrders: 0,
-           totalEarnings: 0,
-           avgOrderValue: 0,
-           period,
-           startDate,
-           endDate: new Date()
-         });
-       }
-       
-       let startDate: Date;
-       const endDate = new Date();
-       
-       switch (period) {
-         case 'today':
-           startDate = new Date();
-           startDate.setHours(0, 0, 0, 0);
-           break;
-         case 'week':
-           startDate = new Date();
-           startDate.setDate(startDate.getDate() - 7);
-           break;
-         case 'month':
-           startDate = new Date();
-           startDate.setMonth(startDate.getMonth() - 1);
-           break;
-         default:
-           startDate = new Date();
-           startDate.setHours(0, 0, 0, 0);
-       }
-       
-       // Get all orders and filter by driver and status - consider moving to DB query in Phase 2
-       const allOrders = await storage.getOrders();
-       const driverOrders = allOrders.filter(order => 
-         order.driverId === id && 
-         order.status === 'delivered' &&
-         new Date(order.createdAt) >= startDate &&
-         new Date(order.createdAt) <= endDate
-       );
-       
-       const totalEarnings = driverOrders.reduce((sum: number, order: any) => {
-         // Prefer driverEarnings for driver-specific calculations
-         const amount = order.driverEarnings ?? order.totalAmount ?? order.total ?? 0;
-         return sum + parseFloat(amount.toString() || '0');
-       }, 0);
-       
-       const stats = {
-         totalOrders: driverOrders.length,
-         totalEarnings,
-         avgOrderValue: driverOrders.length > 0 ? totalEarnings / driverOrders.length : 0,
-         period,
-         startDate,
-         endDate
-       };
-       
-       res.json(stats);
-     } catch (error) {
-       res.status(500).json({ message: "Failed to fetch driver stats" });
-     }
-   });
+  app.get("/api/drivers/:id/stats", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { period = 'today' } = req.query;
+      
+      // Validate UUID format (supports both with and without hyphens)
+      const uuidRe = /^[0-9a-fA-F]{8}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{4}-?[0-9a-fA-F]{12}$/i;
+      if (!id || id.length < 8 || !uuidRe.test(id.replace(/-/g, ''))) {
+        return res.status(400).json({ message: "Invalid driver id format" });
+      }
+      
+      // Check if driver exists
+      const driver = await storage.getDriver(id);
+      if (!driver) {
+        // Return zero stats for non-existent driver to keep client stable
+        const startDate = new Date();
+        startDate.setHours(0, 0, 0, 0);
+        return res.json({
+          totalOrders: 0,
+          totalEarnings: 0,
+          avgOrderValue: 0,
+          period,
+          startDate,
+          endDate: new Date()
+        });
+      }
+      
+      let startDate: Date;
+      const endDate = new Date();
+      
+      switch (period) {
+        case 'today':
+          startDate = new Date();
+          startDate.setHours(0, 0, 0, 0);
+          break;
+        case 'week':
+          startDate = new Date();
+          startDate.setDate(startDate.getDate() - 7);
+          break;
+        case 'month':
+          startDate = new Date();
+          startDate.setMonth(startDate.getMonth() - 1);
+          break;
+        default:
+          startDate = new Date();
+          startDate.setHours(0, 0, 0, 0);
+      }
+      
+      // Get all orders and filter by driver and status
+      const allOrders = await storage.getOrders();
+      const driverOrders = allOrders.filter(order => 
+        order.driverId === id && 
+        order.status === 'delivered' &&
+        new Date(order.createdAt) >= startDate &&
+        new Date(order.createdAt) <= endDate
+      );
+      
+      const totalEarnings = driverOrders.reduce((sum: number, order: any) => {
+        // Prefer driverEarnings for driver-specific calculations
+        const amount = order.driverEarnings ?? order.totalAmount ?? order.total ?? 0;
+        return sum + parseFloat(amount.toString() || '0');
+      }, 0);
+      
+      const stats = {
+        totalOrders: driverOrders.length,
+        totalEarnings,
+        avgOrderValue: driverOrders.length > 0 ? totalEarnings / driverOrders.length : 0,
+        period,
+        startDate,
+        endDate
+      };
+      
+      res.json(stats);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch driver stats" });
+    }
+  });
 
   // Available orders for drivers are handled in routes/orders.ts
 
@@ -993,8 +939,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // ملاحظة: مسارات /api/favorites/* المكررة تم حذفها — استخدم المسارات أعلاه التي تتطلب مصادقة
-  app.get("/api/favorites/check/:userId/:restaurantId", requireCustomerAuth, requireOwnership('userId'), async (req, res) => {
+  // Favorites endpoints - مسارات المفضلة
+  app.get("/api/favorites/:userId", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const favorites = await storage.getFavoriteRestaurants(userId);
+      res.json(favorites);
+    } catch (error) {
+      console.error('Error fetching favorites:', error);
+      res.status(500).json({ message: 'Failed to fetch favorite restaurants' });
+    }
+  });
+
+  app.post("/api/favorites", async (req, res) => {
+    try {
+      const validatedData = insertFavoritesSchema.parse(req.body);
+      const newFavorite = await storage.addToFavorites(validatedData);
+      res.status(201).json(newFavorite);
+    } catch (error) {
+      console.error('Error adding to favorites:', error);
+      res.status(500).json({ message: 'Failed to add restaurant to favorites' });
+    }
+  });
+
+  app.delete("/api/favorites/:userId/:restaurantId", async (req, res) => {
+    try {
+      const { userId, restaurantId } = req.params;
+      const success = await storage.removeFromFavorites(userId, restaurantId);
+      
+      if (success) {
+        res.json({ message: 'Restaurant removed from favorites' });
+      } else {
+        res.status(404).json({ message: 'Favorite not found' });
+      }
+    } catch (error) {
+      console.error('Error removing from favorites:', error);
+      res.status(500).json({ message: 'Failed to remove restaurant from favorites' });
+    }
+  });
+
+  app.get("/api/favorites/check/:userId/:restaurantId", async (req, res) => {
     try {
       const { userId, restaurantId } = req.params;
       const isFavorite = await storage.isRestaurantFavorite(userId, restaurantId);

@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import { randomUUID } from 'crypto';
 import { storage } from './storage';
 import { 
   type InsertAdminUser, 
@@ -8,19 +8,39 @@ import {
   type AdminUser
 } from '@shared/schema';
 
-const JWT_SECRET = process.env.JWT_SECRET;
-if (!JWT_SECRET || JWT_SECRET.length < 32) {
-  throw new Error('JWT_SECRET must be set in environment variables and be at least 32 characters long');
+// نوع بيانات الجلسة
+interface SessionData {
+  adminId: string;
+  userType: string;
+  expiresAt: Date;
 }
 
-const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'saree1-refresh-secret-key-2026-min-32-chars';
-const ACCESS_TOKEN_EXPIRES_IN = '15m'; // Short-lived access token
-const REFRESH_TOKEN_EXPIRES_IN = '7d'; // Long-lived refresh token
+// نوع إدخال الجلسة
+interface InsertAdminSession {
+  adminId: string;
+  token: string;
+  userType: string;
+  expiresAt: Date;
+}
 
-// نوع بيانات التوكن
-interface TokenPayload {
-  id: string;
-  userType: 'customer' | 'driver' | 'admin';
+// مخزن الجلسات في الذاكرة
+const sessionStore = new Map<string, SessionData>();
+
+// دوال إدارة الجلسات
+function createAdminSession(data: InsertAdminSession): void {
+  sessionStore.set(data.token, {
+    adminId: data.adminId,
+    userType: data.userType,
+    expiresAt: data.expiresAt
+  });
+}
+
+function getAdminSession(token: string): SessionData | null {
+  return sessionStore.get(token) || null;
+}
+
+function deleteAdminSession(token: string): boolean {
+  return sessionStore.delete(token);
 }
 
 // نوع المستخدم الموحد للمصادقة
@@ -30,7 +50,6 @@ export interface AuthUser {
   username?: string;
   email?: string;
   phone?: string;
-  address?: string;
   userType: 'customer' | 'driver' | 'admin';
   isActive: boolean;
 }
@@ -194,12 +213,19 @@ export class UnifiedAuthService {
         };
       }
 
-      // إنشاء توكن JWT
-      const token = jwt.sign(
-        { id: user.id, userType: user.userType } as TokenPayload,
-        JWT_SECRET,
-        { expiresIn: '24h' }
-      );
+      // إنشاء الجلسة
+      const token = randomUUID();
+      const expiresAt = new Date();
+      expiresAt.setHours(expiresAt.getHours() + 24); // 24 ساعة
+
+      const sessionData: InsertAdminSession = {
+        adminId: user.id,
+        token,
+        userType: user.userType,
+        expiresAt
+      };
+
+      createAdminSession(sessionData);
 
       console.log('🎉 تم تسجيل الدخول بنجاح للمستخدم:', user.name);
       
@@ -219,50 +245,26 @@ export class UnifiedAuthService {
     }
   }
 
-  // إنشاء توكن JWT للوصول (قصير الأمد)
-  private generateAccessToken(payload: TokenPayload): string {
-    return jwt.sign(payload, JWT_SECRET, { expiresIn: ACCESS_TOKEN_EXPIRES_IN });
-  }
-
-  // إنشاء توكن تحديث (طويل الأمد)
-  private generateRefreshToken(payload: TokenPayload): string {
-    return jwt.sign(payload, JWT_REFRESH_SECRET, { expiresIn: REFRESH_TOKEN_EXPIRES_IN });
-  }
-
-  // التحقق من توكن الوصول
-  verifyAccessToken(token: string): TokenPayload | null {
-    try {
-      return jwt.verify(token, JWT_SECRET) as TokenPayload;
-    } catch (error) {
-      return null;
-    }
-  }
-
-  // التحقق من توكن التحديث
-  verifyRefreshToken(token: string): TokenPayload | null {
-    try {
-      return jwt.verify(token, JWT_REFRESH_SECRET) as TokenPayload;
-    } catch (error) {
-      return null;
-    }
-  }
-
-  // التحقق من صحة الجلسة (JWT)
+  // التحقق من صحة الجلسة
   async validateSession(token: string): Promise<{ valid: boolean; user?: AuthUser }> {
     try {
-      // التحقق من التوكن وفك تشفيره
-      const decoded = jwt.verify(token, JWT_SECRET) as TokenPayload;
-      
-      if (!decoded || !decoded.id) {
+      const session = await storage.getAdminSession(token);
+      if (!session) {
         return { valid: false };
       }
 
-      // الحصول على بيانات المستخدم حسب النوع من التوكن
+      // التحقق من انتهاء صلاحية الجلسة
+      if (new Date() > session.expiresAt) {
+        await storage.deleteAdminSession(token);
+        return { valid: false };
+      }
+
+      // الحصول على بيانات المستخدم حسب النوع
       let user: AuthUser | null = null;
       
-      switch (decoded.userType) {
+      switch (session.userType) {
         case 'customer':
-          const customer = await storage.getUserById(decoded.id);
+          const customer = await storage.getUserById(session.adminId!);
           if (customer) {
             user = {
               id: customer.id,
@@ -270,7 +272,6 @@ export class UnifiedAuthService {
               username: customer.username,
               email: customer.email || undefined,
               phone: customer.phone || undefined,
-              address: customer.address || undefined,
               userType: 'customer',
               isActive: customer.isActive
             };
@@ -278,7 +279,7 @@ export class UnifiedAuthService {
           break;
           
         case 'driver':
-          const driver = await storage.getDriverById(decoded.id);
+          const driver = await storage.getDriverById(session.adminId!);
           if (driver) {
             user = {
               id: driver.id,
@@ -293,7 +294,7 @@ export class UnifiedAuthService {
           break;
           
         case 'admin':
-          const admin = await storage.getAdminById(decoded.id);
+          const admin = await storage.getAdminById(session.adminId!);
           if (admin) {
             user = {
               id: admin.id,
@@ -320,11 +321,9 @@ export class UnifiedAuthService {
   }
 
   // تسجيل الخروج
-  async logout(_token: string): Promise<boolean> {
+  async logout(token: string): Promise<boolean> {
     try {
-      // مع JWT، يتم تسجيل الخروج عادةً في جانب العميل بحذف التوكن.
-      // يمكن إضافة قائمة سوداء (Blacklist) للتوكنات هنا مستقبلاً لزيادة الأمان.
-      return true;
+      return await storage.deleteAdminSession(token);
     } catch (error) {
       console.error('خطأ في تسجيل الخروج:', error);
       return false;

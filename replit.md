@@ -25,26 +25,6 @@ A comprehensive food delivery system supporting three user roles: Customers, Dri
 - `/shared` - Shared code (Drizzle schema, types)
 - `/drizzle` - Migration files
 
-## Comprehensive Audit Fixes (April 27, 2026 - Session 3)
-
-### Phase 1 — Security Hardening
-- **JWT_SECRET enforcement**: `server/utils/auth-middleware.ts` and `server/routes/auth.ts` now throw at startup if `JWT_SECRET` is missing in production. Removed insecure hardcoded fallback `'saree1-secret-key-2026'`.
-- **Env loading order**: Replaced `import dotenv from 'dotenv'; dotenv.config()` with `import 'dotenv/config'` in `server/index.ts` to ensure env vars load BEFORE other module imports (ES module hoisting issue).
-- **Favorites endpoints** (`server/routes.ts`): Added `requireCustomerAuth` + ownership checks to all `/api/favorites/*` routes. Removed duplicate registrations of POST/GET/DELETE that lacked auth.
-- **Customer routes** (`server/routes/customer.ts`): Added `requireCustomerAuth` + `requireOwnership('id')` to all `/api/customer/:id/*` routes (profile read/write, addresses CRUD, orders).
-- **Customer orders by phone** (`server/routes/orders.ts`): `GET /api/orders/customer/:phone` now requires auth and verifies the authenticated user's phone matches the requested phone (admins exempted).
-- **Wasalni POST** (`server/routes/wasalni.ts`): If body includes `customerId`, the request must be authenticated and the token's user id must match (or be admin). Guests can still post without `customerId`.
-- **CSP relaxation**: Added OpenStreetMap tile/Nominatim hosts and Replit cartographer dev origins to helmet CSP. Added `'unsafe-eval'` for dev tooling. Production stays restrictive.
-
-### Phase 2 — Functional Fixes
-- **Reorder feature** (`client/src/pages/OrdersPage.tsx`): `handleReorder` now actually parses order items, clears the cart, adds each item with the original quantity, and navigates to `/cart`. Wasalni orders show a friendly "not supported" toast.
-- **Admin Security refresh button** (`client/src/pages/AdminSecurity.tsx`): Wired the previously no-op "تحديث إعدادات الأمان" button to invalidate security queries with loading state and toast feedback.
-- **Admin Financial Reports** (`client/src/pages/AdminFinancialReports.tsx`): Replaced hardcoded mock `categoryData` (مطاعم/متاجر/بقالات/صيدليات) with real revenue source breakdown computed from `latestReport` (commissions, delivery fees, platform fees, restaurant payments).
-
-### Phase 3 — Integration / UX
-- **Driver token cleanup** (`client/src/pages/DriverApp.tsx`): `handleLogout` now removes both `driver_token` (canonical) and `driverToken` (legacy) plus `driverId` to prevent stale-token issues.
-- **Order cancellation toast** (`client/src/pages/driver/EnhancedDriverDashboard.tsx`): Added `order_cancelled` to the relevant WebSocket message types and a destructive toast notifying the driver of cancellation reasons.
-
 ## Driver App Audit Fixes (Session 2)
 - **EnhancedDriverDashboard.tsx**: CRITICAL fix — replaced broken `WS_MANAGER` polling with a dedicated WebSocket connection for the driver app (independent of customer WS). Driver now correctly authenticates and receives real-time notifications
 - **EnhancedDriverDashboard.tsx**: Removed `activeTab` from WebSocket `useEffect` dependency array (was causing WS reconnect on every tab switch). Used `activeTabRef` pattern instead to avoid stale closures
@@ -133,13 +113,6 @@ A comprehensive food delivery system supporting three user roles: Customers, Dri
 - Target: autoscale
 - Build: `npm run build`
 - Run: `node dist/index.js`
-
-## Replit Import Setup (April 27, 2026)
-- **Missing `helmet` and `express-rate-limit` deps**: `server/index.ts` imports `helmet` and `express-rate-limit` but they were not listed in `package.json`. This is what caused the Render deployment to crash with `ERR_MODULE_NOT_FOUND: Cannot find package 'helmet'`. Installed both packages so they are now in `dependencies` (helmet ^8.x, express-rate-limit ^8.x). This must be committed and redeployed on Render.
-- **Database schema**: `npm run db:push --force` was run against the existing Neon `DATABASE_URL` (from `.env`) to create all 54 tables. Default seed data (categories, restaurants, menu items, admin users, drivers, 73 UI settings) was then inserted automatically by `seedDefaultData()` on first server start.
-- **Workflow**: A Replit workflow named "Start application" runs `npm run dev` and binds to port 5000 (webview). The dev script sets `NODE_ENV=development` so Vite middleware is mounted (the `.env` file has `NODE_ENV=production` for Render, but `dotenv.config({ override: false })` in `server/index.ts` correctly leaves the dev-time value untouched).
-- **Deployment**: Configured for `autoscale` with build `npm run build` and start `npm run start` (the existing scripts).
-- **Vite config**: Already correct for Replit — `host: 0.0.0.0`, `port: 5000`, `allowedHosts: true`, HMR via `wss` on port 443. No changes needed.
 
 ## Latest Session Fixes (April 2026)
 - **Targeted notifications (server/socket.ts)**: New `notifyOrder(type, payload, recipients)` helper sends WebSocket events only to the specific customer (by id and phone), assigned driver, admin dashboard, and active order trackers. Replaced all global `ws.broadcast('order_update', ...)` calls in `server/routes/orders.ts`, `server/routes/wasalni.ts`, `server/routes/driver.ts`, and one in `server/routes/admin.ts` with `ws.notifyOrder(...)` so each customer only receives their own order updates.

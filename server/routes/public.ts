@@ -1,10 +1,7 @@
 import express from "express";
 import { storage } from "../storage.js";
-import { dbStorage } from "../db";
 import * as schema from "../../shared/schema.js";
 import { eq, desc, and, or, like, sql } from "drizzle-orm";
-
-const db = dbStorage.db;
 
 const router = express.Router();
 
@@ -125,7 +122,7 @@ router.get("/restaurants/:id/menu", async (req, res) => {
 
     res.json({
       restaurant,
-      menu: menuItems,
+      menu: [],
       allItems: menuItems
     });
   } catch (error) {
@@ -272,7 +269,7 @@ router.get("/orders/:id/track", async (req, res) => {
 router.get("/settings", async (req, res) => {
   try {
     const settings = await db.query.systemSettings.findMany({
-      where: eq(schema.systemSettings.isActive, true)
+      where: eq(schema.systemSettings.isPublic, true)
     });
     
     // تحويل الإعدادات إلى كائن

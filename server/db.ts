@@ -46,7 +46,7 @@ import {
   type CouponUsage, type InsertCouponUsage
 } from "@shared/schema";
 import { IStorage } from "./storage";
-import { eq, and, desc, sql, or, like, asc, inArray, isNull, gte, lte, gt, lt } from "drizzle-orm";
+import { eq, and, desc, sql, or, like, asc, inArray, isNull } from "drizzle-orm";
 
 // Database connection
 let db: ReturnType<typeof drizzle> | null = null;
@@ -167,7 +167,7 @@ export class DatabaseStorage {
   async deleteAdminUser(id: string): Promise<boolean> {
     try {
       const result = await this.db.delete(adminUsers).where(eq(adminUsers.id, id));
-      return (result.count ?? result.rowCount ?? result.length ?? 0) > 0;
+      return result.rowCount > 0;
     } catch (error) {
       console.error('Error deleting admin user:', error);
       throw error;
@@ -223,7 +223,7 @@ export class DatabaseStorage {
       await this.db.delete(notifications).where(and(eq(notifications.recipientId, id), eq(notifications.recipientType, 'customer')));
 
       const result = await this.db.delete(users).where(eq(users.id, id));
-      return (result.count ?? result.rowCount ?? result.length ?? 0) > 0;
+      return result.rowCount > 0;
     } catch (error) {
       console.error('Error deleting user:', error);
       throw error;
@@ -259,7 +259,7 @@ export class DatabaseStorage {
       await this.db.delete(specialOffers).where(eq(specialOffers.categoryId, id));
       
       const result = await this.db.delete(categories).where(eq(categories.id, id));
-      return (result.count ?? result.rowCount ?? result.length ?? 0) > 0;
+      return result.rowCount > 0;
     } catch (error) {
       console.error('Error deleting category:', error);
       throw error;
@@ -316,7 +316,7 @@ export class DatabaseStorage {
       await this.db.delete(deliveryFeeSettings).where(eq(deliveryFeeSettings.restaurantId, id));
 
       const result = await this.db.delete(restaurants).where(eq(restaurants.id, id));
-      return (result.count ?? result.rowCount ?? result.length ?? 0) > 0;
+      return result.rowCount > 0;
     } catch (error) {
       console.error('Error deleting restaurant:', error);
       throw error;
@@ -383,7 +383,7 @@ export class DatabaseStorage {
       await this.db.delete(specialOffers).where(eq(specialOffers.menuItemId, id));
       
       const result = await this.db.delete(menuItems).where(eq(menuItems.id, id));
-      return (result.count ?? result.rowCount ?? result.length ?? 0) > 0;
+      return result.rowCount > 0;
     } catch (error) {
       console.error('Error deleting menu item:', error);
       throw error;
@@ -756,7 +756,7 @@ export class DatabaseStorage {
       await this.db.delete(driverEarningsTable).where(eq(driverEarningsTable.driverId, id));
       
       const result = await this.db.delete(drivers).where(eq(drivers.id, id));
-      return (result.count ?? result.rowCount ?? result.length ?? 0) > 0;
+      return result.rowCount > 0;
     } catch (error) {
       console.error('Error deleting driver:', error);
       throw error;
@@ -786,7 +786,7 @@ export class DatabaseStorage {
 
   async deleteSpecialOffer(id: string): Promise<boolean> {
     const result = await this.db.delete(specialOffers).where(eq(specialOffers.id, id));
-    return (result.count ?? result.rowCount ?? result.length ?? 0) > 0;
+    return result.rowCount > 0;
   }
 
   // Search methods - removed duplicate methods, keeping enhanced versions below
@@ -847,7 +847,7 @@ export class DatabaseStorage {
 
   async deleteUiSetting(key: string): Promise<boolean> {
     const result = await this.db.delete(systemSettings).where(eq(systemSettings.key, key));
-    return (result.count ?? result.rowCount ?? result.length ?? 0) > 0;
+    return result.rowCount > 0;
   }
 
   // Notifications
@@ -1409,12 +1409,12 @@ async getNotifications(recipientType?: string, recipientId?: string, unread?: bo
 
   async removeFromCart(cartId: string): Promise<boolean> {
     const result = await this.db.delete(cart).where(eq(cart.id, cartId));
-    return (result.count ?? result.rowCount ?? result.length ?? 0) > 0;
+    return result.rowCount > 0;
   }
 
   async clearCart(userId: string): Promise<boolean> {
     const result = await this.db.delete(cart).where(eq(cart.userId, userId));
-    return (result.count ?? result.rowCount ?? result.length ?? 0) > 0;
+    return result.rowCount > 0;
   }
 
   // Favorites Functions - وظائف المفضلة
@@ -1479,7 +1479,7 @@ async getNotifications(recipientType?: string, recipientId?: string, unread?: bo
 
     const result = await this.db.delete(favorites)
       .where(and(...conditions));
-    return (result.count ?? result.rowCount ?? result.length ?? 0) > 0;
+    return result.rowCount > 0;
   }
 
   async isRestaurantFavorite(userId: string, restaurantId: string): Promise<boolean> {
@@ -1581,7 +1581,7 @@ async getNotifications(recipientType?: string, recipientId?: string, unread?: bo
           eq(userAddresses.userId, userId)
         )
       );
-    return (result.count ?? result.rowCount ?? result.length ?? 0) > 0;
+    return result.rowCount > 0;
   }
 
   // Ratings
@@ -1681,7 +1681,7 @@ async getNotifications(recipientType?: string, recipientId?: string, unread?: bo
     const result = await this.db.update(deliveryZones)
       .set({ isActive: false })
       .where(eq(deliveryZones.id, id));
-    return (result.count ?? result.rowCount ?? result.length ?? 0) > 0;
+    return result.rowCount > 0;
   }
 
   // Financial Reports
@@ -1729,7 +1729,7 @@ async getNotifications(recipientType?: string, recipientId?: string, unread?: bo
 
   async deleteEmployee(id: string): Promise<boolean> {
     const result = await this.db.delete(employees).where(eq(employees.id, id));
-    return (result.count ?? result.rowCount ?? result.length ?? 0) > 0;
+    return result.rowCount > 0;
   }
 
   async getAttendance(employeeId?: string, date?: Date): Promise<Attendance[]> {
@@ -2029,7 +2029,7 @@ async getNotifications(recipientType?: string, recipientId?: string, unread?: bo
 
   async deleteGeoZone(id: string): Promise<boolean> {
     const result = await this.db.delete(geoZones).where(eq(geoZones.id, id));
-    return (result.count ?? result.rowCount ?? result.length ?? 0) > 0;
+    return result.rowCount > 0;
   }
 
   // Delivery Rules methods
@@ -2054,7 +2054,7 @@ async getNotifications(recipientType?: string, recipientId?: string, unread?: bo
 
   async deleteDeliveryRule(id: string): Promise<boolean> {
     const result = await this.db.delete(deliveryRules).where(eq(deliveryRules.id, id));
-    return (result.count ?? result.rowCount ?? result.length ?? 0) > 0;
+    return result.rowCount > 0;
   }
 
   // Delivery Discounts methods
@@ -2074,7 +2074,7 @@ async getNotifications(recipientType?: string, recipientId?: string, unread?: bo
 
   async deleteDeliveryDiscount(id: string): Promise<boolean> {
     const result = await this.db.delete(deliveryDiscounts).where(eq(deliveryDiscounts.id, id));
-    return (result.count ?? result.rowCount ?? result.length ?? 0) > 0;
+    return result.rowCount > 0;
   }
 
   // طلبات السحب (النظام المتقدم)
@@ -2256,7 +2256,7 @@ async getNotifications(recipientType?: string, recipientId?: string, unread?: bo
 
   async deletePaymentGateway(id: string): Promise<boolean> {
     const result = await this.db.delete(paymentGateways).where(eq(paymentGateways.id, id));
-    return (result.count ?? result.rowCount ?? result.length ?? 0) > 0;
+    return result.rowCount > 0;
   }
 
   // Payment Methods (Saudi payment methods)
@@ -2286,7 +2286,7 @@ async getNotifications(recipientType?: string, recipientId?: string, unread?: bo
   async deletePaymentMethod(id: string): Promise<boolean> {
     await this.db.delete(paymentMethodDocuments).where(eq(paymentMethodDocuments.paymentMethodId, id));
     const result = await this.db.delete(paymentMethods).where(eq(paymentMethods.id, id));
-    return (result.count ?? result.rowCount ?? result.length ?? 0) > 0;
+    return result.rowCount > 0;
   }
 
   async getPaymentMethodDocuments(paymentMethodId: string): Promise<PaymentMethodDocument[]> {
@@ -2305,7 +2305,7 @@ async getNotifications(recipientType?: string, recipientId?: string, unread?: bo
 
   async deletePaymentMethodDocument(id: string): Promise<boolean> {
     const result = await this.db.delete(paymentMethodDocuments).where(eq(paymentMethodDocuments.id, id));
-    return (result.count ?? result.rowCount ?? result.length ?? 0) > 0;
+    return result.rowCount > 0;
   }
 
   // Coupons
@@ -2337,7 +2337,7 @@ async getNotifications(recipientType?: string, recipientId?: string, unread?: bo
 
   async deleteCoupon(id: string): Promise<boolean> {
     const result = await this.db.delete(coupons).where(eq(coupons.id, id));
-    return (result.count ?? result.rowCount ?? result.length ?? 0) > 0;
+    return result.rowCount > 0;
   }
 
   async validateCoupon(code: string, orderValue: number, userId?: string, userPhone?: string): Promise<{ valid: boolean; coupon?: Coupon; discount?: number; message?: string }> {
@@ -2373,65 +2373,6 @@ async getNotifications(recipientType?: string, recipientId?: string, unread?: bo
   }
 
   // Detailed Reports
-  async getAdminDashboardStats(): Promise<any> {
-    try {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-
-      const [
-        [restaurantsCount],
-        [ordersCount],
-        [driversCount],
-        [usersCount],
-        [todayOrdersCount],
-        [pendingOrdersCount],
-        [activeDriversCount],
-        [totalRevenueResult],
-        [todayRevenueResult],
-      ] = await Promise.all([
-        this.db.select({ count: sql<number>`count(*)::int` }).from(restaurants),
-        this.db.select({ count: sql<number>`count(*)::int` }).from(orders),
-        this.db.select({ count: sql<number>`count(*)::int` }).from(drivers),
-        this.db.select({ count: sql<number>`count(*)::int` }).from(users),
-        this.db.select({ count: sql<number>`count(*)::int` }).from(orders).where(gte(orders.createdAt, today)),
-        this.db.select({ count: sql<number>`count(*)::int` }).from(orders).where(eq(orders.status, 'pending')),
-        this.db.select({ count: sql<number>`count(*)::int` }).from(drivers).where(eq(drivers.isActive, true)),
-        this.db.select({ total: sql<number>`sum(${orders.totalAmount})::numeric` }).from(orders).where(eq(orders.status, 'delivered')),
-        this.db.select({ total: sql<number>`sum(${orders.totalAmount})::numeric` }).from(orders).where(and(eq(orders.status, 'delivered'), gte(orders.createdAt, today))),
-      ]);
-
-      const recentOrders = await this.db.select({
-        id: orders.id,
-        orderNumber: orders.orderNumber,
-        customerName: orders.customerName,
-        status: orders.status,
-        totalAmount: orders.totalAmount,
-        createdAt: orders.createdAt,
-      })
-      .from(orders)
-      .orderBy(desc(orders.createdAt))
-      .limit(10);
-
-      return {
-        stats: {
-          totalRestaurants: restaurantsCount?.count || 0,
-          totalOrders: ordersCount?.count || 0,
-          totalDrivers: driversCount?.count || 0,
-          totalCustomers: usersCount?.count || 0,
-          todayOrders: todayOrdersCount?.count || 0,
-          pendingOrders: pendingOrdersCount?.count || 0,
-          activeDrivers: activeDriversCount?.count || 0,
-          totalRevenue: parseFloat(totalRevenueResult?.total?.toString() || "0"),
-          todayRevenue: parseFloat(todayRevenueResult?.total?.toString() || "0"),
-        },
-        recentOrders
-      };
-    } catch (error) {
-      console.error("Error fetching dashboard stats:", error);
-      throw error;
-    }
-  }
-
   async getDetailedReport(filters: any): Promise<any> {
     const { type, startDate, endDate } = filters || {};
     const start = startDate ? new Date(startDate) : new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);

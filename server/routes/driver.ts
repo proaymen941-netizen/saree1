@@ -3,17 +3,17 @@ import { storage } from "../storage";
 import { z } from "zod";
 import { insertDriverSchema } from "@shared/schema";
 import { coerceRequestData } from "../utils/coercion";
-import { requireDriverAuth, requireAdminAuth, AuthenticatedRequest } from "../utils/auth-middleware";
+import { requireDriverAuth, AuthenticatedRequest } from "../utils/auth-middleware";
 import { AdvancedDatabaseStorage } from "../db-advanced";
 
 const router = express.Router();
 
 // ================================================================
-// المسارات العامة (للإدارة - تتطلب صلاحيات مدير)
+// المسارات العامة (للإدارة - لا تتطلب توكن سائق)
 // ================================================================
 
 // جلب جميع السائقين
-router.get("/", requireAdminAuth, async (req, res) => {
+router.get("/", async (req, res) => {
   try {
     const { available } = req.query;
     let drivers;
@@ -29,7 +29,7 @@ router.get("/", requireAdminAuth, async (req, res) => {
 });
 
 // إنشاء سائق جديد (من لوحة التحكم)
-router.post("/", requireAdminAuth, async (req, res) => {
+router.post("/", async (req, res) => {
   try {
     const validatedData = insertDriverSchema.parse(req.body);
     const driver = await storage.createDriver(validatedData);
@@ -63,17 +63,14 @@ router.get("/app/dashboard", requireDriverAuth, async (req: AuthenticatedRequest
       return res.status(404).json({ error: "السائق غير موجود" });
     }
 
-    const advStorage = new AdvancedDatabaseStorage(storage.db);
-
-    // تنفيذ كل الاستعلامات بالتوازي لتسريع الاستجابة
-    const [allOrders, driverBalance, driverCommissions, driverReviews] = await Promise.all([
-      storage.getOrders(),
-      storage.getDriverBalance(driverId),
-      storage.getDriverCommissions(driverId),
-      advStorage.getDriverReviews(driverId),
-    ]);
-
+    const allOrders = await storage.getOrders();
     const driverOrders = allOrders.filter(order => order.driverId === driverId);
+
+    const driverBalance = await storage.getDriverBalance(driverId);
+    const driverCommissions = await storage.getDriverCommissions(driverId);
+
+    const advStorage = new AdvancedDatabaseStorage(storage.db);
+    const driverReviews = await advStorage.getDriverReviews(driverId);
 
     const todayStr = new Date().toDateString();
 
@@ -233,32 +230,6 @@ router.post("/orders/:id/accept", requireDriverAuth, async (req: AuthenticatedRe
       });
     }
 
-    // إنشاء قيد تتبع وإشعار للعميل عند قبول السائق للطلب
-    try {
-      const acceptMessage = `قام السائق ${driver.name} بقبول طلبك`;
-      await storage.createOrderTracking({
-        orderId: id,
-        status: 'ready',
-        message: acceptMessage,
-        createdBy: driverId,
-        createdByType: 'driver',
-      });
-
-      if (order.customerId || order.customerPhone) {
-        await storage.createNotification({
-          type: 'order_accepted',
-          title: 'تم قبول طلبك',
-          message: `طلبك رقم ${order.orderNumber}: ${acceptMessage}`,
-          recipientType: 'customer',
-          recipientId: order.customerId || order.customerPhone,
-          orderId: id,
-          isRead: false,
-        });
-      }
-    } catch (trackErr) {
-      console.error('خطأ في إنشاء التتبع/الإشعار عند قبول الطلب:', trackErr);
-    }
-
     res.json({ success: true, order: updatedOrder });
   } catch (error) {
     console.error("خطأ في قبول الطلب:", error);
@@ -412,16 +383,13 @@ router.get("/stats", requireDriverAuth, async (req: AuthenticatedRequest, res) =
     const driver = await storage.getDriver(driverId);
     if (!driver) return res.status(404).json({ error: "السائق غير موجود" });
 
+    const driverBalance = await storage.getDriverBalance(driverId);
+    const driverCommissions = await storage.getDriverCommissions(driverId);
+
     const advStorage = new AdvancedDatabaseStorage(storage.db);
+    const driverReviews = await advStorage.getDriverReviews(driverId);
 
-    // تنفيذ الاستعلامات بالتوازي
-    const [driverBalance, driverCommissions, driverReviews, allOrders] = await Promise.all([
-      storage.getDriverBalance(driverId),
-      storage.getDriverCommissions(driverId),
-      advStorage.getDriverReviews(driverId),
-      storage.getOrders(),
-    ]);
-
+    const allOrders = await storage.getOrders();
     const driverOrders = allOrders.filter(order => order.driverId === driverId);
     const deliveredOrders = driverOrders.filter(order => order.status === "delivered");
 
@@ -753,61 +721,46 @@ router.put("/wasalni/:id/status", requireDriverAuth, async (req: AuthenticatedRe
 // مسارات الـ Wildcard للإدارة (يجب أن تكون في النهاية دائماً)
 // ================================================================
 
-// جلب سائق محدد بالمعرف (محمي - يتطلب توكن سائق أو مدير)
-router.get("/:id", requireDriverAuth, async (req: AuthenticatedRequest, res) => {
+// جلب سائق محدد بالمعرف
+router.get("/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const driver = await storage.getDriver(id);
     if (!driver) {
-      return res.status(404).json({ error: "Driver not found" });
-    }
-    // السائق يمكنه فقط رؤية بياناته الخاصة
-    if (req.driverId !== id && req.userType !== 'admin') {
-      return res.status(403).json({ error: "Access denied - can only view own data" });
+      return res.status(404).json({ message: "Driver not found" });
     }
     res.json(driver);
   } catch (error) {
-    res.status(500).json({ error: "Failed to fetch driver" });
+    res.status(500).json({ message: "Failed to fetch driver" });
   }
 });
 
-// تحديث بيانات سائق (من لوحة التحكم أو السائق نفسه)
-router.put("/:id", requireDriverAuth, async (req: AuthenticatedRequest, res) => {
+// تحديث بيانات سائق (من لوحة التحكم)
+router.put("/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    // السائق يمكنه فقط تعديل بياناته الخاصة
-    if (req.driverId !== id && req.userType !== 'admin') {
-      return res.status(403).json({ error: "Access denied - can only modify own data" });
-    }
-    const coercedData = coerceRequestData(req.body);
-    const validatedData = insertDriverSchema.partial().parse(coercedData);
+    const validatedData = insertDriverSchema.partial().parse(req.body);
     const driver = await storage.updateDriver(id, validatedData);
     if (!driver) {
-      return res.status(404).json({ error: "Driver not found" });
+      return res.status(404).json({ message: "Driver not found" });
     }
     res.json(driver);
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      return res.status(400).json({ 
-        error: "بيانات تحديث السائق غير صحيحة", 
-        details: error.errors 
-      });
-    }
-    res.status(500).json({ error: "Failed to update driver" });
+    res.status(400).json({ message: "Invalid driver data" });
   }
 });
 
-// حذف سائق (من قبل المدير فقط)
-router.delete("/:id", requireAdminAuth, async (req: AuthenticatedRequest, res) => {
+// حذف سائق
+router.delete("/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const success = await storage.deleteDriver(id);
     if (!success) {
-      return res.status(404).json({ error: "Driver not found" });
+      return res.status(404).json({ message: "Driver not found" });
     }
     res.status(204).send();
   } catch (error) {
-    res.status(500).json({ error: "Failed to delete driver" });
+    res.status(500).json({ message: "Failed to delete driver" });
   }
 });
 

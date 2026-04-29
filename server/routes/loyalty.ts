@@ -1,13 +1,28 @@
 import { Router } from "express";
 import { db } from "../db";
-import { loyaltyPoints, loyaltyTransactions } from "@shared/schema";
-import { eq, desc } from "drizzle-orm";
+import { loyaltyPoints, loyaltyTransactions, users } from "@shared/schema";
+import { eq, desc, sum } from "drizzle-orm";
 
 const router = Router();
 
-const POINTS_PER_ORDER_SAR = 10;
-const POINTS_REDEMPTION_VALUE = 0.05;
+function getDb() {
+  const { DatabaseStorage } = require("../db");
+  return db;
+}
 
+import postgres from "postgres";
+import { drizzle } from "drizzle-orm/postgres-js";
+
+function getDatabase() {
+  const databaseUrl = process.env.DATABASE_URL!;
+  const client = postgres(databaseUrl, { max: 5 });
+  return drizzle(client);
+}
+
+const POINTS_PER_ORDER_SAR = 10; // 10 points per SAR
+const POINTS_REDEMPTION_VALUE = 0.05; // 1 point = 0.05 SAR
+
+// حساب مستوى الولاء
 function calculateTier(totalPoints: number): string {
   if (totalPoints >= 5000) return "platinum";
   if (totalPoints >= 2000) return "gold";
@@ -15,17 +30,19 @@ function calculateTier(totalPoints: number): string {
   return "bronze";
 }
 
+// الحصول على نقاط الولاء للعميل
 router.get("/user/:userId", async (req, res) => {
   try {
     const { userId } = req.params;
+    const ldb = getDatabase();
 
-    let [pointsRecord] = await db
+    let [pointsRecord] = await ldb
       .select()
       .from(loyaltyPoints)
       .where(eq(loyaltyPoints.userId, userId));
 
     if (!pointsRecord) {
-      [pointsRecord] = await db
+      [pointsRecord] = await ldb
         .insert(loyaltyPoints)
         .values({
           userId,
@@ -37,7 +54,7 @@ router.get("/user/:userId", async (req, res) => {
         .returning();
     }
 
-    const transactions = await db
+    const transactions = await ldb
       .select()
       .from(loyaltyTransactions)
       .where(eq(loyaltyTransactions.userId, userId))
@@ -56,13 +73,15 @@ router.get("/user/:userId", async (req, res) => {
   }
 });
 
+// إضافة نقاط للعميل بعد اكتمال الطلب (يستدعى داخليًا)
 router.post("/earn", async (req, res) => {
   try {
     const { userId, orderId, orderTotal } = req.body;
+    const ldb = getDatabase();
 
     const pointsEarned = Math.floor(parseFloat(orderTotal) * POINTS_PER_ORDER_SAR);
 
-    let [pointsRecord] = await db
+    let [pointsRecord] = await ldb
       .select()
       .from(loyaltyPoints)
       .where(eq(loyaltyPoints.userId, userId));
@@ -72,7 +91,7 @@ router.post("/earn", async (req, res) => {
     const newTier = calculateTier(newTotal);
 
     if (!pointsRecord) {
-      [pointsRecord] = await db
+      [pointsRecord] = await ldb
         .insert(loyaltyPoints)
         .values({
           userId,
@@ -83,7 +102,7 @@ router.post("/earn", async (req, res) => {
         })
         .returning();
     } else {
-      [pointsRecord] = await db
+      [pointsRecord] = await ldb
         .update(loyaltyPoints)
         .set({
           totalPoints: newTotal,
@@ -95,7 +114,7 @@ router.post("/earn", async (req, res) => {
         .returning();
     }
 
-    await db.insert(loyaltyTransactions).values({
+    await ldb.insert(loyaltyTransactions).values({
       userId,
       orderId,
       type: "earned",
@@ -110,11 +129,13 @@ router.post("/earn", async (req, res) => {
   }
 });
 
+// استبدال النقاط
 router.post("/redeem", async (req, res) => {
   try {
     const { userId, pointsToRedeem } = req.body;
+    const ldb = getDatabase();
 
-    const [pointsRecord] = await db
+    const [pointsRecord] = await ldb
       .select()
       .from(loyaltyPoints)
       .where(eq(loyaltyPoints.userId, userId));
@@ -125,7 +146,7 @@ router.post("/redeem", async (req, res) => {
 
     const discountValue = (pointsToRedeem * POINTS_REDEMPTION_VALUE).toFixed(2);
 
-    await db
+    await ldb
       .update(loyaltyPoints)
       .set({
         redeemedPoints: pointsRecord.redeemedPoints + pointsToRedeem,
@@ -134,7 +155,7 @@ router.post("/redeem", async (req, res) => {
       })
       .where(eq(loyaltyPoints.userId, userId));
 
-    await db.insert(loyaltyTransactions).values({
+    await ldb.insert(loyaltyTransactions).values({
       userId,
       type: "redeemed",
       points: -pointsToRedeem,
@@ -148,31 +169,34 @@ router.post("/redeem", async (req, res) => {
   }
 });
 
+// إضافة نقاط مكافأة من الأدمن
 router.post("/admin/bonus", async (req, res) => {
   try {
     const { userId, points, reason } = req.body;
     const adminToken = req.headers.authorization?.split(' ')[1];
     if (!adminToken) return res.status(401).json({ message: "غير مصرح" });
 
-    let [pointsRecord] = await db
+    const ldb = getDatabase();
+
+    let [pointsRecord] = await ldb
       .select()
       .from(loyaltyPoints)
       .where(eq(loyaltyPoints.userId, userId));
 
     if (!pointsRecord) {
-      [pointsRecord] = await db
+      [pointsRecord] = await ldb
         .insert(loyaltyPoints)
         .values({ userId, totalPoints: points, redeemedPoints: 0, availablePoints: points, tier: calculateTier(points) })
         .returning();
     } else {
       const newTotal = pointsRecord.totalPoints + points;
-      await db
+      await ldb
         .update(loyaltyPoints)
         .set({ totalPoints: newTotal, availablePoints: pointsRecord.availablePoints + points, tier: calculateTier(newTotal), updatedAt: new Date() })
         .where(eq(loyaltyPoints.userId, userId));
     }
 
-    await db.insert(loyaltyTransactions).values({
+    await ldb.insert(loyaltyTransactions).values({
       userId,
       type: "bonus",
       points,
@@ -186,9 +210,11 @@ router.post("/admin/bonus", async (req, res) => {
   }
 });
 
+// إحصائيات الولاء للأدمن
 router.get("/admin/stats", async (req, res) => {
   try {
-    const allPoints = await db.select().from(loyaltyPoints);
+    const ldb = getDatabase();
+    const allPoints = await ldb.select().from(loyaltyPoints);
 
     const stats = {
       totalUsers: allPoints.length,

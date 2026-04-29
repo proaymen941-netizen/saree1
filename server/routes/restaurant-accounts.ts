@@ -9,14 +9,10 @@ import { AdvancedDatabaseStorage } from "../db-advanced";
 import { z } from "zod";
 import { eq, desc, and, inArray } from "drizzle-orm";
 import { orders, restaurants, restaurantWallets, withdrawalRequests } from "@shared/schema";
-import { requireAdminAuth } from "../utils/auth-middleware";
 
 const router = express.Router();
 const dbStorage = new DatabaseStorage();
 const db = dbStorage.db;
-
-// كل نقاط حسابات المطاعم محصورة بالمدير
-router.use(requireAdminAuth);
 
 function getAdvStorage() {
   return new AdvancedDatabaseStorage(db);

@@ -275,7 +275,6 @@ export interface IStorage {
   deletePaymentMethodDocument(id: string): Promise<boolean>;
 
   // Reporting
-  getAdminDashboardStats(): Promise<any>;
   getDetailedReport(filters: any): Promise<any>;
 }
 

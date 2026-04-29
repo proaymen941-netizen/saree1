@@ -4,7 +4,6 @@ import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import { deviceTokens, notifications } from "../../shared/schema.js";
 import { eq, and, gt, desc, or } from "drizzle-orm";
-import { requireAdminAuth } from "../utils/auth-middleware";
 
 const router = express.Router();
 
@@ -183,8 +182,8 @@ router.get("/notifications/poll", async (req, res) => {
 });
 
 // POST /api/flutter/notifications/send
-// لوحة التحكم ترسل إشعار مباشرة لكل أجهزة Flutter (محمي - مدير فقط)
-router.post("/notifications/send", requireAdminAuth, async (req, res) => {
+// لوحة التحكم ترسل إشعار مباشرة لكل أجهزة Flutter
+router.post("/notifications/send", async (req, res) => {
   try {
     const { title, message, type = "info", recipientType = "flutter" } = req.body;
 
@@ -215,8 +214,8 @@ router.post("/notifications/send", requireAdminAuth, async (req, res) => {
 });
 
 // POST /api/flutter/notifications/send-targeted
-// إرسال إشعار موجّه لفئة محددة (محمي - مدير فقط)
-router.post("/notifications/send-targeted", requireAdminAuth, async (req, res) => {
+// إرسال إشعار موجّه لفئة محددة
+router.post("/notifications/send-targeted", async (req, res) => {
   try {
     const { title, message, type = "info", recipientType = "all", recipientId = null } = req.body;
 

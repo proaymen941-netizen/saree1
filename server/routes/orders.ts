@@ -4,7 +4,6 @@ import { calculateDeliveryFee } from "../services/deliveryFeeService";
 import { formatCurrency } from "../../shared/utils";
 import { canOrderFromRestaurant } from "../../utils/restaurantHours";
 import { randomUUID } from "crypto";
-import { requireAdminAuth, requireCustomerAuth, type AuthenticatedRequest } from "../utils/auth-middleware";
 
 const router = express.Router();
 
@@ -511,8 +510,8 @@ router.put("/:id/assign-driver", async (req, res) => {
   }
 });
 
-// تعديل أسعار الطلب (من قبل المدير) - محمي
-router.put("/:id/prices", requireAdminAuth, async (req, res) => {
+// تعديل أسعار الطلب (من قبل المدير)
+router.put("/:id/prices", async (req, res) => {
   try {
     const { id } = req.params;
     const { items, deliveryFee, subtotal, totalAmount, priceAdjustmentNote } = req.body;
@@ -541,35 +540,6 @@ router.put("/:id/prices", requireAdminAuth, async (req, res) => {
         driverId: order.driverId,
         orderId: id,
       });
-    }
-
-    // إنشاء إشعار وقيد تتبع للعميل عند تعديل أسعار الطلب
-    try {
-      const adjMessage = priceAdjustmentNote
-        ? `تم تعديل أسعار الطلب: ${priceAdjustmentNote}`
-        : 'تم تعديل أسعار الطلب من قِبل الإدارة';
-
-      if (order.customerId || order.customerPhone) {
-        await storage.createNotification({
-          type: 'order_price_updated',
-          title: 'تعديل أسعار الطلب',
-          message: `طلبك رقم ${order.orderNumber}: ${adjMessage}`,
-          recipientType: 'customer',
-          recipientId: order.customerId || order.customerPhone,
-          orderId: id,
-          isRead: false,
-        });
-      }
-
-      await storage.createOrderTracking({
-        orderId: id,
-        status: order.status,
-        message: adjMessage,
-        createdBy: 'admin',
-        createdByType: 'admin',
-      });
-    } catch (notifyErr) {
-      console.error('خطأ في إنشاء إشعار/تتبع تعديل الأسعار:', notifyErr);
     }
 
     res.json({ success: true, order: updatedOrder });
@@ -704,31 +674,19 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-// جلب الطلبات حسب العميل - مصادقة + التحقق من تطابق الهاتف
-router.get("/customer/:phone", requireCustomerAuth, async (req: AuthenticatedRequest, res) => {
+// جلب الطلبات حسب العميل
+router.get("/customer/:phone", async (req, res) => {
   try {
     const phone = req.params.phone.trim().replace(/\s+/g, '');
-
+    
     if (!phone) {
-      return res.status(400).json({
+      return res.status(400).json({ 
         error: "رقم الهاتف مطلوب"
       });
     }
-
-    // التحقق من ملكية الطلبات: المدير يمكنه الوصول، أما العميل فيجب أن يكون رقم هاتفه مطابقاً
-    if (req.userType !== 'admin') {
-      try {
-        const me = req.userId ? await storage.getUser(req.userId) : null;
-        const myPhone = (me?.phone || '').toString().trim().replace(/\s+/g, '');
-        if (!myPhone || myPhone !== phone) {
-          return res.status(403).json({ error: "غير مصرح لك بقراءة طلبات عميل آخر" });
-        }
-      } catch {
-        return res.status(403).json({ error: "غير مصرح لك بقراءة هذه البيانات" });
-      }
-    }
-
+    
     const customerOrders = await storage.getOrdersByCustomer(phone);
+    
     res.json(customerOrders);
   } catch (error) {
     console.error("خطأ في جلب طلبات العميل:", error);
