@@ -4,6 +4,16 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { 
   BarChart3, 
   ShoppingBag, 
@@ -281,6 +291,13 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const [location, setLocation] = useLocation();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [unassignedAlert, setUnassignedAlert] = useState<{
+    orderId: string;
+    orderNumber: string;
+    customerName?: string;
+    minutes: number;
+    message: string;
+  } | null>(null);
   const navRef = useRef<HTMLDivElement>(null);
   const mobileNavRef = useRef<HTMLDivElement>(null);
   const navScrollRef = useRef(0);
@@ -335,6 +352,21 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
             queryClient.invalidateQueries({ queryKey: ['/api/notifications/customer'] });
             queryClient.invalidateQueries({ queryKey: ['/api/wasalni'] });
             queryClient.invalidateQueries({ queryKey: ['/api/admin/ui-settings'] });
+          }
+          if (msg.type === "order_unassigned_alert") {
+            const p = msg.payload || {};
+            setUnassignedAlert({
+              orderId: p.orderId,
+              orderNumber: p.orderNumber,
+              customerName: p.customerName,
+              minutes: p.minutes,
+              message: p.message || `الطلب رقم ${p.orderNumber} لم يُسند إلى سائق منذ ${p.minutes} دقيقة`,
+            });
+            try {
+              const audio = new Audio('/notification.mp3');
+              audio.play().catch(() => {});
+            } catch (_) {}
+            queryClient.invalidateQueries({ queryKey: ['/api/admin/orders'] });
           }
         } catch (_) {}
       };
@@ -639,6 +671,44 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       {showNotifications && (
         <div className="fixed inset-0 z-20" onClick={() => setShowNotifications(false)} />
       )}
+
+      <AlertDialog open={!!unassignedAlert} onOpenChange={(open) => !open && setUnassignedAlert(null)}>
+        <AlertDialogContent dir="rtl" className="max-w-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2 text-amber-600 text-lg font-black">
+              <Bell className="h-5 w-5" />
+              تنبيه: طلب بدون سائق
+            </AlertDialogTitle>
+            <AlertDialogDescription className="space-y-2 text-right">
+              <p className="text-base text-gray-800">
+                {unassignedAlert?.message}
+              </p>
+              {unassignedAlert?.customerName && (
+                <p className="text-sm text-gray-600">
+                  العميل: <span className="font-semibold">{unassignedAlert.customerName}</span>
+                </p>
+              )}
+              <p className="text-sm text-amber-700 font-medium">
+                يرجى تعيين سائق لهذا الطلب في أقرب وقت لتجنّب تأخير التوصيل.
+              </p>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="gap-2">
+            <AlertDialogCancel>تجاهل</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-primary hover:bg-primary/90"
+              onClick={() => {
+                if (unassignedAlert?.orderId) {
+                  setLocation(`/admin/orders?focus=${unassignedAlert.orderId}`);
+                }
+                setUnassignedAlert(null);
+              }}
+            >
+              فتح الطلب وتعيين سائق
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
