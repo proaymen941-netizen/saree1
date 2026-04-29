@@ -133,7 +133,7 @@ export default function EnhancedDriverDashboard({ driverId, onLogout }: Enhanced
         try {
           const message = JSON.parse(event.data);
           const relevantTypes = [
-            'order_update', 'new_order_assigned', 'order_status_changed', 'order_cancelled',
+            'order_update', 'new_order_assigned', 'order_status_changed',
             'review_received', 'NEW_NOTIFICATION', 'notifications_updated', 'settings_changed'
           ];
           if (!relevantTypes.includes(message.type)) return;
@@ -162,12 +162,6 @@ export default function EnhancedDriverDashboard({ driverId, onLogout }: Enhanced
             toast({
               title: 'تحديث حالة الطلب',
               description: `تغيرت حالة الطلب #${message.payload?.orderId?.slice(-6)} إلى ${message.payload?.status}`,
-            });
-          } else if (message.type === 'order_cancelled') {
-            toast({
-              title: '⚠️ تم إلغاء الطلب',
-              description: `تم إلغاء الطلب #${message.payload?.orderId?.slice(-6) || ''} ${message.payload?.reason ? `- السبب: ${message.payload.reason}` : ''}`,
-              variant: 'destructive',
             });
           }
         } catch (err) {
@@ -213,7 +207,7 @@ export default function EnhancedDriverDashboard({ driverId, onLogout }: Enhanced
       }
       return response.json();
     },
-    refetchInterval: 10000,
+    refetchInterval: 30000,
     enabled: !!driverToken
   });
 

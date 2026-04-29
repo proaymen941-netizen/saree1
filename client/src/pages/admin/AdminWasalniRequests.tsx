@@ -50,7 +50,6 @@ export default function AdminWasalniRequests() {
   const [cancelReason, setCancelReason] = useState('');
   const [estimatedFee, setEstimatedFee] = useState('');
   const [selectedDriverId, setSelectedDriverId] = useState<string>('');
-  const [localStatus, setLocalStatus] = useState<string>('');
 
   const { data: requests = [], isLoading } = useQuery<any[]>({
     queryKey: ['/api/wasalni'],
@@ -183,7 +182,6 @@ export default function AdminWasalniRequests() {
     setCancelReason(r.cancelReason || '');
     setEstimatedFee(r.estimatedFee || '');
     setSelectedDriverId(r.driverId || '');
-    setLocalStatus(r.status || 'pending');
     setShowDetail(true);
   };
 
@@ -451,7 +449,7 @@ export default function AdminWasalniRequests() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label className="text-[10px] font-black text-gray-400 uppercase px-2">الحالة</Label>
-                    <Select value={localStatus} onValueChange={setLocalStatus}>
+                    <Select value={selectedRequest.status} onValueChange={handleUpdateStatus}>
                       <SelectTrigger className="h-12 rounded-[1.25rem] bg-gray-50 border-gray-100 font-bold">
                         <SelectValue />
                       </SelectTrigger>
@@ -474,7 +472,7 @@ export default function AdminWasalniRequests() {
                   </div>
                 </div>
 
-                {localStatus === 'cancelled' && (
+                {selectedRequest.status === 'cancelled' && (
                   <div className="space-y-2 animate-in slide-in-from-top-2">
                     <Label className="text-[10px] font-black text-red-400 uppercase px-2">سبب الإلغاء</Label>
                     <Input
@@ -498,7 +496,7 @@ export default function AdminWasalniRequests() {
                 </div>
 
                 <Button 
-                  onClick={() => handleUpdateStatus(localStatus)}
+                  onClick={() => handleUpdateStatus(selectedRequest.status)}
                   disabled={updateMutation.isPending}
                   className="w-full h-14 bg-primary hover:opacity-90 text-white rounded-[1.5rem] font-black text-lg transition-all shadow-xl shadow-primary/20"
                 >

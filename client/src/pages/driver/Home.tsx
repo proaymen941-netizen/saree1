@@ -11,6 +11,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import type { Restaurant, Category, SpecialOffer } from '@shared/schema';
+import TimingBanner from '@/components/TimingBanner';
 import CategoryTabs from '@/components/CategoryTabs';
 
 export default function Home() {
@@ -62,6 +63,9 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Timing Banner */}
+      <TimingBanner />
+
       {/* Main Content */}
       <main className="p-4">
         {/* Category Tabs */}

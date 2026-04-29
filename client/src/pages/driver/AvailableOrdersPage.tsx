@@ -53,7 +53,7 @@ export default function AvailableOrdersPage({ driverId, onSelectOrder, onOrderAc
       const data = await response.json();
       return Array.isArray(data) ? data : [];
     },
-    refetchInterval: 10000,
+    refetchInterval: 30000,
     enabled: !!driverToken
   });
 
@@ -67,7 +67,7 @@ export default function AvailableOrdersPage({ driverId, onSelectOrder, onOrderAc
       const data = await response.json();
       return Array.isArray(data) ? data : [];
     },
-    refetchInterval: 10000,
+    refetchInterval: 30000,
     enabled: !!driverToken
   });
 

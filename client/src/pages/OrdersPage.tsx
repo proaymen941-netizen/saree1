@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useLocation } from 'wouter';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/context/AuthContext';
-import { useCart } from '@/context/CartContext';
 import { ArrowRight, Package, Clock, CheckCircle, XCircle, Eye, Loader, Star, Phone, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -64,7 +63,6 @@ export default function OrdersPage() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const { user } = useAuth();
-  const { addItem, clearCart } = useCart();
   const queryClient = useQueryClient();
   const [selectedTab, setSelectedTab] = useState<'all' | 'active' | 'completed' | 'cancelled'>('all');
   const [showRatingDialog, setShowRatingDialog] = useState(false);
@@ -153,7 +151,7 @@ export default function OrdersPage() {
       );
       return merged;
     },
-    refetchInterval: 8000,
+    refetchInterval: 30000,
     retry: 1
   });
 
@@ -206,7 +204,7 @@ export default function OrdersPage() {
 
         ws.onclose = () => {
           if (!cancelled) {
-            reconnectTimeout = setTimeout(connect, 2000);
+            reconnectTimeout = setTimeout(connect, 5000);
           }
         };
         ws.onerror = () => {
@@ -324,71 +322,10 @@ export default function OrdersPage() {
   };
 
   const handleReorder = (order: Order) => {
-    try {
-      // طلبات وصل لي ليست لها عناصر قابلة لإعادة الطلب
-      if (order._isWasalni) {
-        toast({
-          title: "تعذرت إعادة الطلب",
-          description: "طلبات وصل لي لا يمكن إعادتها من هنا",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // تحليل عناصر الطلب من السلسلة JSON
-      let parsedItems: any[] = [];
-      try {
-        parsedItems = order.parsedItems && order.parsedItems.length > 0
-          ? order.parsedItems as any[]
-          : (typeof order.items === 'string' ? JSON.parse(order.items) : (order.items as any));
-      } catch {
-        parsedItems = [];
-      }
-
-      if (!Array.isArray(parsedItems) || parsedItems.length === 0 || !order.restaurantId) {
-        toast({
-          title: "تعذرت إعادة الطلب",
-          description: "لا توجد عناصر متاحة في هذا الطلب",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // مسح السلة الحالية ثم إضافة عناصر الطلب السابق
-      clearCart();
-      const restaurantName = order.restaurantName || 'المطعم';
-      let added = 0;
-      for (const it of parsedItems) {
-        const menuItem = {
-          id: it.id || `reorder-${Date.now()}-${added}`,
-          name: it.name,
-          description: it.description || '',
-          price: String(it.price ?? 0),
-          imageUrl: it.imageUrl || '',
-          category: it.category || 'الكل',
-          isAvailable: true,
-          isSpecialOffer: false,
-          restaurantId: order.restaurantId,
-        } as any;
-        for (let q = 0; q < (Number(it.quantity) || 1); q++) {
-          addItem(menuItem, order.restaurantId, restaurantName);
-        }
-        added++;
-      }
-
-      toast({
-        title: "تمت إضافة العناصر إلى السلة",
-        description: `${added} عنصر من طلب ${order.orderNumber}`,
-      });
-      setLocation('/cart');
-    } catch (e) {
-      console.error('Reorder failed:', e);
-      toast({
-        title: "تعذرت إعادة الطلب",
-        description: "حدث خطأ غير متوقع",
-        variant: "destructive",
-      });
-    }
+    toast({
+      title: "جاري إعادة الطلب",
+      description: `سيتم إضافة عناصر طلب ${order.orderNumber} إلى السلة`,
+    });
   };
 
   const openCancelDialog = (order: Order) => {
