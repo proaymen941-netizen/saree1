@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useLocation } from 'wouter';
 import { 
   Home, 
@@ -15,7 +15,6 @@ import {
   MessageCircle,
   X,
   Globe,
-  Clock,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -46,18 +45,12 @@ export default function Layout({ children }: LayoutProps) {
   const [supportOpen, setSupportOpen] = useState(false);
   const { getSetting } = useUiSettings();
 
-  const openingTime = getSetting('opening_time') || '08:00';
-  const closingTime = getSetting('closing_time') || '23:00';
-  const storeStatus = getSetting('store_status') || 'open';
-
-  // Recompute status every 30s so the bar stays accurate without a manual reload
-  const [, setStatusTick] = useState(0);
-  useEffect(() => {
-    const id = setInterval(() => setStatusTick((n) => n + 1), 30000);
-    return () => clearInterval(id);
-  }, []);
-
-  const appStatus = getAppStatus(openingTime, closingTime, storeStatus);
+  const appStatus = (() => {
+    const openingTime = getSetting('opening_time') || '08:00';
+    const closingTime = getSetting('closing_time') || '23:00';
+    const storeStatus = getSetting('store_status') || 'open';
+    return getAppStatus(openingTime, closingTime, storeStatus);
+  })();
 
   const getS = (key: string, defaultValue: string) => getSetting(key) || defaultValue;
 
@@ -196,50 +189,6 @@ export default function Layout({ children }: LayoutProps) {
               </div>
               {language === 'ar' ? <ChevronLeft className="h-4 w-4 text-slate-300" /> : <ChevronRight className="h-4 w-4 text-slate-300" />}
             </button>
-          </div>
-
-          {/* App Status Bar (real-time open/closed + hours) */}
-          <div className="px-5 mt-4">
-            <div className={`relative overflow-hidden rounded-2xl p-3 border ${
-              appStatus.isOpen
-                ? 'bg-gradient-to-l from-emerald-50 to-white border-emerald-200'
-                : 'bg-gradient-to-l from-rose-50 to-white border-rose-200'
-            }`} data-testid="sidebar-app-status">
-              <div className="flex items-center gap-3">
-                <div className={`relative w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                  appStatus.isOpen ? 'bg-emerald-500' : 'bg-rose-500'
-                }`}>
-                  {appStatus.isOpen && (
-                    <span className="absolute inset-0 rounded-xl bg-emerald-400 animate-ping opacity-40" />
-                  )}
-                  <Clock className="relative h-5 w-5 text-white" />
-                </div>
-                <div className="flex-1 text-right min-w-0">
-                  <div className="flex items-center gap-2 justify-end">
-                    <span className={`text-sm font-black ${
-                      appStatus.isOpen ? 'text-emerald-700' : 'text-rose-700'
-                    }`}>
-                      {appStatus.isOpen
-                        ? (language === 'ar' ? 'التطبيق مفتوح' : 'App Open')
-                        : (language === 'ar' ? 'التطبيق مغلق' : 'App Closed')}
-                    </span>
-                    <span className={`relative flex h-2 w-2`}>
-                      <span className={`absolute inline-flex h-full w-full rounded-full opacity-75 ${
-                        appStatus.isOpen ? 'bg-emerald-400 animate-ping' : 'bg-rose-400'
-                      }`} />
-                      <span className={`relative inline-flex h-2 w-2 rounded-full ${
-                        appStatus.isOpen ? 'bg-emerald-500' : 'bg-rose-500'
-                      }`} />
-                    </span>
-                  </div>
-                  <p className="text-[11px] font-bold text-slate-500 mt-0.5 truncate">
-                    {language === 'ar'
-                      ? `الفتح ${openingTime} • الإغلاق ${closingTime}`
-                      : `Opens ${openingTime} • Closes ${closingTime}`}
-                  </p>
-                </div>
-              </div>
-            </div>
           </div>
 
           {/* Menu Items */}

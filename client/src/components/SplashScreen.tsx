@@ -10,8 +10,8 @@ interface SplashScreenProps {
   onFinish: () => void;
 }
 
-const MIN_SPLASH_MS = 600;
-const MAX_BOOTSTRAP_MS = 3000;
+const MIN_SPLASH_MS = 1400;
+const MAX_BOOTSTRAP_MS = 6000;
 
 const PARTICLE_COUNT = 22;
 const TWINKLE_COUNT = 14;
