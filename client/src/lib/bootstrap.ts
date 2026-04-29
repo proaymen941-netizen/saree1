@@ -56,7 +56,7 @@ export function prefetchBootstrap(
   bootstrapPromise = (async () => {
     try {
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 5000);
+      const timeout = setTimeout(() => controller.abort(), 8000);
       const res = await fetch(url, { signal: controller.signal, credentials: 'include' });
       clearTimeout(timeout);
       if (!res.ok) throw new Error(`bootstrap http ${res.status}`);

@@ -57,8 +57,7 @@ export function UiSettingsProvider({ children }: { children: React.ReactNode }) 
 
   const loadSettings = useCallback(async (isInitial = false) => {
     try {
-      // Public endpoint — works for customers (no admin auth required)
-      const response = await fetch('/api/ui-settings');
+      const response = await fetch('/api/admin/ui-settings');
       if (response.ok) {
         const settingsData: UiSetting[] = await response.json();
         const settingsMap = settingsData.reduce((acc, setting) => {

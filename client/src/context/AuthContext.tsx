@@ -7,7 +7,6 @@ export interface AuthUser {
   username?: string;
   email?: string;
   phone?: string;
-  address?: string;
   userType: 'customer' | 'driver' | 'admin';
   isActive: boolean;
 }
@@ -92,52 +91,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-   // Token refresh logic - refresh token before expiry (every 23 hours)
-   useEffect(() => {
-     if (!authState.token) return;
-
-     // Refresh token every 23 hours (before 24h expiry)
-     const refreshInterval = setInterval(async () => {
-       try {
-         const response = await fetch('/api/auth/refresh', {
-           method: 'POST',
-           headers: {
-             'Content-Type': 'application/json',
-             'Authorization': `Bearer ${authState.token}`,
-           },
-         });
-         
-         if (response.ok) {
-           const data = await response.json();
-           if (data.success && data.token) {
-             localStorage.setItem('auth_token', data.token);
-             setAuthState(prev => ({ ...prev, token: data.token }));
-             console.log('✅ Token refreshed successfully');
-           }
-         } else {
-           // Token refresh failed, clear auth state
-           console.warn('⚠️ Token refresh failed, logging out');
-           clearAuthState();
-         }
-       } catch (error) {
-         console.error('Token refresh error:', error);
-         clearAuthState();
-       }
-     }, 23 * 60 * 60 * 1000); // 23 hours
-
-     return () => clearInterval(refreshInterval);
-   }, [authState.token]);
-
-   // Clear auth state helper
-   const clearAuthState = () => {
-     localStorage.removeItem('auth_token');
-     setAuthState({
-       isAuthenticated: false,
-       user: null,
-       token: null,
-       loading: false,
-     });
-   };
+  const clearAuthState = () => {
+    localStorage.removeItem('auth_token');
+    setAuthState({
+      isAuthenticated: false,
+      user: null,
+      token: null,
+      loading: false,
+    });
+  };
 
   const login = async (
     identifier: string, 
