@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 dotenv.config({ override: false }); // Don't override existing env vars (Replit secrets take priority)
 import express, { type Request, Response, NextFunction } from "express";
-import { eq } from "drizzle-orm";
+import { eq, lt, inArray, and } from "drizzle-orm";
 import compression from "compression";
 import { registerRoutes } from "./routes";
 import { setupWebSockets } from "./socket";
@@ -200,6 +200,150 @@ app.use((req, res, next) => {
           } catch (e) { console.error(`خطأ في تفعيل طلب وصل لي ${request.id}:`, e); }
         }
       } catch (e) { console.error('خطأ في مؤقت الطلبات المجدولة:', e); }
+
+      // ===== تنبيه الطلبات التي مرّ عليها 15 دقيقة دون تعيين سائق =====
+      try {
+        const allOrdersForAlert = await storage.getOrders();
+        const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000);
+        const alertedMap: Map<string, number> = ((globalThis as any).__unassignedAlerts ||= new Map());
+        // تنظيف العناصر القديمة (أقدم من 24 ساعة)
+        const dayAgo = Date.now() - 24 * 60 * 60 * 1000;
+        for (const [k, v] of alertedMap) if (v < dayAgo) alertedMap.delete(k);
+
+        const stale = allOrdersForAlert.filter((o: any) => {
+          if (o.driverId) return false;
+          const status = String(o.status || '').toLowerCase();
+          if (!['pending', 'confirmed', 'preparing', 'ready'].includes(status)) return false;
+          const createdAt = o.createdAt ? new Date(o.createdAt) : null;
+          if (!createdAt || isNaN(createdAt.getTime())) return false;
+          if (createdAt > fifteenMinutesAgo) return false;
+          // لا تنبّه أكثر من مرة لنفس الطلب خلال نفس الساعة
+          const lastAlerted = alertedMap.get(o.id);
+          if (lastAlerted && (Date.now() - lastAlerted) < 60 * 60 * 1000) return false;
+          return true;
+        });
+
+        if (stale.length > 0) {
+          const wsServer = app.get('ws');
+          for (const order of stale) {
+            alertedMap.set((order as any).id, Date.now());
+            const minutes = Math.floor((Date.now() - new Date((order as any).createdAt).getTime()) / 60000);
+            const message = `الطلب رقم ${(order as any).orderNumber} لم يُسند إلى سائق منذ ${minutes} دقيقة`;
+            try {
+              await storage.createNotification({
+                type: 'order_unassigned_alert',
+                title: '⚠️ طلب بدون سائق',
+                message,
+                recipientType: 'admin',
+                recipientId: null,
+                orderId: (order as any).id,
+                isRead: false,
+              });
+            } catch (e) { console.error('خطأ في إنشاء إشعار الإسناد المتأخر:', e); }
+            if (wsServer && typeof wsServer.sendToAdmin === 'function') {
+              wsServer.sendToAdmin('order_unassigned_alert', {
+                orderId: (order as any).id,
+                orderNumber: (order as any).orderNumber,
+                customerName: (order as any).customerName,
+                minutes,
+                message,
+              });
+            }
+          }
+        }
+      } catch (e) { console.error('خطأ في تنبيه الطلبات غير المُسندة:', e); }
+
+      // ===== تنظيف دوري كل ساعة: حذف الإشعارات > 24 ساعة والطلبات المنتهية > يومين =====
+      try {
+        const counterKey = '__cleanupCounter';
+        const counter: number = ((globalThis as any)[counterKey] || 0) + 1;
+        (globalThis as any)[counterKey] = counter;
+        // 60 = كل ساعة (لأن المؤقت يعمل كل دقيقة). نُشغّل التنظيف عند بدء التشغيل ثم كل ساعة.
+        const shouldRun = counter === 1 || counter % 60 === 0;
+        if (shouldRun && (storage as any).db) {
+          const db = (storage as any).db;
+          const schema = await import("../shared/schema");
+          const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+          const twoDaysAgo = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000);
+
+          // ---- 1) حذف الإشعارات الأقدم من 24 ساعة ----
+          try {
+            const deletedNotifs = await db
+              .delete(schema.notifications)
+              .where(lt(schema.notifications.createdAt, oneDayAgo))
+              .returning({ id: schema.notifications.id });
+            if (deletedNotifs?.length) log(`🧹 تم حذف ${deletedNotifs.length} إشعاراً قديماً (>24 ساعة)`);
+          } catch (e) { console.error('خطأ في حذف الإشعارات القديمة:', e); }
+
+          // ---- 2) حذف الطلبات المنتهية الأقدم من يومين (وكل سجلاتها المرتبطة) ----
+          try {
+            const TERMINAL = ['delivered', 'cancelled', 'refunded', 'rejected', 'completed'];
+            const oldOrders = await db
+              .select({ id: schema.orders.id })
+              .from(schema.orders)
+              .where(and(
+                lt(schema.orders.createdAt, twoDaysAgo),
+                inArray(schema.orders.status, TERMINAL),
+              ));
+
+            if (oldOrders.length > 0) {
+              const oldIds = oldOrders.map((o: any) => o.id);
+
+              // حذف السجلات التابعة بالترتيب الآمن (FKs تشير إلى orders.id)
+              const childTables: any[] = [
+                schema.orderTracking,
+                schema.ratings,
+                schema.driverReviews,
+                schema.driverCommissions,
+                schema.walletTransactions,
+                schema.loyaltyTransactions,
+                schema.supportTickets,
+                schema.messages,
+                schema.couponUsages,
+              ].filter(Boolean);
+
+              for (const tbl of childTables) {
+                try {
+                  await db.delete(tbl).where(inArray((tbl as any).orderId, oldIds));
+                } catch (e) {
+                  console.error(`خطأ في حذف سجلات تابعة من جدول ${(tbl as any)[Symbol.for('drizzle:Name')] || ''}:`, e);
+                }
+              }
+
+              // حذف إشعارات الطلبات (لا توجد علاقة FK لكن نُنظّفها يدوياً)
+              try {
+                await db.delete(schema.notifications).where(inArray(schema.notifications.orderId, oldIds));
+              } catch (_) {}
+
+              // حذف الطلبات نفسها
+              try {
+                const deletedOrders = await db
+                  .delete(schema.orders)
+                  .where(inArray(schema.orders.id, oldIds))
+                  .returning({ id: schema.orders.id });
+                if (deletedOrders?.length) log(`🧹 تم حذف ${deletedOrders.length} طلب منتهي قديم (>يومين)`);
+              } catch (e) {
+                console.error('فشل حذف الطلبات القديمة (قد يكون بسبب علاقة لم تُحذف):', e);
+              }
+            }
+          } catch (e) { console.error('خطأ في حذف الطلبات القديمة:', e); }
+
+          // ---- 3) حذف طلبات وصل لي المنتهية الأقدم من يومين ----
+          try {
+            if (schema.wasalniRequests) {
+              const TERMINAL_WASALNI = ['delivered', 'cancelled', 'completed', 'rejected'];
+              const deletedWasalni = await db
+                .delete(schema.wasalniRequests)
+                .where(and(
+                  lt(schema.wasalniRequests.createdAt, twoDaysAgo),
+                  inArray(schema.wasalniRequests.status, TERMINAL_WASALNI),
+                ))
+                .returning({ id: schema.wasalniRequests.id });
+              if (deletedWasalni?.length) log(`🧹 تم حذف ${deletedWasalni.length} طلب "وصل لي" منتهي قديم`);
+            }
+          } catch (e) { console.error('خطأ في حذف طلبات وصل لي القديمة:', e); }
+        }
+      } catch (e) { console.error('خطأ في مهمة التنظيف الدورية:', e); }
     }, 60 * 1000);
     log('⏰ تم تشغيل مؤقت الطلبات المجدولة');
 

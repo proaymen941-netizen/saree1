@@ -68,7 +68,7 @@ export function coerceRequestData(data: any) {
   });
   
   // Convert optional text/UUID fields to undefined instead of null
-  const optionalTextFields = ['categoryId', 'temporaryCloseReason', 'address', 'restaurantId'];
+  const optionalTextFields = ['categoryId', 'temporaryCloseReason', 'address', 'restaurantId', 'sectionId', 'menuItemId'];
   optionalTextFields.forEach(field => {
     if (coerced[field] === null || coerced[field] === '') {
       coerced[field] = undefined;

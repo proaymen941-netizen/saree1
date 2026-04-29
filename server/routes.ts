@@ -381,8 +381,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           customerId
             ? (storage as any).getUserAddresses?.(customerId).catch(() => []) ?? Promise.resolve([])
             : Promise.resolve([]),
-          phone
-            ? storage.getOrdersByCustomer(phone).catch(() => [])
+          (phone || customerId)
+            ? storage.getOrdersByCustomer(phone || '', customerId as any).catch(() => [])
             : Promise.resolve([]),
           (storage as any).getNotifications?.('customer').catch(() => []) ?? Promise.resolve([]),
         ]);

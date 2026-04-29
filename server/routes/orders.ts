@@ -677,16 +677,17 @@ router.put("/:id", async (req, res) => {
 // جلب الطلبات حسب العميل
 router.get("/customer/:phone", async (req, res) => {
   try {
-    const phone = req.params.phone.trim().replace(/\s+/g, '');
-    
-    if (!phone) {
-      return res.status(400).json({ 
-        error: "رقم الهاتف مطلوب"
+    const phone = (req.params.phone || '').trim().replace(/\s+/g, '');
+    const customerId = (req.query.customerId as string) || undefined;
+
+    if (!phone && !customerId) {
+      return res.status(400).json({
+        error: "رقم الهاتف أو معرّف الحساب مطلوب"
       });
     }
-    
-    const customerOrders = await storage.getOrdersByCustomer(phone);
-    
+
+    const customerOrders = await storage.getOrdersByCustomer(phone, customerId);
+
     res.json(customerOrders);
   } catch (error) {
     console.error("خطأ في جلب طلبات العميل:", error);

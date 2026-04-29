@@ -517,9 +517,13 @@ export class DatabaseStorage {
     }
   }
 
-  async getOrdersByCustomer(phone: string): Promise<any[]> {
+  async getOrdersByCustomer(phone: string, customerId?: string): Promise<any[]> {
     try {
-      const cleanPhone = phone.trim().replace(/\s+/g, '');
+      const cleanPhone = (phone || '').trim().replace(/\s+/g, '');
+      // مطابقة برقم الهاتف (مع تجاهل المسافات) أو بمعرّف الحساب لضمان ظهور كل طلبات العميل
+      const matchClause = customerId
+        ? sql`(REPLACE(${orders.customerPhone}, ' ', '') = ${cleanPhone} OR ${orders.customerId} = ${customerId})`
+        : sql`REPLACE(${orders.customerPhone}, ' ', '') = ${cleanPhone}`;
       const result = await this.db.select({
         id: orders.id,
         orderNumber: orders.orderNumber,
@@ -557,7 +561,7 @@ export class DatabaseStorage {
       .from(orders)
       .leftJoin(restaurants, eq(orders.restaurantId, restaurants.id))
       .leftJoin(drivers, eq(orders.driverId, drivers.id))
-      .where(sql`REPLACE(${orders.customerPhone}, ' ', '') = ${cleanPhone}`)
+      .where(matchClause)
       .orderBy(desc(orders.createdAt));
       
       return Array.isArray(result) ? result : [];

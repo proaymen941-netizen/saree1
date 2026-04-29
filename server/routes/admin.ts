@@ -1701,49 +1701,55 @@ router.post("/special-offers", async (req, res) => {
     };
     
     console.log("Processed special offer data:", offerData);
-    
-    // ضمان وجود تصنيف "العروض" وربط العرض به تلقائياً
-    try {
-      const allCategories = await storage.getCategories();
-      let offersCategory = allCategories.find(c => c.name === 'العروض' || c.name === 'Offers');
-      
-      if (!offersCategory) {
-        offersCategory = await storage.createCategory({
-          name: 'العروض',
-          icon: 'fas fa-tags',
-          image: 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?q=80&w=400',
-          isActive: true,
-          sortOrder: -1, // جعلها تظهر في البداية
-          type: 'primary'
-        });
-      }
-      
-      if (!offerData.categoryId) {
-        offerData.categoryId = offersCategory.id;
-      }
-    } catch (catError) {
-      console.error('Error ensuring Offers category exists:', catError);
-    }
 
-    // إذا اختار المسؤول إنشاء قسم "العروض" تلقائياً للمتجر
-    if (offerData.restaurantId && (coercedData.autoCreateOffersSection || (!offerData.sectionId && coercedData.autoCreateOffersSection !== false))) {
+    // قواعد الربط:
+    //   - عرض خاص بمتجر (restaurantId محدد):
+    //       * لا يتم ربطه بالتصنيف العام "العروض"
+    //       * إذا لم يحدد المسؤول قسماً: ابحث عن قسم اسمه "العروض" داخل المتجر،
+    //         وإن لم يوجد فأنشئه تلقائياً واربط العرض به.
+    //   - عرض عام (بدون restaurantId):
+    //       * إذا لم يحدد تصنيفاً: تأكد من وجود تصنيف عام "العروض" واربط العرض به.
+    if (offerData.restaurantId) {
+      // عرض خاص بمتجر
+      offerData.categoryId = undefined; // لا تربط العروض الخاصة بمتجر بتصنيف عام
+      if (!offerData.sectionId) {
+        try {
+          const existingSections = await storage.getRestaurantSections(offerData.restaurantId);
+          let offersSection = existingSections.find((s: any) => s.name === 'العروض' || s.name === 'Offers');
+          if (!offersSection) {
+            offersSection = await storage.createRestaurantSection({
+              restaurantId: offerData.restaurantId,
+              name: 'العروض',
+              description: 'العروض الخاصة لهذا المتجر',
+              sortOrder: -1,
+              isActive: true,
+            } as any);
+          }
+          if (offersSection) offerData.sectionId = offersSection.id;
+        } catch (secErr) {
+          console.error('Error ensuring offers section for store:', secErr);
+        }
+      }
+    } else {
+      // عرض عام (شركة بكاملها) - تأكد من وجود التصنيف العام "العروض"
       try {
-        const existingSections = await storage.getRestaurantSections(offerData.restaurantId);
-        let offersSection = existingSections.find((s: any) => s.name === 'العروض' || s.name === 'Offers');
-        if (!offersSection && coercedData.autoCreateOffersSection) {
-          offersSection = await storage.createRestaurantSection({
-            restaurantId: offerData.restaurantId,
+        const allCategories = await storage.getCategories();
+        let offersCategory = allCategories.find(c => c.name === 'العروض' || c.name === 'Offers');
+        if (!offersCategory) {
+          offersCategory = await storage.createCategory({
             name: 'العروض',
-            description: 'العروض الخاصة لهذا المتجر',
-            sortOrder: -1,
+            icon: 'fas fa-tags',
+            image: 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?q=80&w=400',
             isActive: true,
-          } as any);
+            sortOrder: -1,
+            type: 'primary'
+          });
         }
-        if (!offerData.sectionId && offersSection) {
-          offerData.sectionId = offersSection.id;
+        if (!offerData.categoryId && offersCategory) {
+          offerData.categoryId = offersCategory.id;
         }
-      } catch (secErr) {
-        console.error('Error ensuring offers section for store:', secErr);
+      } catch (catError) {
+        console.error('Error ensuring Offers category exists:', catError);
       }
     }
 
