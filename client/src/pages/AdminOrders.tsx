@@ -450,7 +450,7 @@ export default function AdminOrders() {
                           <div>
                             <CardTitle className="text-lg">طلب #{order.orderNumber || order.id.slice(0,8)}</CardTitle>
                             <p className="text-sm text-muted-foreground">
-                              {formatDate(order.createdAt)}
+                              {formatDate(order.createdAt)} - {new Date(order.createdAt).toLocaleTimeString('ar-YE', { hour: '2-digit', minute: '2-digit' })}
                             </p>
                           </div>
                         </div>

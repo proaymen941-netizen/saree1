@@ -179,7 +179,7 @@ export default function AvailableOrdersPage({ driverId, onSelectOrder, onOrderAc
                     <div>
                       <p className="font-bold text-lg">طلب #{order.orderNumber}</p>
                       <p className="text-sm font-semibold text-primary">{order.restaurantName || 'مطعم'}</p>
-                      <p className="text-xs text-gray-500">{formatDate(order.createdAt)}</p>
+                      <p className="text-xs text-gray-500">{formatDate(order.createdAt)} - {new Date(order.createdAt).toLocaleTimeString('ar-YE', { hour: '2-digit', minute: '2-digit' })}</p>
                     </div>
                     <Badge variant="outline" className="bg-blue-50 text-blue-700">مُعين لك</Badge>
                   </div>

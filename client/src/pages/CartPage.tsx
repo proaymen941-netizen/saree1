@@ -17,12 +17,14 @@ import { getAppStatus, getRestaurantStatus } from '@/utils/restaurantHours';
 import { formatCurrency } from '@/lib/utils';
 import AppClosedOverlay from '@/components/AppClosedOverlay';
 import ScheduledOrderDialog from '@/components/ScheduledOrderDialog';
+import { useAuth } from '@/context/AuthContext';
 
 export default function CartPage() {
   const [, setLocation] = useLocation();
   const { state, removeItem, updateQuantity, clearCart, setDeliveryFee } = useCart();
   const { items, subtotal, total, deliveryFee } = state;
   const { toast } = useToast();
+  const { user } = useAuth();
   const { location: userLocation, getCurrentLocation } = useCoordinates();
   const [calculatingFee, setCalculatingFee] = useState(false);
   const [deliveryInfo, setDeliveryInfo] = useState<{
@@ -220,6 +222,18 @@ export default function CartPage() {
     paymentMethod: availablePaymentMethods[0]?.value || 'cash',
   });
 
+  // ملء الحقول تلقائياً ببيانات العميل المسجل لضمان وصول الإشعارات والتتبع
+  useEffect(() => {
+    if (user) {
+      setOrderForm(prev => ({
+        ...prev,
+        customerName: prev.customerName || user.name || '',
+        customerPhone: prev.customerPhone || user.phone || '',
+        customerEmail: prev.customerEmail || (user as any).email || '',
+      }));
+    }
+  }, [user]);
+
   // تحديث طريقة الدفع الافتراضية عند تغيّر القائمة المتاحة
   useEffect(() => {
     if (availablePaymentMethods.length > 0) {
@@ -293,11 +307,14 @@ export default function CartPage() {
       return;
     }
 
-    const orderData: InsertOrder = {
+    const orderData: InsertOrder & { customerId?: string } = {
       orderNumber: `ORD${Date.now()}`,
       customerName: orderForm.customerName,
-      customerPhone: orderForm.customerPhone,
+      // استخدم رقم هاتف الحساب المسجّل عند توفره لضمان تطابق المُعرّف مع الإشعارات والتتبع
+      customerPhone: (user?.phone || orderForm.customerPhone).trim(),
       customerEmail: orderForm.customerEmail || undefined,
+      // تمرير معرّف الحساب لربط الطلب والإشعارات بحساب العميل المسجّل
+      customerId: user?.id || undefined,
       deliveryAddress: orderForm.deliveryAddress,
       notes: orderForm.notes || undefined,
       paymentMethod: orderForm.paymentMethod,
@@ -315,6 +332,11 @@ export default function CartPage() {
         : undefined,
       status: 'pending',
     };
+
+    // حفظ رقم الهاتف لاسترجاع الطلبات لاحقاً (للزوار وللعملاء معاً)
+    if (orderData.customerPhone) {
+      try { localStorage.setItem('customer_phone', orderData.customerPhone); } catch (_) {}
+    }
 
     placeOrderMutation.mutate(orderData);
   };

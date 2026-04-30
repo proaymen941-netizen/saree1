@@ -12,7 +12,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
-import type { SpecialOffer, Restaurant, Category } from '@shared/schema';
+import type { SpecialOffer, Restaurant, Category, RestaurantSection } from '@shared/schema';
 import {
   Select,
   SelectContent,
@@ -33,11 +33,13 @@ export default function AdminOffers() {
     image: '',
     discountPercent: '',
     discountAmount: '',
-    minimumOrder: '0',
+    minimumOrder: '',
     validUntil: '',
     isActive: true,
     restaurantId: '',
     categoryId: '',
+    sectionId: '',
+    autoCreateOffersSection: true,
   });
 
   const { data: offers, isLoading } = useQuery<SpecialOffer[]>({
@@ -55,16 +57,30 @@ export default function AdminOffers() {
   const restaurants = restaurantsResponse?.restaurants || [];
   const categories = categoriesData || [];
 
+  // أقسام المتجر المختار (تُحمّل تلقائياً عند اختيار متجر)
+  const { data: storeSections = [] } = useQuery<RestaurantSection[]>({
+    queryKey: ['/api/restaurants', formData.restaurantId, 'sections'],
+    queryFn: async () => {
+      if (!formData.restaurantId) return [];
+      const res = await fetch(`/api/restaurants/${formData.restaurantId}/sections`);
+      if (!res.ok) return [];
+      return res.json();
+    },
+    enabled: !!formData.restaurantId,
+  });
+
   const createOfferMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
       const submitData = {
         ...data,
         discountPercent: data.discountPercent ? parseInt(data.discountPercent) : null,
         discountAmount: data.discountAmount ? parseFloat(data.discountAmount) : null,
-        minimumOrder: parseFloat(data.minimumOrder),
+        minimumOrder: data.minimumOrder ? parseFloat(data.minimumOrder) : null,
         validUntil: data.validUntil ? new Date(data.validUntil).toISOString() : null,
         restaurantId: data.restaurantId || null,
         categoryId: data.categoryId || null,
+        sectionId: data.sectionId || null,
+        autoCreateOffersSection: data.autoCreateOffersSection,
       };
       const response = await apiRequest('POST', '/api/admin/special-offers', submitData);
       if (!response.ok) {
@@ -97,10 +113,11 @@ export default function AdminOffers() {
         ...data,
         discountPercent: data.discountPercent ? parseInt(data.discountPercent) : null,
         discountAmount: data.discountAmount ? parseFloat(data.discountAmount) : null,
-        minimumOrder: parseFloat(data.minimumOrder),
+        minimumOrder: data.minimumOrder ? parseFloat(data.minimumOrder) : null,
         validUntil: data.validUntil ? new Date(data.validUntil).toISOString() : null,
         restaurantId: data.restaurantId || null,
         categoryId: data.categoryId || null,
+        sectionId: data.sectionId || null,
       };
       const response = await apiRequest('PUT', `/api/admin/special-offers/${id}`, submitData);
       if (!response.ok) {
@@ -154,39 +171,22 @@ export default function AdminOffers() {
   });
 
   const resetForm = () => {
-    // Find Tamtoom Store and Offers Category to set as defaults
-    const tamtoomStore = restaurants.find(r => r.name.includes('واصل'));
-    const offersCategory = categories.find(c => c.name.includes('عرض') || c.name.includes('العروض'));
-
     setFormData({
       title: '',
       description: '',
       image: '',
       discountPercent: '',
       discountAmount: '',
-      minimumOrder: '0',
+      minimumOrder: '',
       validUntil: '',
       isActive: true,
-      restaurantId: tamtoomStore?.id || '',
-      categoryId: offersCategory?.id || '',
+      restaurantId: '',
+      categoryId: '',
+      sectionId: '',
+      autoCreateOffersSection: true,
     });
     setEditingOffer(null);
   };
-
-  // Set defaults when data loads for the first time
-  useEffect(() => {
-    if (restaurants.length > 0 && categories.length > 0 && !editingOffer) {
-      const tamtoomStore = restaurants.find(r => r.name.includes('واصل'));
-      const offersCategory = categories.find(c => c.name.includes('عرض') || c.name.includes('العروض'));
-      if (tamtoomStore || offersCategory) {
-        setFormData(prev => ({
-          ...prev,
-          restaurantId: prev.restaurantId || tamtoomStore?.id || '',
-          categoryId: prev.categoryId || offersCategory?.id || '',
-        }));
-      }
-    }
-  }, [restaurants, categories, editingOffer]);
 
   const handleEdit = (offer: SpecialOffer) => {
     setEditingOffer(offer);
@@ -196,18 +196,20 @@ export default function AdminOffers() {
       image: offer.image,
       discountPercent: offer.discountPercent?.toString() || '',
       discountAmount: offer.discountAmount || '',
-      minimumOrder: offer.minimumOrder || '0',
+      minimumOrder: offer.minimumOrder || '',
       validUntil: offer.validUntil ? new Date(offer.validUntil).toISOString().slice(0, 16) : '',
       isActive: offer.isActive,
       restaurantId: offer.restaurantId || '',
       categoryId: offer.categoryId || '',
+      sectionId: (offer as any).sectionId || '',
+      autoCreateOffersSection: false,
     });
     setIsDialogOpen(true);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.title.trim() || !formData.description.trim()) {
       toast({
         title: "خطأ",
@@ -217,10 +219,10 @@ export default function AdminOffers() {
       return;
     }
 
-    if (!formData.discountPercent && !formData.discountAmount) {
+    if (!formData.image.trim()) {
       toast({
         title: "خطأ",
-        description: "يرجى إدخال نسبة الخصم أو مبلغ الخصم",
+        description: "يرجى إضافة صورة للعرض",
         variant: "destructive",
       });
       return;
@@ -305,46 +307,101 @@ export default function AdminOffers() {
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="restaurantId">المتجر المرتبط (اختياري)</Label>
-                  <Select
-                    value={formData.restaurantId || "none"}
-                    onValueChange={(value) => setFormData(prev => ({ ...prev, restaurantId: value === "none" ? "" : value }))}
-                  >
-                    <SelectTrigger id="restaurantId">
-                      <SelectValue placeholder="اختر متجراً" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="none">عرض عام (لكل المتاجر)</SelectItem>
-                      {restaurants.map((restaurant) => (
-                        <SelectItem key={restaurant.id} value={restaurant.id}>
-                          {restaurant.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+              {/* الخطوة 1: اختيار نطاق العرض - متجر معيّن أو الشركة بأكملها */}
+              <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 space-y-3">
+                <Label htmlFor="restaurantId" className="font-bold text-primary flex items-center gap-1">
+                  <Store className="h-4 w-4" />
+                  نطاق العرض - اختر المتجر أولاً
+                </Label>
+                <Select
+                  value={formData.restaurantId || "none"}
+                  onValueChange={(value) => setFormData(prev => ({
+                    ...prev,
+                    restaurantId: value === "none" ? "" : value,
+                    sectionId: '', // إعادة تعيين القسم عند تغيير المتجر
+                    categoryId: '', // إعادة تعيين التصنيف
+                  }))}
+                >
+                  <SelectTrigger id="restaurantId">
+                    <SelectValue placeholder="اختر متجراً أو اتركه عرضاً عاماً للشركة" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">عرض عام لكامل التطبيق (شركة بكاملها)</SelectItem>
+                    {restaurants.map((restaurant) => (
+                      <SelectItem key={restaurant.id} value={restaurant.id}>
+                        {restaurant.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
 
-                <div>
-                  <Label htmlFor="categoryId">التصنيف/القسم (اختياري)</Label>
-                  <Select
-                    value={formData.categoryId || "none"}
-                    onValueChange={(value) => setFormData(prev => ({ ...prev, categoryId: value === "none" ? "" : value }))}
-                  >
-                    <SelectTrigger id="categoryId">
-                      <SelectValue placeholder="اختر تصنيفاً" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="none">عرض عام (لكل التصنيفات)</SelectItem>
-                      {categories.map((category) => (
-                        <SelectItem key={category.id} value={category.id}>
-                          {category.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+                {/* عرض خاص بمتجر: اختيار قسم داخل المتجر */}
+                {formData.restaurantId && (
+                  <div className="space-y-3 pt-2 border-t border-primary/10">
+                    <div>
+                      <Label htmlFor="sectionId" className="text-sm font-semibold">قسم داخل المتجر (اختياري)</Label>
+                      <Select
+                        value={formData.sectionId || "none"}
+                        onValueChange={(value) => setFormData(prev => ({ ...prev, sectionId: value === "none" ? "" : value }))}
+                      >
+                        <SelectTrigger id="sectionId">
+                          <SelectValue placeholder={storeSections.length ? "اختر قسماً من المتجر" : "لا توجد أقسام لهذا المتجر بعد"} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">— لم أُحدد قسماً —</SelectItem>
+                          {storeSections.map((section) => (
+                            <SelectItem key={section.id} value={section.id}>
+                              {section.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    {!formData.sectionId && (
+                      <div className="flex items-center justify-between bg-white border rounded-lg px-3 py-2">
+                        <div className="flex-1">
+                          <Label htmlFor="autoCreateOffersSection" className="text-sm font-semibold cursor-pointer">
+                            إنشاء قسم "العروض" تلقائياً داخل هذا المتجر
+                          </Label>
+                          <p className="text-xs text-muted-foreground mt-0.5">
+                            إذا لم يكن موجوداً سيتم إنشاؤه ووضع العرض فيه
+                          </p>
+                        </div>
+                        <Switch
+                          id="autoCreateOffersSection"
+                          checked={formData.autoCreateOffersSection}
+                          onCheckedChange={(checked) => setFormData(prev => ({ ...prev, autoCreateOffersSection: checked }))}
+                        />
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* عرض عام: اختيار تصنيف عام (اختياري) */}
+                {!formData.restaurantId && (
+                  <div className="pt-2 border-t border-primary/10">
+                    <Label htmlFor="categoryId" className="text-sm font-semibold">التصنيف العام (اختياري)</Label>
+                    <Select
+                      value={formData.categoryId || "none"}
+                      onValueChange={(value) => setFormData(prev => ({ ...prev, categoryId: value === "none" ? "" : value }))}
+                    >
+                      <SelectTrigger id="categoryId">
+                        <SelectValue placeholder="اختر تصنيفاً" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">— تصنيف "العروض" تلقائياً —</SelectItem>
+                        {categories.map((category) => (
+                          <SelectItem key={category.id} value={category.id}>
+                            {category.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      إن لم تختر تصنيفاً، سيتم وضع العرض في تصنيف "العروض" العام تلقائياً.
+                    </p>
+                  </div>
+                )}
               </div>
 
               <div>

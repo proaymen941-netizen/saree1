@@ -75,13 +75,17 @@ export default function OrdersPage() {
   const [customCancelReason, setCustomCancelReason] = useState('');
 
   const customerPhone = user?.phone || localStorage.getItem('customer_phone');
+  const customerId = user?.id || '';
 
   const { data: orders = [], isLoading, error } = useQuery<Order[]>({
-    queryKey: ['orders', customerPhone],
-    enabled: !!customerPhone,
+    queryKey: ['orders', customerPhone, customerId],
+    enabled: !!(customerPhone || customerId),
     queryFn: async () => {
+      // تمرير معرّف الحساب أيضاً لضمان جلب طلبات العميل حتى لو اختلف الهاتف المُدخل
+      const cidParam = customerId ? `?customerId=${encodeURIComponent(customerId)}` : '';
+      const phoneParam = encodeURIComponent(customerPhone || '');
       const [ordersRes, wasalniRes] = await Promise.all([
-        fetch(`/api/orders/customer/${customerPhone}`),
+        fetch(`/api/orders/customer/${phoneParam}${cidParam}`),
         fetch(`/api/wasalni?phone=${encodeURIComponent(customerPhone || '')}`),
       ]);
       if (!ordersRes.ok) {
@@ -474,7 +478,9 @@ export default function OrdersPage() {
                           <span>المجموع: {formatCurrency(order.totalAmount)}</span>
                         </div>
                         <div className="flex justify-between text-xs text-gray-500">
-                          <span>تاريخ الطلب: {formatDate(order.createdAt)}</span>
+                          <span>
+                            تاريخ الطلب: {formatDate(order.createdAt)} - {new Date(order.createdAt).toLocaleTimeString('ar-YE', { hour: '2-digit', minute: '2-digit' })}
+                          </span>
                           {order.estimatedTime && (
                             <span>الوقت المتوقع: {order.estimatedTime}</span>
                           )}

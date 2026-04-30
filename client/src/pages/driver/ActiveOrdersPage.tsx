@@ -195,7 +195,7 @@ export default function ActiveOrdersPage({ driverId, onSelectOrder }: ActiveOrde
                     <div>
                       <p className="font-bold text-lg">طلب #{order.orderNumber}</p>
                       <p className="text-sm text-gray-600">{order.customerName}</p>
-                      <p className="text-xs text-gray-400">{formatDate(order.createdAt)}</p>
+                      <p className="text-xs text-gray-400">{formatDate(order.createdAt)} - {new Date(order.createdAt).toLocaleTimeString('ar-YE', { hour: '2-digit', minute: '2-digit' })}</p>
                     </div>
                     <Badge className={getStatusColor(order.status)}>{getStatusText(order.status)}</Badge>
                   </div>
