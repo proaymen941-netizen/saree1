@@ -99,10 +99,13 @@ export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       queryFn: getQueryFn({ on401: "throw" }),
-      refetchInterval: false,       // Disable auto-refetch by default (use WebSockets instead)
-      refetchOnWindowFocus: false,  // Disable refetch on window focus to reduce requests
-      staleTime: 60 * 1000,         // 1 minute cache for most data
-      gcTime: 5 * 60 * 1000,        // Keep in cache for 5 minutes
+      refetchInterval: false,         // Disable auto-refetch by default (use WebSockets instead)
+      refetchOnWindowFocus: false,    // Disable refetch on window focus to reduce requests
+      // عرض الكاش فوراً عند العودة للصفحة (لا وميض). إذا كانت البيانات قديمة سيُجدّدها react-query بصمت في الخلفية.
+      refetchOnMount: 'always',
+      staleTime: 2 * 60 * 1000,       // 2 minutes — most data is read-heavy and updated via WebSockets
+      gcTime: 60 * 60 * 1000,         // Keep in cache for 1 hour to prevent data disappearing on navigation between pages
+      placeholderData: (prev: any) => prev, // أبقِ البيانات السابقة معروضة حتى تكتمل عملية التحديث الجديدة
       retry: (failureCount, error: any) => {
         if (error?.message?.includes('401') || error?.message?.includes('403') || error?.message?.includes('500')) {
           return false;
