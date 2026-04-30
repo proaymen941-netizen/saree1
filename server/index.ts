@@ -267,13 +267,74 @@ app.use((req, res, next) => {
           const twoDaysAgo = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000);
 
           // ---- 1) حذف الإشعارات الأقدم من 24 ساعة ----
+          // (نستثني إشعارات تحذير حذف التتبع حتى يراها العميل قبل الحذف)
           try {
             const deletedNotifs = await db
               .delete(schema.notifications)
-              .where(lt(schema.notifications.createdAt, oneDayAgo))
+              .where(and(
+                lt(schema.notifications.createdAt, oneDayAgo),
+                sql`${schema.notifications.type} <> 'order_tracking_deletion_warning'`,
+              ))
               .returning({ id: schema.notifications.id });
             if (deletedNotifs?.length) log(`🧹 تم حذف ${deletedNotifs.length} إشعاراً قديماً (>24 ساعة)`);
           } catch (e) { console.error('خطأ في حذف الإشعارات القديمة:', e); }
+
+          // ---- 1.5) إرسال تحذير حذف التتبع للعملاء المسجلين قبل 24 ساعة من الحذف ----
+          // الطلبات المنتهية للعملاء المسجلين (customerId IS NOT NULL) التي مر عليها بين 23 و 25 ساعة
+          // ولم يُرسل لها تحذير من قبل.
+          try {
+            const TERMINAL = ['delivered', 'cancelled', 'refunded', 'rejected', 'completed'];
+            const twentyThreeHoursAgo = new Date(Date.now() - 23 * 60 * 60 * 1000);
+            const twentyFiveHoursAgo = new Date(Date.now() - 25 * 60 * 60 * 1000);
+
+            const candidateOrders = await db
+              .select({
+                id: schema.orders.id,
+                orderNumber: schema.orders.orderNumber,
+                customerId: schema.orders.customerId,
+                customerPhone: schema.orders.customerPhone,
+              })
+              .from(schema.orders)
+              .where(and(
+                inArray(schema.orders.status, TERMINAL),
+                lt(schema.orders.createdAt, twentyThreeHoursAgo),
+                sql`${schema.orders.createdAt} > ${twentyFiveHoursAgo}`,
+                sql`${schema.orders.customerId} IS NOT NULL`,
+              ));
+
+            for (const order of candidateOrders) {
+              try {
+                // تحقق من عدم إرسال تحذير سابق لنفس الطلب
+                const existing = await db
+                  .select({ id: schema.notifications.id })
+                  .from(schema.notifications)
+                  .where(and(
+                    eq(schema.notifications.orderId, order.id),
+                    eq(schema.notifications.type, 'order_tracking_deletion_warning'),
+                  ))
+                  .limit(1);
+                if (existing.length > 0) continue;
+
+                const recipients = Array.from(new Set([order.customerId, order.customerPhone].filter(Boolean))) as string[];
+                for (const rid of recipients) {
+                  await storage.createNotification({
+                    type: 'order_tracking_deletion_warning',
+                    title: '🗑️ تنبيه: سيتم حذف بيانات تتبع طلبك',
+                    message: `سيتم حذف بيانات تتبع طلبك رقم ${order.orderNumber} خلال 24 ساعة. يرجى الاحتفاظ بأي معلومات مهمة قبل ذلك.`,
+                    recipientType: 'customer',
+                    recipientId: rid,
+                    orderId: order.id,
+                    isRead: false,
+                  });
+                }
+              } catch (e) {
+                console.error(`خطأ في إرسال تحذير حذف التتبع للطلب ${order.id}:`, e);
+              }
+            }
+            if (candidateOrders.length > 0) {
+              log(`📨 تم فحص ${candidateOrders.length} طلباً لتحذيرات حذف التتبع`);
+            }
+          } catch (e) { console.error('خطأ في إرسال تحذيرات حذف التتبع:', e); }
 
           // ---- 2) حذف الطلبات المنتهية الأقدم من يومين (وكل سجلاتها المرتبطة) ----
           try {

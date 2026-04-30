@@ -12,6 +12,7 @@ import {
   geoZones, deliveryRules, deliveryDiscounts,
   messages, auditLogs, paymentGateways,
   paymentMethods, paymentMethodDocuments, coupons, couponUsages, restaurantWallets, wasalniRequests,
+  driverReviews, walletTransactions, loyaltyTransactions, supportTickets,
   type AdminUser, type InsertAdminUser,
   type Category, type InsertCategory,
   type Restaurant, type InsertRestaurant,
@@ -2196,9 +2197,64 @@ async getNotifications(recipientType?: string, recipientId?: string, unread?: bo
         createdByType: 'system'
       });
 
+      // 5. حذف فوري لبيانات الزائر (طلبات بدون حساب) فور التسليم:
+      // الزائر = customerId IS NULL. نحذف الإشعارات والتتبع والطلب نفسه.
+      // العميل المسجل: تُحذف بياناته بعد يومين عبر مهمة التنظيف الدورية.
+      if (!order.customerId) {
+        try {
+          // إعطاء فرصة قصيرة للواجهة لتظهر "تم التسليم" قبل الحذف
+          setTimeout(() => {
+            this.deleteOrderAndAssociated(order.id).catch((err) => {
+              console.error('فشل حذف بيانات طلب الزائر بعد التسليم:', err);
+            });
+          }, 15 * 1000);
+        } catch (e) {
+          console.error('خطأ في جدولة حذف بيانات طلب الزائر:', e);
+        }
+      }
+
       return updatedOrder;
     } catch (error) {
       console.error('Error completing order:', error);
+      throw error;
+    }
+  }
+
+  // حذف طلب وكافة سجلاته التابعة + إشعاراته (يستخدم لطلبات الزوار فور التسليم
+  // ولمهمة التنظيف الدورية للطلبات المنتهية الأقدم من يومين).
+  async deleteOrderAndAssociated(orderId: string): Promise<void> {
+    try {
+      const childTables: any[] = [
+        orderTracking,
+        ratings,
+        driverReviews,
+        driverCommissions,
+        walletTransactions,
+        loyaltyTransactions,
+        supportTickets,
+        messages,
+        couponUsages,
+      ].filter(Boolean);
+
+      for (const tbl of childTables) {
+        try {
+          await this.db.delete(tbl).where(eq((tbl as any).orderId, orderId));
+        } catch (e) {
+          console.error(`خطأ في حذف سجلات تابعة من جدول ${(tbl as any)[Symbol.for('drizzle:Name')] || ''}:`, e);
+        }
+      }
+
+      try {
+        await this.db.delete(notifications).where(eq(notifications.orderId, orderId));
+      } catch (_) {}
+
+      try {
+        await this.db.delete(orders).where(eq(orders.id, orderId));
+      } catch (e) {
+        console.error('فشل حذف الطلب:', e);
+      }
+    } catch (error) {
+      console.error('Error deleting order and associated data:', error);
       throw error;
     }
   }

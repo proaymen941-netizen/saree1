@@ -1,6 +1,7 @@
 import express from "express";
 import { storage } from "../storage.js";
-import { wasalniRequests, insertWasalniRequestSchema } from "../../shared/schema.js";
+import { wasalniRequests, insertWasalniRequestSchema, notifications } from "../../shared/schema.js";
+import { eq } from "drizzle-orm";
 import { randomUUID } from "crypto";
 
 const router = express.Router();
@@ -263,6 +264,25 @@ router.put("/:id", async (req, res) => {
           } catch (notifyErr) {
             console.error("⚠️ فشل إنشاء إشعار العميل لتحديث وصل لي (تم تجاهله):", notifyErr);
           }
+        }
+      }
+
+      // حذف فوري لطلبات وصل لي للزوار (customerId IS NULL) فور التسليم
+      if (status === 'delivered' && !updated.customerId) {
+        try {
+          const dbInstance = (storage as any).db;
+          setTimeout(async () => {
+            try {
+              await dbInstance.delete(notifications).where(eq(notifications.orderId, updated.id));
+            } catch (_) {}
+            try {
+              await dbInstance.delete(wasalniRequests).where(eq(wasalniRequests.id, updated.id));
+            } catch (e) {
+              console.error('فشل حذف طلب وصل لي للزائر:', e);
+            }
+          }, 15 * 1000);
+        } catch (e) {
+          console.error('خطأ في جدولة حذف طلب وصل لي للزائر:', e);
         }
       }
     }

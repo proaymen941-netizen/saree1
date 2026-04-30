@@ -39,6 +39,13 @@ A comprehensive food delivery system supporting three user roles: Customers, Dri
 4. Set `VITE_GOOGLE_CLIENT_ID` environment variable with your client ID
 5. The Google Sign-In button in `/auth` will automatically activate
 
+## Session 3: Guest/Auth Cleanup, Login Fix, HomePage Cache
+- **Login bug fix** (`server/routes/auth.ts`): Login identifier and registration username/phone/email are now trimmed of whitespace and Arabic-Indic digits are converted to Latin. Login matches against both raw and whitespace-stripped forms.
+- **Guest order auto-deletion** (`server/db.ts`): Added `deleteOrderAndAssociated(orderId)` helper. In `completeOrder`, when an order has `customerId IS NULL` (guest), the order, its tracking, ratings, driver reviews/commissions, wallet/loyalty transactions, support tickets, messages, coupon usages, and notifications are deleted ~15 seconds after delivery (giving the UI a moment to show "delivered").
+- **Guest wasalni auto-deletion** (`server/routes/wasalni.ts`): Same immediate-delete behavior applied to wasalni requests when `status='delivered'` and `customerId IS NULL`.
+- **Logged-in tracking deletion warning** (`server/index.ts`): Hourly cleanup now sends a `order_tracking_deletion_warning` notification to logged-in customers (`customerId IS NOT NULL`) ~24h after a terminal order, exactly 1 day before the existing 2-day cleanup deletes the order. Idempotent: skips if a warning was already sent. The warning notification is excluded from the 24h notification cleanup so the customer can see it before the order itself is deleted at +48h.
+- **HomePage data persistence** (`client/src/lib/queryClient.ts`): Bumped `gcTime` from 5min → 1hr so cached query data isn't garbage-collected after the user navigates to Profile/Orders and stays there. Added `placeholderData: (prev) => prev` to keep stale data visible during background refetch (no more empty/flicker when returning to HomePage).
+
 ## Recent Fixes Applied (Comprehensive Audit)
 - Fixed `eq import` error in `server/index.ts` scheduled orders timer
 - Fixed admin/driver login routing in `AuthContext.tsx` and `LoginPage.tsx`

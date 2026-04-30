@@ -64,26 +64,41 @@ async function upgradePasswordIfNeeded(
 // تسجيل الدخول للعملاء
 router.post('/login', async (req, res) => {
   try {
-    const { identifier, password } = req.body;
+    const rawIdentifier = req.body?.identifier;
+    const rawPassword = req.body?.password;
 
-    if (!identifier || !password) {
+    if (!rawIdentifier || !rawPassword) {
       return res.status(400).json({
         success: false,
         message: 'اسم المستخدم/الهاتف وكلمة المرور مطلوبان'
       });
     }
 
+    // تطبيع المدخلات: إزالة الفراغات الزائدة وتحويل الأرقام العربية إلى لاتينية
+    const arabicToLatinDigits = (s: string) =>
+      s.replace(/[\u0660-\u0669]/g, (d) => String(d.charCodeAt(0) - 0x0660))
+       .replace(/[\u06F0-\u06F9]/g, (d) => String(d.charCodeAt(0) - 0x06F0));
+
+    const identifier = arabicToLatinDigits(String(rawIdentifier).trim());
+    const password = String(rawPassword);
+    const identifierNoSpaces = identifier.replace(/\s+/g, '');
+    const identifierLower = identifier.toLowerCase();
+
     console.log('🔐 محاولة تسجيل دخول عميل:', identifier);
 
     // البحث عن العميل في قاعدة البيانات (باسم المستخدم أو الهاتف أو البريد)
+    // ندعم: المطابقة مع الفراغات أو بدونها، وحالة الأحرف للبريد
     const userResult = await dbStorage.db
       .select()
       .from(users)
       .where(
         or(
           eq(users.username, identifier),
+          eq(users.username, identifierNoSpaces),
           eq(users.phone, identifier),
-          eq(users.email, identifier)
+          eq(users.phone, identifierNoSpaces),
+          eq(users.email, identifier),
+          eq(users.email, identifierLower)
         )
       )
       .limit(1);
@@ -244,14 +259,32 @@ router.post('/validate', async (req, res) => {
 router.post('/register', async (req, res) => {
   try {
     const validatedData = insertUserSchema.parse(req.body);
-    
+
+    // تطبيع المدخلات: إزالة الفراغات الزائدة من اسم المستخدم/الهاتف/البريد
+    const arabicToLatinDigits = (s: string) =>
+      s.replace(/[\u0660-\u0669]/g, (d) => String(d.charCodeAt(0) - 0x0660))
+       .replace(/[\u06F0-\u06F9]/g, (d) => String(d.charCodeAt(0) - 0x06F0));
+
+    if (validatedData.username) {
+      validatedData.username = arabicToLatinDigits(String(validatedData.username).trim()).replace(/\s+/g, '');
+    }
+    if (validatedData.phone) {
+      validatedData.phone = arabicToLatinDigits(String(validatedData.phone).trim()).replace(/\s+/g, '');
+    }
+    if (validatedData.email) {
+      validatedData.email = String(validatedData.email).trim().toLowerCase();
+    }
+    if (validatedData.name) {
+      validatedData.name = String(validatedData.name).trim();
+    }
+
     // التحقق من وجود المستخدم مسبقاً
     const existingUser = await dbStorage.db
       .select()
       .from(users)
       .where(
         or(
-          eq(users.username, validatedData.username),
+          validatedData.username ? eq(users.username, validatedData.username) : undefined,
           validatedData.phone ? eq(users.phone, validatedData.phone) : undefined
         )
       )
